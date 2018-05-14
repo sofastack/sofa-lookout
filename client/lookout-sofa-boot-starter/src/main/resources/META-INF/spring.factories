@@ -1,0 +1,8 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.alipay.lookout.starter.autoConfiguration.LookoutAutoConfiguration
+
+
+# Initializers
+org.springframework.context.ApplicationContextInitializer=\
+com.alipay.lookout.starter.support.LookoutApplicationContextInitializer

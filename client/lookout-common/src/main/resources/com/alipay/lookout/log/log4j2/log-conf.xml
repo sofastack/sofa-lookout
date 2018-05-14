@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+
+    <Properties>
+        <!-- 将系统属性进行一次本地转换 -->
+        <Property name="LOOKOUT_LOG_LEVEL">${sys:logging.level.com.alipay.lookout}</Property>
+        <Property name="LOOKOUT_LOG_PATH">${sys:logging.path}</Property>
+        <Property name="LOOKOUT_FILE_ENCODING">${sys:file.encoding}</Property>
+    </Properties>
+
+    <appenders>
+
+        <RollingFile name="ERROR-APPENDER" fileName="${LOOKOUT_LOG_PATH}/lookout/common-error.log" append="true"
+                     filePattern="${LOOKOUT_LOG_PATH}/lookout/common-error-%d{yyyy-MM-dd}.log">
+            <!-- only print error log -->
+            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="${LOOKOUT_FILE_ENCODING}">
+                <pattern>%d %-5p %-32t - %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- 按天分日志文件:重要的是 filePattern 配置到按照天 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="ROOT-APPENDER" fileName="${LOOKOUT_LOG_PATH}/lookout/common-default.log" append="true"
+                     filePattern="${LOOKOUT_LOG_PATH}/lookout/common-default-%d{yyyy-MM-dd}.log">
+            <ThresholdFilter level="${LOOKOUT_LOG_LEVEL}" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="${LOOKOUT_FILE_ENCODING}">
+                <pattern>%d %-5p %-32t - %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- 按天分日志文件:重要的是 filePattern 配置到按照天 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="ANTEVENTCONTEXT-APPENDER" fileName="${LOOKOUT_LOG_PATH}/lookout/ant-biz-stat.log" append="true"
+                     filePattern="${LOOKOUT_LOG_PATH}/lookout/ant-biz-stat-%d{yyyy-MM-dd}.log">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="${LOOKOUT_FILE_ENCODING}">
+                <pattern>%d %-5p %-32t - %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- 按天分日志文件:重要的是 filePattern 配置到按照天 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+
+    </appenders>
+
+    <loggers>
+        <root level="${LOOKOUT_LOG_LEVEL}">
+            <appender-ref ref="ROOT-APPENDER"/>
+            <appender-ref ref="ERROR-APPENDER"/>
+        </root>
+
+        <logger name="ANTEVENTCONTEXT-LOG" value="INFO" additivity="false">
+            <appender-ref ref="ANTEVENTCONTEXT-APPENDER"/>
+            <appender-ref ref="ERROR-APPENDER" />
+        </logger>
+    </loggers>
+</configuration>
