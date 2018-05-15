@@ -6,6 +6,9 @@
     <artifactId>lookout-parent</artifactId>
     <version>1.4.0</version>
     <packaging>pom</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>

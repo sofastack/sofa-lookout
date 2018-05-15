@@ -1,4 +1,7 @@
 # SOFALookout
+
+[![Coverage Status](https://coveralls.io/repos/github/alipay/sofa-lookout/badge.svg?branch=master)](https://coveralls.io/github/alipay/sofa-lookout?branch=master)
+
 [English Document](./README_EN.md)
 
 访问 [WIKI](https://github.com/alipay/sofa-lookout/wiki) 查看完整的文档使用指南。
