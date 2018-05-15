@@ -7,6 +7,9 @@
     <artifactId>lookout-client-parent</artifactId>
     <version>1.4.0</version>
     <packaging>pom</packaging>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>It is a library which allows you to instrument your app with custom metrics</description>
+    <url>https://github.com/sofastack/sofa-lookout</url>
 
     <properties>
         <project.encoding>UTF-8</project.encoding>
