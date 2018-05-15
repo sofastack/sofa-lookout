@@ -16,23 +16,36 @@
  */
 package com.alipay.lookout.common.utils;
 
+import com.alipay.lookout.api.BasicTag;
+import com.alipay.lookout.api.PRIORITY;
+import com.alipay.lookout.api.Tag;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static com.alipay.lookout.common.LookoutConstants.TAG_PRIORITY_KEY;
 
 /**
- * Created by kevin.luy@alipay.com on 2018/4/4.
+ * Created by kevin.luy@alipay.com on 2018/5/15.
  */
-public class ClassUtilTest {
+public class PriorityTagUtilTest {
 
     @Test
-    public void testNewInstance() {
-        ArrayList list = ClassUtil.newInstance(ArrayList.class.getName(), null, null);
-        Assert.assertNotNull(list);
+    public void testResolveHigh() {
+        List<Tag> tags = new ArrayList<Tag>();
+        tags.add(new BasicTag("k1", "v1"));
+        tags.add(new BasicTag(TAG_PRIORITY_KEY, PRIORITY.HIGH.toString()));
+        Assert.assertEquals(PRIORITY.HIGH, PriorityTagUtil.resolve(tags));
+    }
 
-        Integer integer = ClassUtil.newInstance(Integer.class.getName(), new Class[] { int.class },
-            new Object[] { 5 });
-        Assert.assertEquals("5", integer.toString());
+    @Test
+    public void testResolveNothing() {
+        List<Tag> tags = new ArrayList<Tag>();
+        tags.add(new BasicTag("k1", "v1"));
+        Assert.assertNotEquals(PRIORITY.HIGH, PriorityTagUtil.resolve(tags));
+        Assert.assertEquals(PRIORITY.NORMAL, PriorityTagUtil.resolve(tags));
+
     }
 }

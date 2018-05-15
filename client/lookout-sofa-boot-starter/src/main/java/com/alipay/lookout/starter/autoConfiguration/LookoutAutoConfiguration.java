@@ -69,7 +69,7 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     public LookoutConfig lookoutConfig(LookoutClientProperties lookoutClientProperties,
                                        Environment environment) {
         String appName = environment.getProperty("spring.application.name");
-        Assert.notNull(appName);
+        Assert.notNull(appName, "spring.application.name can not be null!");
         LookoutConfig config = buildLookoutConfig(lookoutClientProperties);
         config.setProperty(APP_NAME, appName);
         return config;

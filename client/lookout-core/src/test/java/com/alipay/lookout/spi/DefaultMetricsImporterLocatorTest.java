@@ -14,30 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.common.utils;
+package com.alipay.lookout.spi;
 
-import com.alipay.lookout.api.Metric;
-
-import java.util.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * Created by kevin.luy@alipay.com on 2017/5/15.
+ * Created by kevin.luy@alipay.com on 2018/5/15.
  */
-public abstract class MetricsUtil {
-    private MetricsUtil() {
-    }
+public class DefaultMetricsImporterLocatorTest {
 
-    public static <T extends Metric> Iterator<T> sortedIterator(Iterator<T> it,
-                                                                Comparator<T> comparator) {
-        if (it == null) {
-            return it;
-        }
-        List list = new ArrayList();
-        while (it.hasNext()) {
-            list.add(it.next());
-        }
-        Collections.sort(list, comparator);
-        return list.iterator();
+    @Test
+    public void testLocateImporters() {
+        DefaultMetricsImporterLocator locator = new DefaultMetricsImporterLocator();
+        locator.locate();
+        Assert.assertEquals(0, locator.locate().size());
     }
-
 }

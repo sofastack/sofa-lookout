@@ -14,29 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//package com.alipay.lookout.jvm.memory;
-//
-///**
-// * Created by kevin.luy@alipay.com on 2017/2/16.
-// */
-//public class JvmGcMetricsImporterTest {
-//
-//        @Test
-//        public void testGcInfo() {
-//            Registry registry = new DefaultRegistry();
-//            JvmGcMetricsImporter jvmGcMetricsImporter = new JvmGcMetricsImporter();
-//            jvmGcMetricsImporter.register(registry);
-//
-//            for (int i = 0; i < 3; i++) {
-//                Iterator<Metric> it = registry.iterator();
-//                while (it.hasNext()) {
-//                    Metric m = it.next();
-//                    m.measure();
-//                }
-//
-//                byte[] bytes = new byte[1024 * 1024 * 8];
-//                System.gc();
-//            }
-//
-//        }
-//}
+package com.alipay.lookout.common.utils;
+
+import com.alipay.lookout.common.log.LookoutLoggerFactory;
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.helpers.NOPLogger;
+
+/**
+ * Created by kevin.luy@alipay.com on 2018/5/15.
+ */
+public class LookoutLoggerFactoryTest {
+
+    @Test
+    public void testLookoutLoggerFactory() {
+        Logger logger = LookoutLoggerFactory.getLogger(LookoutLoggerFactoryTest.class);
+        Assert.assertTrue(logger instanceof NOPLogger);
+    }
+}
