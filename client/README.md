@@ -15,6 +15,7 @@ lookout-api支持被单独依赖和使用，方便植入您的项目代码，收
 lookout 客户端提供了 SPI 机制（只需要实现 `com.alipay.lookout.spi.MetricsImporter` 接口），支持可以扩展一些公共的Metrics收集模块，比如默认提供的： jvm（lookout-ext-jvm）、os（lookout-ext-os）。
 
 ## 4.Metrics的注册表
+
 - lookout-reg-prometheus 模块可以提供简单的 metrics 的查询服务,作为 lookout 的 exporter 被 prometheus 抓取；
 - lookout-reg-server 模块可以定时向 lookout server 上报 metrics 数据；
 - lookout-reg-dropwizard 模块可以降维映射为 dropwizard 注册表上；
