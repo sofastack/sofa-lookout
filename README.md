@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/alipay/sofa-lookout.svg?branch=master)](https://travis-ci.org/alipay/sofa-lookout)
 [![Coverage Status](https://coveralls.io/repos/github/alipay/sofa-lookout/badge.svg?branch=master)](https://coveralls.io/github/alipay/sofa-lookout?branch=master)
+![license](https://img.shields.io/badge/license-Apache--2.0-green.svg)
+![maven](https://img.shields.io/github/release/alipay/sofa-lookout.svg)
 
 [English Document](./README_EN.md)
 
