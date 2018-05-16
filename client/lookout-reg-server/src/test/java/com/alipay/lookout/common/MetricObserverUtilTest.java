@@ -43,7 +43,7 @@ public class MetricObserverUtilTest {
         LogObserver logObserver = new LogObserver();
         CompositeRegistry compositeRegistry = new CompositeRegistry(Clock.SYSTEM);
         compositeRegistry.add(reg);
-        MetricObserverUtil.addMetricObservers(reg, logObserver);
+        MetricObserverUtil.addMetricObservers(compositeRegistry, logObserver);
         Assert.assertTrue(reg.getMetricObservers().contains(logObserver));
     }
 }

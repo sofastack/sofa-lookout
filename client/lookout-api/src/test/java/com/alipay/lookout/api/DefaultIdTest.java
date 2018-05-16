@@ -14,25 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.common.utils;
+package com.alipay.lookout.api;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 /**
- * Created by kevin.luy@alipay.com on 2018/4/4.
+ * Created by kevin.luy@alipay.com on 2018/5/16.
  */
-public class ClassUtilTest {
+public class DefaultIdTest {
 
     @Test
-    public void testNewInstance() {
-        ArrayList list = ClassUtil.newInstance(ArrayList.class.getName(), null, null);
-        Assert.assertNotNull(list);
+    public void testEquals() {
 
-        Integer integer = ClassUtil.newInstance(Integer.class.getName(), new Class[] { int.class },
-            new Object[] { 5 });
-        Assert.assertEquals("5", integer.toString());
+        Id id1 = new DefaultId("name").withTag(new BasicTag("k1", "v1")).withTag(
+            new BasicTag("k2", "v2"));
+
+        Tag[] tags = new Tag[] { new BasicTag("k2", "v2"), new BasicTag("k1", "v1") };
+        Id id2 = new DefaultId("name").withTags(tags);
+        System.out.println(id1);
+        Assert.assertTrue(id1.equals(id2));
+        Assert.assertEquals(id1, id2);
+        Assert.assertEquals(id1.hashCode(), id2.hashCode());
+
     }
 }

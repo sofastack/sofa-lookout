@@ -14,25 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.common.utils;
+package com.alipay.lookout.spi;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 /**
- * Created by kevin.luy@alipay.com on 2018/4/4.
+ * Created by kevin.luy@alipay.com on 2018/5/15.
  */
-public class ClassUtilTest {
+public class DefaultMetricsImporterLocatorTest {
 
     @Test
-    public void testNewInstance() {
-        ArrayList list = ClassUtil.newInstance(ArrayList.class.getName(), null, null);
-        Assert.assertNotNull(list);
-
-        Integer integer = ClassUtil.newInstance(Integer.class.getName(), new Class[] { int.class },
-            new Object[] { 5 });
-        Assert.assertEquals("5", integer.toString());
+    public void testLocateImporters() {
+        DefaultMetricsImporterLocator locator = new DefaultMetricsImporterLocator();
+        locator.locate();
+        Assert.assertEquals(0, locator.locate().size());
     }
 }

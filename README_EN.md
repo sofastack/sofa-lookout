@@ -1,5 +1,12 @@
 # SOFALookout
+
+[![Build Status](https://travis-ci.org/alipay/sofa-lookout.svg?branch=master)](https://travis-ci.org/alipay/sofa-lookout)
+[![Coverage Status](https://coveralls.io/repos/github/alipay/sofa-lookout/badge.svg?branch=master)](https://coveralls.io/github/alipay/sofa-lookout?branch=master)
+![license](https://img.shields.io/badge/license-Apache--2.0-green.svg)
+![maven](https://img.shields.io/github/release/alipay/sofa-lookout.svg)
+
 Visit [WIKI](https://github.com/alipay/sofa-lookout/wiki) for the full documentation, examples, and guides.
+
 Lookout can help you to measure and monitor the status of the target system with its multi-dimensional metrics.
 Lookout's multi-dimensional metrics refer to the [Metrics 2.0](http://metrics20.org/) standard.
 

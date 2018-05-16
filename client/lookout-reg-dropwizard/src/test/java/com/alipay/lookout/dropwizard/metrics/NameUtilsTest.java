@@ -14,25 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.common.utils;
+package com.alipay.lookout.dropwizard.metrics;
 
+import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.core.DefaultRegistry;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 /**
- * Created by kevin.luy@alipay.com on 2018/4/4.
+ * Created by kevin.luy@alipay.com on 2018/5/16.
  */
-public class ClassUtilTest {
+public class NameUtilsTest {
 
     @Test
-    public void testNewInstance() {
-        ArrayList list = ClassUtil.newInstance(ArrayList.class.getName(), null, null);
-        Assert.assertNotNull(list);
-
-        Integer integer = ClassUtil.newInstance(Integer.class.getName(), new Class[] { int.class },
-            new Object[] { 5 });
-        Assert.assertEquals("5", integer.toString());
+    public void testMetricname() {
+        String name = NameUtils.toMetricName(new DefaultRegistry(Clock.SYSTEM).createId("name")
+            .withTag("k", "v"));
+        System.out.println(name);
+        Assert.assertEquals("name.k-v", name);
     }
 }

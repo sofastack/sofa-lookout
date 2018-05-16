@@ -56,6 +56,11 @@
         </dependency>
         <!-- adapter spring boot v1 actuator begin-->
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>com.alipay.sofa.lookout</groupId>
             <artifactId>lookout-reg-dropwizard</artifactId>
             <scope>provided</scope>
@@ -70,13 +75,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- adapter spring boot v1 actuator end-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
-        <!-- adapter spring boot v1 actuator end-->
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

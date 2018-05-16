@@ -16,12 +16,14 @@
  */
 package com.alipay.lookout.os.utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author wuqin
  * @version $Id: FileUtils.java, v 0.1 2017-03-18 下午5:17 wuqin Exp $$
  */
@@ -78,60 +80,5 @@ public class FileUtils {
             }
         }
         return lines;
-    }
-
-    /**
-     * Read the last N lines of file
-     *
-     * @param path the path to file
-     * @param numRead the number of line
-     * @return
-     */
-    public static List<String> readLastNLine(String path, int numRead) {
-        File file = new File(path);
-        if (!file.exists() || file.isDirectory() || !file.canRead()) {
-            return null;
-        }
-
-        List<String> result = new ArrayList<String>();
-        long count = 0;
-        RandomAccessFile fileRead = null;
-        try {
-            fileRead = new RandomAccessFile(file, "r");
-            long length = fileRead.length();
-            if (length == 0L) {
-                return result;
-            } else {
-                long pos = length - 1;
-                while (pos > 0) {
-                    pos--;
-                    fileRead.seek(pos);
-                    if (fileRead.readByte() == '\n') {
-                        String line = fileRead.readLine();
-                        result.add(line);
-                        count++;
-                        if (count == numRead) {
-                            break;
-                        }
-                    }
-                }
-                if (pos == 0) {
-                    fileRead.seek(0);
-                    result.add(fileRead.readLine());
-                }
-            }
-        } catch (IOException e) {
-            // ignore
-        } finally {
-            if (fileRead != null) {
-                try {
-                    fileRead.close();
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-        }
-
-        return result;
     }
 }

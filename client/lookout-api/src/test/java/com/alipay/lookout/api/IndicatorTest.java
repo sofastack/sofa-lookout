@@ -14,29 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//package com.alipay.lookout.jvm.memory;
-//
-///**
-// * Created by kevin.luy@alipay.com on 2017/2/16.
-// */
-//public class JvmGcMetricsImporterTest {
-//
-//        @Test
-//        public void testGcInfo() {
-//            Registry registry = new DefaultRegistry();
-//            JvmGcMetricsImporter jvmGcMetricsImporter = new JvmGcMetricsImporter();
-//            jvmGcMetricsImporter.register(registry);
-//
-//            for (int i = 0; i < 3; i++) {
-//                Iterator<Metric> it = registry.iterator();
-//                while (it.hasNext()) {
-//                    Metric m = it.next();
-//                    m.measure();
-//                }
-//
-//                byte[] bytes = new byte[1024 * 1024 * 8];
-//                System.gc();
-//            }
-//
-//        }
-//}
+package com.alipay.lookout.api;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+/**
+ * Created by kevin.luy@alipay.com on 2018/5/16.
+ */
+public class IndicatorTest {
+
+    @Test
+    public void testAddMeasument() {
+        Indicator indicator = new Indicator(11l, NoopRegistry.INSTANCE.createId("name"));
+        indicator.addMeasurement("k", 1);
+        indicator.addMeasurement(new Measurement("K2", "V2"));
+        Assert.assertEquals(2, indicator.measurements().size());
+        Assert.assertEquals(11l, indicator.getTimestamp());
+        Assert.assertTrue(indicator.id() == NoopId.INSTANCE);
+
+    }
+}

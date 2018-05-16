@@ -16,23 +16,20 @@
  */
 package com.alipay.lookout.common.utils;
 
+import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.helpers.NOPLogger;
 
 /**
- * Created by kevin.luy@alipay.com on 2018/4/4.
+ * Created by kevin.luy@alipay.com on 2018/5/15.
  */
-public class ClassUtilTest {
+public class LookoutLoggerFactoryTest {
 
     @Test
-    public void testNewInstance() {
-        ArrayList list = ClassUtil.newInstance(ArrayList.class.getName(), null, null);
-        Assert.assertNotNull(list);
-
-        Integer integer = ClassUtil.newInstance(Integer.class.getName(), new Class[] { int.class },
-            new Object[] { 5 });
-        Assert.assertEquals("5", integer.toString());
+    public void testLookoutLoggerFactory() {
+        Logger logger = LookoutLoggerFactory.getLogger(LookoutLoggerFactoryTest.class);
+        Assert.assertTrue(logger instanceof NOPLogger);
     }
 }

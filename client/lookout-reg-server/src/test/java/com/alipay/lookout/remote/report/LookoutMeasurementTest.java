@@ -112,28 +112,6 @@ public class LookoutMeasurementTest {
     }
 
     @Test
-    public void testManuJson() {
-        Date date = new Date();
-        LookoutMeasurement measurement = new LookoutMeasurement(date, id);
-        int i = 3;
-        measurement.addTag("lsjdfljalsjdfljsalflsajfdljslfjlja" + i, "xxxxxxxxxxxx" + i);
-        measurement.put("xxx" + i, i);
-        measurement.put("yyy" + i, i);
-        measurement.put("zzz" + i, i);
-
-        String str = null;
-        long t1 = System.currentTimeMillis();
-        str = measurement.toString();
-        long t2 = System.currentTimeMillis();
-        System.out.println("t2-t1:" + (t2 - t1));
-        System.out.println(str);
-
-        String jsonStr = "\"lsjdfljalsjdfljsalflsajfdljslfjlja3\":\"xxxxxxxxxxxx3\"},\"aaaaaa.bbbbbbb.ccccc\":{\"xxx3\":3,\"yyy3\":3,\"zzz3\":3}}";
-        System.out.println(jsonStr);
-        Assert.assertTrue(str.contains(jsonStr));
-    }
-
-    @Test
     public void testJsonPerf() {
         long t1 = System.currentTimeMillis();
         for (LookoutMeasurement measurement : measurements) {

@@ -19,20 +19,13 @@ package com.alipay.lookout.common.utils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 /**
- * Created by kevin.luy@alipay.com on 2018/4/4.
+ * Created by kevin.luy@alipay.com on 2018/5/15.
  */
-public class ClassUtilTest {
+public class NetworkUtilTest {
 
     @Test
-    public void testNewInstance() {
-        ArrayList list = ClassUtil.newInstance(ArrayList.class.getName(), null, null);
-        Assert.assertNotNull(list);
-
-        Integer integer = ClassUtil.newInstance(Integer.class.getName(), new Class[] { int.class },
-            new Object[] { 5 });
-        Assert.assertEquals("5", integer.toString());
+    public void testGetLocalAddress() {
+        Assert.assertNotNull(NetworkUtil.getLocalAddress().getHostAddress());
     }
 }

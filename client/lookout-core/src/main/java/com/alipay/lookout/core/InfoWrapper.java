@@ -31,7 +31,7 @@ public class InfoWrapper<I, Y extends Info<I>> implements Info<I>, Metric {
     protected static final Logger logger       = LookoutLoggerFactory.getLogger(Info.class);
     public static final String    EMPTY_STRING = "";
     protected Y                   info;
-    private Clock                 clock;
+    protected Clock               clock;
     private Id                    id;
 
     public InfoWrapper(Id id, Y info, Clock clock) {
