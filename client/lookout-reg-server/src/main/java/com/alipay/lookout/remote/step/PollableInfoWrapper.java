@@ -50,13 +50,13 @@ public final class PollableInfoWrapper extends InfoWrapper {
         //            if (lastPolledTime > 0) {
         //                return false;
         //            }
-        //            lastPolledTime = System.currentTimeMillis();//第一次执行后的时间
+        //            lastPolledTime = clock.wallTime();//第一次执行后的时间
         //            return true;
         //        }
         if (suggestion == AutoPollSuggestion.POLL_WHEN_UPDATED) {
             //最近发生更新了
             if (lastPolledTime <= ((AutoPollFriendlyInfo) info).lastModifiedTime()) {
-                lastPolledTime = System.currentTimeMillis();
+                lastPolledTime = clock.wallTime();
                 return true;
             }
             return false;
@@ -67,8 +67,8 @@ public final class PollableInfoWrapper extends InfoWrapper {
         }
         // 默认会有小于step的误差；
         if (lastPolledTime <= 0
-            || (System.currentTimeMillis() - lastPolledTime >= suggestion.intervalMills())) {
-            lastPolledTime = System.currentTimeMillis();
+            || (clock.wallTime() - lastPolledTime >= suggestion.intervalMills())) {
+            lastPolledTime = clock.wallTime();
             return true;
         }
         return false;
@@ -76,12 +76,12 @@ public final class PollableInfoWrapper extends InfoWrapper {
 
     @Override
     public Indicator measure() {
-        long start = System.currentTimeMillis();
+        long start = clock.wallTime();
         try {
             return super.measure();
         } finally {
             //可能很耗时,超过1s先日志警告！！
-            long duration = System.currentTimeMillis() - start;
+            long duration = clock.wallTime() - start;
             if (duration > 1000) {
                 logger.warn("Info metric id:{} value method invoke too long(duration:{})!",
                     duration);

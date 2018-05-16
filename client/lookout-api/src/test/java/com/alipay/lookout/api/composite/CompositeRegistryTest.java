@@ -21,7 +21,10 @@ import com.alipay.lookout.api.info.Info;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by kevin.luy@alipay.com on 2018/5/16.
@@ -54,6 +57,55 @@ public class CompositeRegistryTest {
         Assert.assertFalse(registerExtentedMetrics);
         cr.registerExtendedMetrics();
         Assert.assertTrue(registerExtentedMetrics);
+    }
+
+    @Test
+    public void testGetCompositeCounter() {
+        Registry r = NoopRegistry.INSTANCE;
+        List<Registry> list = new ArrayList<Registry>();
+        list.add(r);
+        Counter counter = new CompositeCounter(r.createId("xx"), list);
+        counter.dec(1);
+        counter.dec();
+        counter.inc(2);
+        counter.inc();
+        Assert.assertEquals(0, counter.count());
+    }
+
+    @Test
+    public void testGetCompositeTimer() {
+        Registry r = NoopRegistry.INSTANCE;
+        List<Registry> list = new ArrayList<Registry>();
+        list.add(r);
+        Timer t = new CompositeTimer(r.createId("xx"), Clock.SYSTEM, list);
+        t.record(100, TimeUnit.SECONDS);
+        Assert.assertEquals(0, t.count());
+        Assert.assertEquals(0, t.totalTime());
+    }
+
+    @Test
+    public void testGetCompositeDistributionSummary() {
+        Registry r = NoopRegistry.INSTANCE;
+        List<Registry> list = new ArrayList<Registry>();
+        list.add(r);
+        DistributionSummary t = new CompositeDistributionSummary(r.createId("xx"), list);
+        t.record(100);
+        Assert.assertEquals(0, t.count());
+        Assert.assertEquals(0, t.totalAmount());
+    }
+
+    @Test
+    public void testGetCompositeMixin() {
+        Registry r = NoopRegistry.INSTANCE;
+        List<Registry> list = new ArrayList<Registry>();
+        list.add(r);
+        MixinMetric m = new CompositeMixinMetric(r.createId("xx"), Clock.SYSTEM, list);
+        Counter counter = m.counter("test");
+        Assert.assertTrue(counter instanceof CompositeCounter);
+        Timer timer = m.timer("test");
+        Assert.assertTrue(timer instanceof CompositeTimer);
+        DistributionSummary ds = m.distributionSummary("test");
+        Assert.assertTrue(ds instanceof CompositeDistributionSummary);
     }
 
     public static class MockRegistry extends MetricRegistry {
