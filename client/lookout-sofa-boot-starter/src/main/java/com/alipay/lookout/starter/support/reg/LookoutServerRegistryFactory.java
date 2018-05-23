@@ -45,8 +45,7 @@ public class LookoutServerRegistryFactory implements
         LookoutRegistry lookoutRegistry = new LookoutRegistry(metricConfig);
         //add observers to lookoutRegistry
         if (!CollectionUtils.isEmpty(metricObservers)) {
-            MetricObserver[] metricObserverArray = new MetricObserver[metricObservers.size()];
-            for (MetricObserver observer : metricObserverArray)
+            for (MetricObserver observer : metricObservers)
                 lookoutRegistry.addMetricObserver(observer);
             logger.info("add metricObservers:{} to lookout registry.", metricObservers);
         }
