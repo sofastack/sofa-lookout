@@ -16,6 +16,8 @@
  */
 package com.alipay.lookout.remote.report;
 
+import com.alipay.lookout.api.Lookout;
+import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
@@ -24,6 +26,7 @@ import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
 import com.alipay.lookout.report.MetricObserver;
 import com.google.common.base.Strings;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -31,7 +34,10 @@ import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import org.xerial.snappy.Snappy;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -70,7 +76,13 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     private volatile boolean           enableReportAlreadyLogged  = false;
     private volatile boolean           disableReportAlreadyLogged = false;
 
+    private Registry                   reg;
+
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService) {
+        this(lookoutConfig, addrService, null);
+    }
+
+    public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry) {
         this.lookoutConfig = lookoutConfig;
         addressService = addrService;
         addressService.setAgentServerVip(lookoutConfig.getString(LOOKOUT_AGENT_HOST_ADDRESS));
@@ -85,6 +97,11 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         if (lookoutConfig.containsKey(LookoutConfig.APP_NAME)) {
             commonMetadata.put(APP_HEADER_NAME, lookoutConfig.getString(LookoutConfig.APP_NAME));
         }
+        this.reg = registry;
+    }
+
+    private Registry registry() {
+        return reg == null ? Lookout.registry() : reg;
     }
 
     /**
@@ -102,13 +119,9 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             // ask agent ?
             Address agentAddress = addressService.getAgentServerHost();
             if (!isAgentAddressEmpty(agentAddress)) {
-                try {
-                    httpRequestProcessor.sendGetRequest(
-                        new HttpGet(String.format(AGENT_URL_PATTERN, agentAddress.ip(),
-                            agentAddress.port())), commonMetadata);
-                } catch (Throwable e) {
-                    logger.info(">>WARNING: check passed fail!agent:{}", agentAddress);
-                }
+                sendHttpDataSilently(
+                    new HttpGet(String.format(AGENT_URL_PATTERN, agentAddress.ip(),
+                        agentAddress.port())), commonMetadata);
                 return false;//下次再重新询问是否passed
             }
         }
@@ -163,9 +176,10 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
 
     /**
      * Get a list of all measurements and break them into batches.
-     * @param ms measurement list
+     *
+     * @param ms        measurement list
      * @param batchSize batch size
-     * @return  measurement list
+     * @return measurement list
      */
     public List<List<LookoutMeasurement>> getBatches(List<LookoutMeasurement> ms, int batchSize) {
         List<List<LookoutMeasurement>> batches = new ArrayList();
@@ -194,7 +208,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         }
 
         String text = buildReportText(measures);
-        if (measures.size() < 200) {
+        if (measures.size() < lookoutConfig.getInt(LOOKOUT_REPORT_COMPRESSION_THRESHOLD, 100)) {
             report2Agent(agentAddress, text, metadata);
         } else {
             reportSnappy2Agent(agentAddress, text, metadata);
@@ -217,38 +231,58 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     }
 
     void reportSnappy2Agent(Address agentAddress, String msg, Map<String, String> metadata) {
+        HttpPost httpPost = new HttpPost(buildRealAgentServerURL(agentAddress));
+        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_OCTET_STREAM);
+        httpPost.setHeader(HttpHeaders.CONTENT_ENCODING, SNAPPY);
+        byte[] compressed = new byte[0];
         try {
-            HttpPost httpPost = new HttpPost(buildRealAgentServerURL(agentAddress));
-            httpPost.setHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_OCTET_STREAM);
-            httpPost.setHeader(HttpHeaders.CONTENT_ENCODING, SNAPPY);
-            byte[] compressed = Snappy.compress(msg, Charset.forName(UTF_8));
-            httpPost.setEntity(new ByteArrayEntity(compressed));
-            httpRequestProcessor.sendPostRequest(httpPost, metadata);
-        } catch (Throwable e) {
-            reportDecider.markUnpassed();
-            if (e instanceof UnknownHostException || e instanceof ConnectException) {
-                addressService.clearAddressCache();
-                logger.info(">>WARNING: lookout agent address err?cause:{}", e.getMessage());
-            }
-            logger.info(">>WARNING: report to lookout agent fail!cause:{}", e.getMessage());
+            compressed = Snappy.compress(msg, Charset.forName(UTF_8));
+        } catch (IOException e) {
+            logger.info(">>WARNING: snappy compress report msg err:{}", e.getMessage());
         }
-
+        httpPost.setEntity(new ByteArrayEntity(compressed));
+        sendHttpDataSilently(httpPost, metadata);
     }
 
     void report2Agent(Address agentAddress, String msg, Map<String, String> metadata) {
+        HttpPost httpPost = new HttpPost(buildRealAgentServerURL(agentAddress));
+        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, TEXT_MEDIATYPE);
         try {
-            HttpPost httpPost = new HttpPost(buildRealAgentServerURL(agentAddress));
-            httpPost.setHeader(HttpHeaders.CONTENT_TYPE, TEXT_MEDIATYPE);
             httpPost.setEntity(new StringEntity(msg));
-            httpRequestProcessor.sendPostRequest(httpPost, metadata);
+        } catch (UnsupportedEncodingException e) {
+            logger.info(">>WARNING: report msg encoding err:{}", e.getMessage());
+        }
+        sendHttpDataSilently(httpPost, metadata);
+    }
+
+    private void sendHttpDataSilently(HttpRequest httpRequest, Map<String, String> metadata) {
+        try {
+            if (httpRequest instanceof HttpPost) {
+                registry().counter(
+                    registry().createId("lookout.client.report.count").withTag("mtd", "post"))
+                    .inc();
+                httpRequestProcessor.sendPostRequest((HttpPost) httpRequest, metadata);
+            } else if (httpRequest instanceof HttpGet) {
+                registry().counter(
+                    registry().createId("lookout.client.report.count").withTag("mtd", "get")).inc();
+                httpRequestProcessor.sendGetRequest((HttpGet) httpRequest, metadata);
+            } else {
+                logger.info(">>WARNING: unSupport http request Type:{}", httpRequest);
+            }
         } catch (Throwable e) {
             reportDecider.markUnpassed();
             if (e instanceof UnknownHostException || e instanceof ConnectException) {
                 addressService.clearAddressCache();
-                logger.info(">>WARNING: lookout agent:{} err?cause:{}", agentAddress.ip(),
+                logger.info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest.toString(),
                     e.getMessage());
+            } else if (e instanceof SocketTimeoutException) {
+                registry().counter(
+                    registry().createId("lookout.client.report.fail.count").withTag("err",
+                        "socket_timeout")).inc();
+            } else {
+                registry().counter(registry().createId("lookout.client.report.fail.count")).inc();
             }
-            logger.info(">>WARNING: report to lookout agent:{} fail!cause:{}", agentAddress.ip(),
+            logger.info(">>WARNING: lookout agent:{} fail!cause:{}", httpRequest.toString(),
                 e.getMessage());
         }
     }

@@ -48,7 +48,7 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
                            LookoutConfig config) {
         super(clock, config);
         if (observer == null) {
-            observer = new HttpObserver(config, getAddressService(config));
+            observer = new HttpObserver(config, getAddressService(config), this);
         }
         addMetricObserver(observer);
         this.poller = new SchedulerPoller(this, config, metricObserverComposite);
