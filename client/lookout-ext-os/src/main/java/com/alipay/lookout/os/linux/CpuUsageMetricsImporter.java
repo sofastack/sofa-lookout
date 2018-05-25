@@ -147,7 +147,7 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
     protected void loadValues() {
         CpuInfo currentCpuInfo = collectCpuInfo();
         if (currentCpuInfo == null) {
-            logger.warn("collect cpu info failed!");
+            logger.info("warning,collect cpu info failed!");
             lastCpuInfo = new CpuInfo();
             return;
         }
@@ -224,7 +224,7 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
                 return cpuInfo;
             }
         } catch (Exception e) {
-            logger.warn("can't parse text at /proc/stat", e);
+            logger.info("waring,can't parse text at /proc/stat", e.getMessage());
         }
 
         return null;
