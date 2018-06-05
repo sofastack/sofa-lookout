@@ -25,11 +25,11 @@ public final class Address {
     private int    port = 7200;
 
     public Address(String ip) {
-        this.ip = ip;
+        this.ip = ip.trim();
     }
 
     public Address(String ip, int port) {
-        this.ip = ip;
+        this.ip = ip.trim();
         this.port = port;
     }
 

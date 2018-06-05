@@ -130,7 +130,7 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         return lookoutClient.getRegistry();
     }
 
-    private LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {
+    protected LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {
         LookoutConfig lookoutConfig = new LookoutConfig();
         lookoutConfig.setProperty(LOOKOUT_ENABLE, lookoutClientProperties.isEnable());
         lookoutConfig.setProperty(LOOKOUT_AGENT_HOST_ADDRESS,

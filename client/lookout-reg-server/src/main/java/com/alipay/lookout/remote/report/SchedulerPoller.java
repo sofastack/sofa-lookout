@@ -157,7 +157,7 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
                 }
                 //else normal filter
                 poll0(metricObserver, null, metricFilter);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.warn("failed to send metrics", e);
             }
         }

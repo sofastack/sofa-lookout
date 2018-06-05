@@ -134,7 +134,7 @@ public class NetTrafficMetricsImporter extends CachedMetricsImporter {
                 }
             }
         } catch (Exception e) {
-            logger.warn("can't parse text at /proc/net/dev", e);
+            logger.info("warning,can't parse text at /proc/net/dev", e.getMessage());
         }
     }
 }

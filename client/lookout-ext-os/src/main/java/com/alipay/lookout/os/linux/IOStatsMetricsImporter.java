@@ -144,7 +144,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     protected void loadValues() {
         float deltaTime = collectUpTime();
         if (deltaTime == 0.0f) {
-            logger.warn("calculate delta time failed!");
+            logger.info("warning,calculate delta time failed!");
             return;
         }
 
@@ -173,7 +173,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
             lastUpTime = currentUpTime;
             return deltaTime;
         } catch (Exception e) {
-            logger.warn("can't parse line at /proc/uptime", e);
+            logger.info("warning,can't parse line at /proc/uptime", e.getMessage());
             return 0.0f;
         }
     }
@@ -189,7 +189,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
             for (String line : lines) {
                 String[] stats = line.trim().split(SPLIT);
                 if (stats == null || stats.length != TOTAL_LENGTH) {
-                    logger.warn("can't parse text at /proc/diskstats, line: " + line);
+                    logger.info("warning,can't parse text at /proc/diskstats, line: " + line);
                     continue;
                 }
                 if (Long.parseLong(stats[DiskStats.STATS.ordinal()]) == 0) {
@@ -242,7 +242,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
                 }
             }
         } catch (Exception e) {
-            logger.warn("can't parse text at /proc/diskstats", e);
+            logger.info("warning,can't parse text at /proc/diskstats", e.getMessage());
         }
 
         return results;
