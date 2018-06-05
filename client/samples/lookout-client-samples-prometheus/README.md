@@ -12,7 +12,10 @@
             <version>${lookout.client.version}</version>
         </dependency>
 ```
-## 2.启动samples,后可以访问：http://localhost:{com.alipay.sofa.lookout.prometheus.exporter.server.port}
+
+## 2.启动samples,后可以访问：http://localhost:9494
+
+端口可以改变，配置项：`com.alipay.sofa.lookout.prometheus-exporter-server-port`
 
 ## 3.可以配合 prometheus 服务查看
 
