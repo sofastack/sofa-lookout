@@ -18,7 +18,7 @@ A clear and concise description of what the bug is.
 
 ### Environment
 
-- SOFA Lookout version:
+- SOFALookout version:
 - JVM version (e.g. `java -version`):
 - OS version (e.g. `uname -a`):
 - Maven version:
