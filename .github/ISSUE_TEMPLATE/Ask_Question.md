@@ -18,7 +18,7 @@ describe the advice or solution you'd like
 
 ### Environment
 
-- SOFA Lookout version:
+- SOFALookout version:
 - JVM version (e.g. `java -version`):
 - OS version (e.g. `uname -a`):
 - Maven version:
