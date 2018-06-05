@@ -1,18 +1,20 @@
-# Lookout Client
+# SOFALookout Client
 
 [English Document](./README-EN.md)
 
-Lookout client 是一个 Java 的开发工具库，可以为您的工程提供关键指标的度量服务。相较于传统的层级结构的 metrics,通过使用 lookout client 的 API 可以为您提供多维度的 metrics。该客户端遵循 metrics2.0
- 标准。
+SOFALookout Client 是一个 Java 的开发工具库，可以为您的工程提供关键指标的度量服务。相较于传统的层级结构的 metrics，通过使用 SOFALookout client 的 API 可以为您提供多维度的 metrics。该客户端遵循 metrics 2.0 标准。
 
-## 1.编译
- lookout-client项目支持 MAVEN 3.2.5+ , JDK 6+ 进行编译。
+## 1. 编译
 
-## 2.API埋点需知
-lookout-api支持被单独依赖和使用，方便植入您的项目代码，收集需要的 metrics，更多信息参考 [WIKI 文档](https://github.com/alipay/sofa-lookout/wiki)。
+SOFALookout Client 项目支持 Maven 3.2.5+，JDK 6+ 进行编译。
 
-## 3.扩展能力
-lookout 客户端提供了 SPI 机制（只需要实现 `com.alipay.lookout.spi.MetricsImporter` 接口），支持可以扩展一些公共的Metrics收集模块，比如默认提供的： jvm（lookout-ext-jvm）、os（lookout-ext-os）。
+## 2. API 埋点需知
+
+lookout-api 支持被单独依赖和使用，方便植入您的项目代码，收集需要的 metrics，更多信息参考 [WIKI 文档](https://github.com/alipay/sofa-lookout/wiki)。
+
+## 3. 扩展能力
+
+lookout 客户端提供了 SPI 机制（只需要实现 `com.alipay.lookout.spi.MetricsImporter` 接口），支持可以扩展一些公共的Metrics收集模块，比如默认提供的：jvm（lookout-ext-jvm）、os（lookout-ext-os）。
 
 ## 4.Metrics的注册表
 
@@ -46,4 +48,5 @@ lookout 客户端提供了 SPI 机制（只需要实现 `com.alipay.lookout.spi.
 ```
 
 ## 6.如何使用
- 参考 [WIKI 文档](https://github.com/alipay/sofa-lookout/wiki)的快速开始和用户手册。
+
+参考 [WIKI 文档](https://github.com/alipay/sofa-lookout/wiki)的快速开始和用户手册。
