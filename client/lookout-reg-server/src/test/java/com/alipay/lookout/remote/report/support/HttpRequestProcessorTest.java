@@ -30,8 +30,9 @@ import static com.alipay.lookout.remote.report.support.http.DefaultHttpRequestPr
  * Created by kevin.luy@alipay.com on 2017/4/13.
  */
 public class HttpRequestProcessorTest {
-    final ReportDecider        reportDecider        = new ReportDecider();
-    final DefaultHttpRequestProcessor httpRequestProcessor = new DefaultHttpRequestProcessor(reportDecider);
+    final ReportDecider               reportDecider        = new ReportDecider();
+    final DefaultHttpRequestProcessor httpRequestProcessor = new DefaultHttpRequestProcessor(
+                                                               reportDecider);
 
     @Test
     public void testHandleErrorResponse401() {

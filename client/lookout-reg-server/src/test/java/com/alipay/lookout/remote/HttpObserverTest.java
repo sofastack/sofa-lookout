@@ -63,7 +63,6 @@ public class HttpObserverTest {
         Assert.assertTrue(observer.isEnable());
     }
 
-
     @Test
     public void testUpdateMeasurements() {
         LookoutConfig config = new LookoutConfig();
@@ -74,10 +73,12 @@ public class HttpObserverTest {
         reportDecider.markPassed();
         Registry registry = new DefaultRegistry();
         MockHttpRequestProcessor requestProcessor = new MockHttpRequestProcessor();
-        HttpObserver observer = new HttpObserver(config, addressService, registry, reportDecider, requestProcessor);
+        HttpObserver observer = new HttpObserver(config, addressService, registry, reportDecider,
+            requestProcessor);
 
         List<LookoutMeasurement> measures = new ArrayList<LookoutMeasurement>();
-        LookoutMeasurement measurement = new LookoutMeasurement(new Date(), new DefaultRegistry().createId("a.b.c"));
+        LookoutMeasurement measurement = new LookoutMeasurement(new Date(),
+            new DefaultRegistry().createId("a.b.c"));
         measures.add(measurement);
 
         observer.update(measures, new HashMap<String, String>());

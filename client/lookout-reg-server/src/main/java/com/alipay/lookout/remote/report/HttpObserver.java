@@ -51,34 +51,34 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
  * Created by kevin.luy@alipay.com on 2017/2/7.
  */
 public class HttpObserver implements MetricObserver<LookoutMeasurement> {
-    private static final Logger logger = LookoutLoggerFactory
-            .getLogger(HttpObserver.class);
-    static final String APP_HEADER_NAME = "app";
-    public static final String UTF_8 = "utf-8";
-    static final String AGENT_URL_PATTERN = "http://%s:%d/datas";
-    public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
-    public static final String SNAPPY = "snappy";
-    static final String TEXT_MEDIATYPE = "text/plain";
+    private static final Logger        logger                     = LookoutLoggerFactory
+                                                                      .getLogger(HttpObserver.class);
+    static final String                APP_HEADER_NAME            = "app";
+    public static final String         UTF_8                      = "utf-8";
+    static final String                AGENT_URL_PATTERN          = "http://%s:%d/datas";
+    public static final String         APPLICATION_OCTET_STREAM   = "application/octet-stream";
+    public static final String         SNAPPY                     = "snappy";
+    static final String                TEXT_MEDIATYPE             = "text/plain";
 
-    private static final char MSG_SPLITOR = '\t';
-    private final AddressService addressService;
+    private static final char          MSG_SPLITOR                = '\t';
+    private final AddressService       addressService;
 
-    AtomicInteger warningTimes = new AtomicInteger(0);
+    AtomicInteger                      warningTimes               = new AtomicInteger(0);
 
-    private final LookoutConfig lookoutConfig;
+    private final LookoutConfig        lookoutConfig;
 
     private final HttpRequestProcessor httpRequestProcessor;
-    private final ReportDecider reportDecider;
+    private final ReportDecider        reportDecider;
 
-    private final Map<String, String> commonMetadata = new HashMap<String, String>();
+    private final Map<String, String>  commonMetadata             = new HashMap<String, String>();
 
-    private int innerAgentPort = -1;
+    private int                        innerAgentPort             = -1;
 
     //anti log repeatly, mark it
-    private volatile boolean enableReportAlreadyLogged = false;
-    private volatile boolean disableReportAlreadyLogged = false;
+    private volatile boolean           enableReportAlreadyLogged  = false;
+    private volatile boolean           disableReportAlreadyLogged = false;
 
-    private Registry reg;
+    private Registry                   reg;
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService) {
         this(lookoutConfig, addrService, null, new ReportDecider());
@@ -86,7 +86,8 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry,
                         ReportDecider reportDecider) {
-        this(lookoutConfig, addrService, registry, reportDecider, new DefaultHttpRequestProcessor(reportDecider));
+        this(lookoutConfig, addrService, registry, reportDecider, new DefaultHttpRequestProcessor(
+            reportDecider));
     }
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry,
@@ -98,7 +99,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         addressService = addrService;
         addressService.setAgentServerVip(lookoutConfig.getString(LOOKOUT_AGENT_HOST_ADDRESS));
         addressService.setAgentTestUrl(lookoutConfig.getString(LOOKOUT_AGENT_TEST_URL,
-                System.getProperty(LOOKOUT_AGENT_TEST_URL)));
+            System.getProperty(LOOKOUT_AGENT_TEST_URL)));
         //inner port
         innerAgentPort = lookoutConfig.getInt(LOOKOUT_AGENT_SERVER_PORT, -1);
 
@@ -108,7 +109,6 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         }
         this.reg = registry;
     }
-
 
     private Registry registry() {
         return reg == null ? Lookout.registry() : reg;
@@ -130,14 +130,14 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             Address agentAddress = addressService.getAgentServerHost();
             if (!isAgentAddressEmpty(agentAddress)) {
                 sendHttpDataSilently(
-                        new HttpGet(String.format(AGENT_URL_PATTERN, agentAddress.ip(),
-                                agentAddress.port())), commonMetadata);
+                    new HttpGet(String.format(AGENT_URL_PATTERN, agentAddress.ip(),
+                        agentAddress.port())), commonMetadata);
                 return false;//下次再重新询问是否passed
             }
         }
 
         boolean enable = addressService.isAgentServerExisted()
-                && lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true);
+                         && lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true);
 
         if (enable) {
             if (disableReportAlreadyLogged) {
@@ -157,9 +157,9 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             if (!disableReportAlreadyLogged) {
                 disableReportAlreadyLogged = true;
                 logger.info(
-                        ">>WARNING: disable report! agent existed:{},lookout.autopoll.enable:{}",
-                        addressService.isAgentServerExisted(),
-                        lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true));
+                    ">>WARNING: disable report! agent existed:{},lookout.autopoll.enable:{}",
+                    addressService.isAgentServerExisted(),
+                    lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true));
             }
         }
 
@@ -174,7 +174,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         metadata.putAll(commonMetadata);
         logger.debug(">> metrics:\n{}\n", measures.toString());
         List<List<LookoutMeasurement>> batches = getBatches(measures,
-                lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
+            lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
         for (List<LookoutMeasurement> batch : batches) {
             reportBatch(batch, metadata);
         }
@@ -206,7 +206,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             //防止日志过多
             if (warningTimes.get() < 5) {
                 logger
-                        .warn(">>WARNING: lookout report fail! cause by :agent-host-address is required!");
+                    .warn(">>WARNING: lookout report fail! cause by :agent-host-address is required!");
                 warningTimes.incrementAndGet();
             }
             return;//空地址，就不报告了.
@@ -269,12 +269,12 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         try {
             if (httpRequest instanceof HttpPost) {
                 registry().counter(
-                        registry().createId("lookout.client.report.count").withTag("mtd", "post"))
-                        .inc();
+                    registry().createId("lookout.client.report.count").withTag("mtd", "post"))
+                    .inc();
                 httpRequestProcessor.sendPostRequest((HttpPost) httpRequest, metadata);
             } else if (httpRequest instanceof HttpGet) {
                 registry().counter(
-                        registry().createId("lookout.client.report.count").withTag("mtd", "get")).inc();
+                    registry().createId("lookout.client.report.count").withTag("mtd", "get")).inc();
                 httpRequestProcessor.sendGetRequest((HttpGet) httpRequest, metadata);
             } else {
                 logger.info(">>WARNING: unSupport http request Type:{}", httpRequest);
@@ -284,21 +284,21 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             if (e instanceof UnknownHostException || e instanceof ConnectException) {
                 addressService.clearAddressCache();
                 logger.info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest.toString(),
-                        e.getMessage());
+                    e.getMessage());
             } else if (e instanceof SocketTimeoutException) {
                 registry().counter(
-                        registry().createId("lookout.client.report.fail.count").withTag("err",
-                                "socket_timeout")).inc();
+                    registry().createId("lookout.client.report.fail.count").withTag("err",
+                        "socket_timeout")).inc();
             } else {
                 registry().counter(registry().createId("lookout.client.report.fail.count")).inc();
             }
             logger.info(">>WARNING: lookout agent:{} fail!cause:{}", httpRequest.toString(),
-                    e.getMessage());
+                e.getMessage());
         }
     }
 
     String buildRealAgentServerURL(Address agentAddress) {
         return String.format(AGENT_URL_PATTERN, agentAddress.ip(),
-                innerAgentPort > 0 ? innerAgentPort : agentAddress.port());
+            innerAgentPort > 0 ? innerAgentPort : agentAddress.port());
     }
 }
