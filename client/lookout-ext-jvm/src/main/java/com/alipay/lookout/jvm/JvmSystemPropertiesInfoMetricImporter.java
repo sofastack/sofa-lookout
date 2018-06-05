@@ -19,6 +19,7 @@ package com.alipay.lookout.jvm;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.api.info.Info;
+import com.alipay.lookout.common.LookoutIdNameConstants;
 import com.alipay.lookout.spi.MetricsImporter;
 
 import java.util.Map;
@@ -31,7 +32,7 @@ public class JvmSystemPropertiesInfoMetricImporter implements MetricsImporter {
 
     @Override
     public void register(Registry registry) {
-        Id id = registry.createId("jvm.system.properties");
+        Id id = registry.createId(LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME);
         registry.info(id, new Info<Properties>() {
             @Override
             public Properties value() {
@@ -39,7 +40,7 @@ public class JvmSystemPropertiesInfoMetricImporter implements MetricsImporter {
             }
         });
 
-        Id envId = registry.createId("jvm.system.env");
+        Id envId = registry.createId(LookoutIdNameConstants.JVM_SYSTEM_ENV_NAME);
         registry.info(envId, new Info<Map<String, String>>() {
             @Override
             public Map<String, String> value() {

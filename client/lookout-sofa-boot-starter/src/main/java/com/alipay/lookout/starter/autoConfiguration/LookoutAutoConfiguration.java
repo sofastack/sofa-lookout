@@ -19,11 +19,16 @@ package com.alipay.lookout.starter.autoConfiguration;
 import com.alipay.lookout.api.NoopRegistry;
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.api.Registry;
+import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.client.DefaultLookoutClient;
+import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 import com.alipay.lookout.starter.LookoutClientProperties;
+import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
+import com.alipay.lookout.starter.support.reader.LookoutRegistryMetricReader;
 import com.alipay.lookout.starter.support.reg.DropWizardMetricsRegistryFactory;
 import com.alipay.lookout.starter.support.reg.LookoutServerRegistryFactory;
 import com.alipay.lookout.starter.support.reg.MetricsRegistryFactory;
@@ -34,8 +39,15 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.MetricsDropwizardAutoConfiguration;
+import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
+import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.actuate.metrics.GaugeService;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +64,7 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
 @AutoConfigureOrder(-100)
 @Configuration
 @EnableConfigurationProperties(LookoutClientProperties.class)
+@AutoConfigureBefore(MetricsDropwizardAutoConfiguration.class)
 public class LookoutAutoConfiguration implements BeanFactoryAware {
     private static final Logger                      logger = LoggerFactory
                                                                 .getLogger(LookoutAutoConfiguration.class);
@@ -124,10 +137,34 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         for (MetricsRegistryFactory metricsRegistryFactory : metricsRegistryFactoryList) {
             lookoutClient.addRegistry(metricsRegistryFactory.get(lookoutConfig));
         }
+        //add default registry
+        logger.info("register default registry");
+        DefaultRegistry defaultRegistry = new DefaultRegistry(lookoutConfig);
+        lookoutClient.addRegistry(defaultRegistry);
         logger.info("register extended metrics.");
         lookoutClient.registerExtendedMetrics();
 
         return lookoutClient.getRegistry();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean({LookoutSpringBootMetricsImpl.class, CounterService.class,
+            GaugeService.class})
+    public LookoutSpringBootMetricsImpl  lookoutMetricServices(Registry lookoutMetricRegistry) {
+        logger.info("Spring Boot Metrics binding to SOFALookout Implementation!");
+        return new LookoutSpringBootMetricsImpl(lookoutMetricRegistry);
+    }
+
+    @Bean
+    @ConditionalOnBean(Registry.class)
+    public MetricReaderPublicMetrics lookoutPublicMetrics(Registry lookoutMetricRegistry) {
+        DefaultRegistry defaultRegistry = this.getDefaultRegistry(lookoutMetricRegistry);
+        if (defaultRegistry != null) {
+            LookoutRegistryMetricReader reader = new LookoutRegistryMetricReader(
+                    defaultRegistry);
+            return new MetricReaderPublicMetrics(reader);
+        }
+        return null;
     }
 
     private LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {
@@ -154,4 +191,33 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         return lookoutConfig;
     }
 
+    protected DefaultRegistry getDefaultRegistry(Registry lookoutMetricRegistry) {
+        if (lookoutMetricRegistry instanceof DefaultRegistry) {
+            return (DefaultRegistry) lookoutMetricRegistry;
+        }
+        if (lookoutMetricRegistry instanceof CompositeRegistry) {
+            CompositeRegistry compositeRegistry = (CompositeRegistry) lookoutMetricRegistry;
+            for (Registry registry : compositeRegistry.getRegistries()) {
+                if (registry instanceof DefaultRegistry) {
+                    return (DefaultRegistry) registry;
+                }
+            }
+        }
+        return null;
+    }
+
+    protected LookoutRegistry getLookoutRegistry(Registry lookoutMetricRegistry) {
+        if (lookoutMetricRegistry instanceof LookoutRegistry) {
+            return (LookoutRegistry) lookoutMetricRegistry;
+        }
+        if (lookoutMetricRegistry instanceof CompositeRegistry) {
+            CompositeRegistry compositeRegistry = (CompositeRegistry) lookoutMetricRegistry;
+            for (Registry registry : compositeRegistry.getRegistries()) {
+                if (registry instanceof LookoutRegistry) {
+                    return (LookoutRegistry) registry;
+                }
+            }
+        }
+        return null;
+    }
 }

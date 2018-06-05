@@ -32,6 +32,7 @@ import com.alipay.lookout.spi.MetricsImporterLocator;
 import org.apache.commons.configuration2.MapConfiguration;
 import org.slf4j.Logger;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -383,6 +384,14 @@ public abstract class AbstractRegistry extends MetricRegistry {
             propagate(e);
             return NoopMixinMetric.INSTANCE;
         }
+    }
+
+    /***
+     * Get the unmodifiable cached metrics
+     * @return cached metrics
+     */
+    public Map<Id, Metric> getMetrics() {
+        return Collections.unmodifiableMap(this.metrics);
     }
 
     protected abstract Metric newMixinMetric(Id id);

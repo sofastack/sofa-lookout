@@ -17,7 +17,7 @@
 package com.alipay.lookout.dropwizard.metrics;
 
 import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Tag;
+import com.alipay.lookout.api.Utils;
 
 /**
  * http://metrics20.org/
@@ -36,12 +36,7 @@ final class NameUtils {
      * @return hierarchical metric name
      */
     static String toMetricName(Id id) {
-        StringBuilder buf = new StringBuilder();
-        buf.append(id.name());
-        for (Tag t : id.tags()) {
-            buf.append('.').append(t.key()).append('-').append(t.value());
-        }
-        return buf.toString();
+        return Utils.toMetricName(id);
     }
 
 }
