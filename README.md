@@ -30,6 +30,9 @@ SOFALookout 是一个利用多维度的 metrics 对目标系统进行度量和�
 
 - 客户端代码编译，进入client子目录，Maven 3.2.5+, JDK Version 1.6+；
 - 服务器端代码编译，进入server子目录，Maven 3.2.5+, JDK Version 1.8+；
+## 样例工程
+
+样例工程演示了如何快速使用 SOFALookout，[详细可参考](https://github.com/alipay/sofa-lookout/wiki/useguide-samples)。
 
 ## 贡献
 如何参与 SOFALookout [代码贡献](./CONTRIBUTING.md)
