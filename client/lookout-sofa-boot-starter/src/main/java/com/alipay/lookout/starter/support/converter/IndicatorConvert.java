@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.alipay.lookout.starter.support.converter;
 
 import com.alipay.lookout.api.Id;
@@ -21,13 +37,15 @@ import java.util.*;
  */
 public class IndicatorConvert {
 
-    private static final Logger logger = LookoutLoggerFactory.getLogger(IndicatorConvert.class);
+    private static final Logger   logger                       = LookoutLoggerFactory
+                                                                   .getLogger(IndicatorConvert.class);
 
     /***
      * 忽略返回 {@link Metric} 关键字数组集合
      */
-    private static final String[] IGNORED_METRIC_NAME_PREFIXES = new String[]{LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME,
-            LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME};
+    private static final String[] IGNORED_METRIC_NAME_PREFIXES = new String[] {
+            LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME,
+            LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME       };
 
     private static boolean isIgnoredMetrics(String namePrefix) {
         if (StringUtils.isBlank(namePrefix)) {
@@ -69,7 +87,8 @@ public class IndicatorConvert {
                 Object measureValue = measurement.value();
                 if (measureValue instanceof Number) {
                     Number valueNumber = (Number) measureValue;
-                    Metric<Number> metric = new Metric<Number>(namePrefix + LookoutConstants.DOT + name, valueNumber, date);
+                    Metric<Number> metric = new Metric<Number>(namePrefix + LookoutConstants.DOT
+                                                               + name, valueNumber, date);
                     indicatorMetricList.add(metric);
                 } else if (measureValue instanceof Map) {
                     Map<String, Object> valueMap = (Map<String, Object>) measureValue;
@@ -81,19 +100,26 @@ public class IndicatorConvert {
                         }
                         if (value instanceof Number) {
                             Number valueMapNumber = (Number) value;
-                            Metric<Number> metric = new Metric<Number>(namePrefix + LookoutConstants.DOT + name +
-                                    LookoutConstants.DOT + keyName, valueMapNumber, date);
+                            Metric<Number> metric = new Metric<Number>(namePrefix
+                                                                       + LookoutConstants.DOT
+                                                                       + name
+                                                                       + LookoutConstants.DOT
+                                                                       + keyName, valueMapNumber,
+                                date);
                             indicatorMetricList.add(metric);
                         } else {
                             //忽略信息
-                            logger.debug("Lookout value is not instance of Number. Value type is [" + value.getClass() + "].Ignored Lookout prefix = " +
-                                    "[" + namePrefix + LookoutConstants.DOT + name + "] Measurement = [" + entry.toString() + "]");
+                            logger.debug("Lookout value is not instance of Number. Value type is ["
+                                         + value.getClass() + "].Ignored Lookout prefix = " + "["
+                                         + namePrefix + LookoutConstants.DOT + name
+                                         + "] Measurement = [" + entry.toString() + "]");
                         }
                     }
                 } else {
                     //忽略信息
-                    logger.debug("Lookout value is not instance of Number. Value type is [" + measureValue.getClass() + "].Ignored Lookout prefix = " +
-                            "[" + namePrefix + "] Measurement = [" + measurement.toString() + "]");
+                    logger.debug("Lookout value is not instance of Number. Value type is ["
+                                 + measureValue.getClass() + "].Ignored Lookout prefix = " + "["
+                                 + namePrefix + "] Measurement = [" + measurement.toString() + "]");
                 }
             }
         } catch (Exception exception) {

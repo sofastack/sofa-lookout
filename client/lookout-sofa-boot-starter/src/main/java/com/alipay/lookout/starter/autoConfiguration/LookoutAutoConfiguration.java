@@ -148,9 +148,9 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     }
 
     @Bean
-    @ConditionalOnMissingBean({LookoutSpringBootMetricsImpl.class, CounterService.class,
-            GaugeService.class})
-    public LookoutSpringBootMetricsImpl  lookoutMetricServices(Registry lookoutMetricRegistry) {
+    @ConditionalOnMissingBean({ LookoutSpringBootMetricsImpl.class, CounterService.class,
+            GaugeService.class })
+    public LookoutSpringBootMetricsImpl lookoutMetricServices(Registry lookoutMetricRegistry) {
         logger.info("Spring Boot Metrics binding to SOFALookout Implementation!");
         return new LookoutSpringBootMetricsImpl(lookoutMetricRegistry);
     }
@@ -160,8 +160,7 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     public MetricReaderPublicMetrics lookoutPublicMetrics(Registry lookoutMetricRegistry) {
         DefaultRegistry defaultRegistry = this.getDefaultRegistry(lookoutMetricRegistry);
         if (defaultRegistry != null) {
-            LookoutRegistryMetricReader reader = new LookoutRegistryMetricReader(
-                    defaultRegistry);
+            LookoutRegistryMetricReader reader = new LookoutRegistryMetricReader(defaultRegistry);
             return new MetricReaderPublicMetrics(reader);
         }
         return null;
