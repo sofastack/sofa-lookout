@@ -150,7 +150,7 @@ public class DiskUsageMetricsImporter extends CachedMetricsImporter {
                 diskUsageByDevice.put(diskUsage.fsSpec, diskUsage);
             }
         } catch (Exception e) {
-            logger.warn("can't parse line at /proc/mounts", e);
+            logger.info("warning,can't parse line at /proc/mounts", e.getMessage());
         }
     }
 

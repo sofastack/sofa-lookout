@@ -35,6 +35,7 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      LOOKOUT_AGENT_TEST_URL                  = "lookout.agent.host.test.url";
     public static final String                      LOOKOUT_MAX_METRICS_NUMBER              = "lookout.max.metrics.number";
     public static final String                      LOOKOUT_REPORT_BATCH_SIZE               = "lookout.report.batch.size";
+    public static final String                      LOOKOUT_REPORT_COMPRESSION_THRESHOLD    = "lookout.report.compression.threshhold";
     public static final String                      LOOKOUT_AUTOPOLL_INFO_METRIC_IGNORE     = "lookout.autopoll.info.ignore";
     public static final String                      LOOKOUT_AGENT_SERVER_PORT               = "lookout.agent.server.port";
     public static final String                      LOOKOUT_ANT_EVENT_LOG_ENABLE            = "lookout.ant.event.log.enable";

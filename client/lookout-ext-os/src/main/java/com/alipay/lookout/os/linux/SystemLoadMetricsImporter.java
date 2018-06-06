@@ -114,7 +114,7 @@ public class SystemLoadMetricsImporter extends CachedMetricsImporter {
                     .group(3));
             }
         } catch (Exception e) {
-            logger.warn("can't parse text at /proc/loadavg", e);
+            logger.info("warning,can't parse text at /proc/loadavg", e.getMessage());
         }
     }
 

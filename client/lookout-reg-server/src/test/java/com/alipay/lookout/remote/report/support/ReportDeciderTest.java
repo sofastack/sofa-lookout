@@ -55,4 +55,19 @@ public class ReportDeciderTest {
             throw new RuntimeException(e);
         }
     }
+
+    @Test
+    public void testMarkPassAndUnpass() {
+        ReportDecider decider = new ReportDecider();
+        decider.markPassed();
+        Assert.assertTrue(decider.isPassed());
+
+        decider.markUnpassed();
+        Assert.assertFalse(decider.isPassed());
+
+        decider.markPassed();
+        Assert.assertTrue(decider.isPassed());
+
+    }
+
 }
