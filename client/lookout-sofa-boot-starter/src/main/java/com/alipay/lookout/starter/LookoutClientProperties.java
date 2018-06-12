@@ -18,9 +18,6 @@ package com.alipay.lookout.starter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.alipay.lookout.core.config.LookoutConfig.DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT;
 import static com.alipay.lookout.core.config.LookoutConfig.DEFAULT_REPORT_BATCH_SIZE;
 import static com.alipay.lookout.core.config.MetricConfig.DEFAULT_MAX_METRICS_NUM;
@@ -30,27 +27,23 @@ import static com.alipay.lookout.core.config.MetricConfig.DEFAULT_MAX_METRICS_NU
  */
 @ConfigurationProperties(prefix = "com.alipay.sofa.lookout")
 public class LookoutClientProperties {
-    private boolean      enable                       = true;
+    private boolean enable                       = true;
 
-    private String       agentHostAddress;
+    private String  agentHostAddress;
 
-    private int          agentServerPort              = -1;
+    private int     agentServerPort              = -1;
 
-    private long         pollingInterval              = -1l;                                    //mills
+    private long    pollingInterval              = -1l;                                    //mills
 
-    private int          maxMetricsNum                = DEFAULT_MAX_METRICS_NUM;
+    private int     maxMetricsNum                = DEFAULT_MAX_METRICS_NUM;
 
-    private int          reportBatchSize              = DEFAULT_REPORT_BATCH_SIZE;
-    private boolean      autopollEnable               = true;
+    private int     reportBatchSize              = DEFAULT_REPORT_BATCH_SIZE;
 
-    private boolean      autopollInfoIgnore           = true;
-    private int          prometheusExporterServerPort = DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT;
+    private boolean autopollEnable               = true;
 
-    /**
-     * Comma-separated list of ignoreEndpointReportClasses to create :
-     * com.alipay.sofa.lookout.ignoreEndpointReportClasses=com.X,com.Y
-     */
-    private List<String> ignoreEndpointReportClasses  = new ArrayList<String>();
+    private boolean autopollInfoIgnore           = true;
+
+    private int     prometheusExporterServerPort = DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT;
 
     public long getPollingInterval() {
         return pollingInterval;
@@ -132,13 +125,5 @@ public class LookoutClientProperties {
 
     public void setPrometheusExporterServerPort(int prometheusExporterServerPort) {
         this.prometheusExporterServerPort = prometheusExporterServerPort;
-    }
-
-    public List<String> getIgnoreEndpointReportClasses() {
-        return ignoreEndpointReportClasses;
-    }
-
-    public void setIgnoreEndpointReportClasses(List<String> ignoreEndpointReportClasses) {
-        this.ignoreEndpointReportClasses = ignoreEndpointReportClasses;
     }
 }
