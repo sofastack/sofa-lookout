@@ -24,6 +24,7 @@ import com.alipay.lookout.client.DefaultLookoutClient;
 import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 import com.alipay.lookout.starter.LookoutClientProperties;
@@ -89,9 +90,16 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnClass(name = "com.alipay.lookout.remote.step.LookoutRegistry")
-    public MetricsRegistryFactory lookoutServerRegistryFactory() {
-        return new LookoutServerRegistryFactory(metricObservers);
+    public AddressService lookoutAddressService(LookoutConfig config) {
+        return LookoutRegistry.getAddressService(config);
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "com.alipay.lookout.remote.step.LookoutRegistry")
+    public MetricsRegistryFactory lookoutServerRegistryFactory(AddressService addressService) {
+        return new LookoutServerRegistryFactory(metricObservers, addressService);
     }
 
     @Bean
@@ -128,7 +136,7 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
 
     @Bean
     public Registry registry(List<MetricsRegistryFactory> metricsRegistryFactoryList,
-                             LookoutConfig lookoutConfig) {
+                             LookoutConfig lookoutConfig, AddressService addressService) {
         if (!lookoutConfig.getBoolean(LOOKOUT_ENABLE, true)) {
             return NoopRegistry.INSTANCE;
         }

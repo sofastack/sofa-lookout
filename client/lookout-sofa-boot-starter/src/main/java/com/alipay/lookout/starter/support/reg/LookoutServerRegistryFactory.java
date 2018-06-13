@@ -19,6 +19,7 @@ package com.alipay.lookout.starter.support.reg;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 import org.slf4j.Logger;
@@ -36,13 +37,21 @@ public class LookoutServerRegistryFactory implements
 
     private List<MetricObserver<LookoutMeasurement>> metricObservers;
 
+    private AddressService                           addressService;
+
     public LookoutServerRegistryFactory(List<MetricObserver<LookoutMeasurement>> metricObservers) {
         this.metricObservers = metricObservers;
     }
 
+    public LookoutServerRegistryFactory(List<MetricObserver<LookoutMeasurement>> metricObservers,
+                                        AddressService addressService) {
+        this.metricObservers = metricObservers;
+        this.addressService = addressService;
+    }
+
     @Override
     public LookoutRegistry get(LookoutConfig metricConfig) {
-        LookoutRegistry lookoutRegistry = new LookoutRegistry(metricConfig);
+        LookoutRegistry lookoutRegistry = new LookoutRegistry(metricConfig, this.addressService);
         //add observers to lookoutRegistry
         if (!CollectionUtils.isEmpty(metricObservers)) {
             for (MetricObserver observer : metricObservers)
