@@ -33,8 +33,8 @@ import java.util.List;
 public class LookoutMeasurementTest {
 
     static List<LookoutMeasurement> measurements;
-    static Registry registry = new DefaultRegistry();
-    static Id id = registry.createId("aaaaaa.bbbbbbb.ccccc");
+    static Registry                 registry = new DefaultRegistry();
+    static Id                       id       = registry.createId("aaaaaa.bbbbbbb.ccccc");
 
     @BeforeClass
     public static void init() {
@@ -78,7 +78,7 @@ public class LookoutMeasurementTest {
     }
 
     @Test
-    public void testLookoutMeasurementFor() {
+    public void testLookoutMeasurementFromMetric() {
         Counter counter = registry.counter(registry.createId("a.b.c"));
 
         LookoutMeasurement measurement = LookoutMeasurement.from(counter, null);
