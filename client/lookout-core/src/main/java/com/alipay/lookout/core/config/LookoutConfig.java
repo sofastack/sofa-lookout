@@ -40,6 +40,9 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      LOOKOUT_AGENT_SERVER_PORT               = "lookout.agent.server.port";
     public static final String                      LOOKOUT_ANT_EVENT_LOG_ENABLE            = "lookout.ant.event.log.enable";
     public static final String                      LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT = "lookout.prometheus.exporter.server.port";
+    // switch
+    public static final String                      LOOKOUT_INFO_REPORT_CLOSED              = "lookout.info.report.closed";
+    public static final String                      LOOKOUT_METRICS_REPORT_CLOSED           = "lookout.metrics.report.closed";
     // default value
     public static final int                         DEFAULT_WEB_SERVER_PORT                 = 8083;
     public static final int                         DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT = 9494;
