@@ -17,6 +17,8 @@
 package com.alipay.lookout.remote.model;
 
 import com.alipay.lookout.api.*;
+import com.alipay.lookout.api.composite.MixinMetric;
+import com.alipay.lookout.api.info.Info;
 import com.alipay.lookout.common.Assert;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.common.MeasurementUtil;
@@ -160,6 +162,20 @@ public class LookoutMeasurement {
         }
         for (Tag tag : id.tags()) {
             measurement.addTag(tag.key(), tag.value());
+        }
+        //add reserved tag
+        if (metric instanceof Info) {
+            measurement.addTag("_type_", "i");
+        } else if (metric instanceof Counter) {
+            measurement.addTag("_type_", "c");
+        } else if (metric instanceof Timer) {
+            measurement.addTag("_type_", "t");
+        } else if (metric instanceof Gauge) {
+            measurement.addTag("_type_", "g");
+        } else if (metric instanceof DistributionSummary) {
+            measurement.addTag("_type_", "d");
+        } else if (metric instanceof MixinMetric) {
+            measurement.addTag("_type_", "m");
         }
         // add common tags,If already assigned then ignore
         if (commonTagsAccessor != null) {

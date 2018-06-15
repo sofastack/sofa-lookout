@@ -206,11 +206,12 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
                     continue;
                 }
             }
-
             if (metric instanceof GaugeWrapper) {
                 Gauge gauge = ((GaugeWrapper) metric).getOriginalOne();
+                //如果是RollableTopGauge roll
                 if (gauge instanceof RollableTopGauge) {
                     ((RollableTopGauge) gauge).roll(polledTime);
+                    // and remove it from priorityMetricsCache.
                     it.remove();
                 }
             }

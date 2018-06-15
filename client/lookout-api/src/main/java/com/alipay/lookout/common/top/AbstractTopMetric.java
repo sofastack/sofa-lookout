@@ -104,6 +104,7 @@ abstract class AbstractTopMetric {
     }
 
     /**
+     * record rollTimeStamp and clear cache;
      * 不会并发poll所以不需要加锁（即使有并发重复roll也没关系）；
      *
      * @param rollStamp
@@ -111,6 +112,7 @@ abstract class AbstractTopMetric {
     public void roll(long rollStamp) {
         if (rollStamp > lastRolledStamp) {
             lastRolledStamp = rollStamp;
+            //clear cache set
             set = new TreeSet<TopUtil.Entry<Id, Long>>(comparator);
         }
     }

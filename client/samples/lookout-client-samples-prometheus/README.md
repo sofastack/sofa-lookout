@@ -32,7 +32,7 @@ scrape_configs:
 - 本地运行 prometheus docker
 
 ```
- docker run -d -p 9090:9090 -v prometheus.yml:/etc/prometheus/prometheus.yml  --name prom prom/prometheus:master
+ docker run -d -p 9090:9090 -v $PWD/prometheus.yml:/etc/prometheus/prometheus.yml  --name prom prom/prometheus:master
 ```
 
 - 浏览器访问: http://localhost:9090
