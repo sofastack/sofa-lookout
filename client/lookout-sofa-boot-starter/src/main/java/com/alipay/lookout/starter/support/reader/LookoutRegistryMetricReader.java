@@ -42,25 +42,25 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
     public LookoutRegistryMetricReader(DefaultRegistry registry) {
         //lookout defaultRegistry
         this.defaultRegistry = registry;
-        //事件监听
+        //event listener
         this.defaultRegistry.addListener(this);
     }
 
     /***
-     * Spring Boot 关注标准接口的几个实现
-     * @param metricName 名称
-     * @return 对应的 Actuator Metric
+     * Spring Boot Standard interface Implementation
+     * @param metricName name
+     * @return Converted Actuator Metric
      */
     @Override
     public Metric<?> findOne(String metricName) {
         if (StringUtils.isBlank(metricName)) {
             return null;
         }
-        //标准 Actuator 实现
+        //Standard Actuator Implementation
         Id id = this.defaultRegistry.createId(metricName);
         List<Metric> metricList = findMetricsById(id);
         if (metricList != null && metricList.size() > 0) {
-            //由于和底层 lookout 的映射关系,todo 先默认返回第一个
+            //Converted to lookout Metrics,default first
             return metricList.get(0);
         } else {
             return null;
