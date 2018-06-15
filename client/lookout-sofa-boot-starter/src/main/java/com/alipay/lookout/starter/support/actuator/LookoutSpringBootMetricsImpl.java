@@ -88,7 +88,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
-        //名字优雅点
+        //name better
         metricName = wrapName(LOOKOUT_GAUGE_PREFIX, metricName);
 
         SimpleLookoutGauge gauge = this.gauges.get(metricName);
@@ -105,11 +105,11 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
     }
 
     /***
-     * 构造 lookout 前缀信息
+     * Construce lookout prefix
      *
-     * @param metricName 名称
-     * @param prefix lookout 前缀
-     * @return 标识信息
+     * @param metricName metric name
+     * @param prefix lookout prefix
+     * @return unique metric
      */
     private String wrapName(String prefix, String metricName) {
         if (StringUtils.isBlank(metricName)) {

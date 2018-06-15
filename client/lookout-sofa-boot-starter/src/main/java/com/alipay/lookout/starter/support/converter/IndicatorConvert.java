@@ -41,7 +41,7 @@ public class IndicatorConvert {
                                                                    .getLogger(IndicatorConvert.class);
 
     /***
-     * 忽略返回 {@link Metric} 关键字数组集合
+     * ignore return {@link Metric} key words composite
      */
     private static final String[] IGNORED_METRIC_NAME_PREFIXES = new String[] {
             LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME,
@@ -60,9 +60,9 @@ public class IndicatorConvert {
     }
 
     /***
-     * 将 lookout 的 {@link Indicator} 实例转换为 {@link Metric} 实例列表,用于浏览器展示
-     * @param indicator Lookout 指标指示器
-     * @return Actuator 维度度量指标
+     * Convert form lookout  {@link Indicator} to Actuator {@link Metric} and also exposed to browser
+     * @param indicator Lookout
+     * @return Actuator Metrics
      */
     public static List<Metric> convertFromIndicator(Indicator indicator) {
         if (indicator == null) {
@@ -75,7 +75,7 @@ public class IndicatorConvert {
         if (id != null) {
             namePrefix = Utils.toMetricName(id);
         }
-        //忽略集合
+        //ignore collection
         if (isIgnoredMetrics(namePrefix)) {
             return indicatorMetricList;
         }
@@ -108,7 +108,7 @@ public class IndicatorConvert {
                                 date);
                             indicatorMetricList.add(metric);
                         } else {
-                            //忽略信息
+                            //ignore collection
                             logger.debug("Lookout value is not instance of Number. Value type is ["
                                          + value.getClass() + "].Ignored Lookout prefix = " + "["
                                          + namePrefix + LookoutConstants.DOT + name
@@ -116,7 +116,7 @@ public class IndicatorConvert {
                         }
                     }
                 } else {
-                    //忽略信息
+                    //ignore collection
                     logger.debug("Lookout value is not instance of Number. Value type is ["
                                  + measureValue.getClass() + "].Ignored Lookout prefix = " + "["
                                  + namePrefix + "] Measurement = [" + measurement.toString() + "]");
