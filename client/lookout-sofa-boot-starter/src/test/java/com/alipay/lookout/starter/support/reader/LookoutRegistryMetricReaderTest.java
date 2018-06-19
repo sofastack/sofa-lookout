@@ -17,7 +17,6 @@
 package com.alipay.lookout.starter.support.reader;
 
 import com.alipay.lookout.starter.base.AbstractTestBase;
-import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +58,7 @@ public class LookoutRegistryMetricReaderTest extends AbstractTestBase {
         ResponseEntity<String> response = testRestTemplate.getForEntity(restUrl, String.class);
         assertTrue(StringUtils.isNotBlank(response.getBody()));
         //
-        Metric metric = this.lookoutRegistryMetricReader
-            .findOne(LookoutSpringBootMetricsImpl.LOOKOUT_GAUGE_PREFIX + "response." + endpointId);
+        Metric metric = this.lookoutRegistryMetricReader.findOne("response." + endpointId);
         assertTrue(metric != null);
     }
 

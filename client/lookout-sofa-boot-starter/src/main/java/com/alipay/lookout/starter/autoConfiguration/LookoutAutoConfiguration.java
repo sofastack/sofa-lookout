@@ -167,7 +167,8 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     @ConditionalOnMissingBean
     @ConditionalOnBean(Registry.class)
     public LookoutRegistryMetricReader lookoutRegistryMetricReader(Registry lookoutMetricRegistry) {
-        ActuatorDefaultRegistry actuatorDefaultRegistry = this.getActuatorDefaultRegistry(lookoutMetricRegistry);
+        ActuatorDefaultRegistry actuatorDefaultRegistry = this
+            .getActuatorDefaultRegistry(lookoutMetricRegistry);
         return new LookoutRegistryMetricReader(actuatorDefaultRegistry);
     }
 

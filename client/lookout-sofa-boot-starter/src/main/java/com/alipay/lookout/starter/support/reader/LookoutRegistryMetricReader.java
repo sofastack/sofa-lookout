@@ -21,6 +21,7 @@ import com.alipay.lookout.api.Indicator;
 import com.alipay.lookout.api.MetricRegistry;
 import com.alipay.lookout.event.MetricRegistryListener;
 import com.alipay.lookout.starter.support.actuator.ActuatorDefaultRegistry;
+import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
 import com.alipay.lookout.starter.support.converter.IndicatorConvert;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.actuate.metrics.Metric;
@@ -59,6 +60,7 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
         if (StringUtils.isBlank(metricName)) {
             return null;
         }
+        metricName = LookoutSpringBootMetricsImpl.LOOKOUT_PREFIX + metricName;
         //Standard Actuator Implementation
         Id id = this.actuatorDefaultRegistry.createId(metricName);
         List<Metric> metricList = findMetricsById(id);
@@ -81,7 +83,8 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
 
     @Override
     public Iterable<Metric<?>> findAll() {
-        final Iterator<com.alipay.lookout.api.Metric> lookoutIt = this.actuatorDefaultRegistry.iterator();
+        final Iterator<com.alipay.lookout.api.Metric> lookoutIt = this.actuatorDefaultRegistry
+            .iterator();
         return new Iterable<Metric<?>>() {
             @Override
             public Iterator<Metric<?>> iterator() {

@@ -24,6 +24,7 @@ import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.boot.actuate.metrics.GaugeService;
 import org.springframework.boot.actuate.metrics.Metric;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -69,10 +70,12 @@ public class LookoutSpringBootMetricsImplTest extends AbstractTestBase {
         this.counterService.increment(metricName);
         Metric metric = this.lookoutRegistryMetricReader.findOne(metricName);
         assertTrue(metric != null);
+        assertEquals(1L, metric.getValue());
         //decrement
         this.counterService.decrement(metricName);
         metric = this.lookoutRegistryMetricReader.findOne(metricName);
-        assertTrue(metric == null);
+        assertTrue(metric != null);
+        assertEquals(0L, metric.getValue());
     }
 
     /**

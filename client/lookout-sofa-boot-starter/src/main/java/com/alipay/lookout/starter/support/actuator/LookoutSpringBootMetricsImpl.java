@@ -35,13 +35,11 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class LookoutSpringBootMetricsImpl implements CounterService, GaugeService {
 
-    private static final String                             LOOKOUT_SUFFIX         = "lookout.";
+    public static final String                              LOOKOUT_PREFIX         = "lookout.";
 
-    public static final String                              LOOKOUT_COUNTER_PREFIX = LOOKOUT_SUFFIX
-                                                                                     + "counter.";
+    private static final String                             LOOKOUT_COUNTER_PREFIX = LOOKOUT_PREFIX;
 
-    public static final String                              LOOKOUT_GAUGE_PREFIX   = LOOKOUT_SUFFIX
-                                                                                     + "gauge.";
+    private static final String                             LOOKOUT_GAUGE_PREFIX   = LOOKOUT_PREFIX;
 
     private final Registry                                  registry;
 
