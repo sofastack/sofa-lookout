@@ -136,12 +136,12 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
 
     @Bean
     public Registry registry(List<MetricsRegistryFactory> metricsRegistryFactoryList,
-                             LookoutConfig lookoutConfig, AddressService addressService) {
+                             LookoutConfig lookoutConfig) {
         if (!lookoutConfig.getBoolean(LOOKOUT_ENABLE, true)) {
             return NoopRegistry.INSTANCE;
         }
         DefaultLookoutClient lookoutClient = new DefaultLookoutClient(
-            lookoutConfig.getString(APP_NAME));
+                lookoutConfig.getString(APP_NAME));
         for (MetricsRegistryFactory metricsRegistryFactory : metricsRegistryFactoryList) {
             lookoutClient.addRegistry(metricsRegistryFactory.get(lookoutConfig));
         }
