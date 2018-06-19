@@ -16,11 +16,18 @@
  */
 package com.alipay.lookout.starter.support.actuator;
 
+import com.alipay.lookout.core.DefaultRegistry;
+import com.alipay.lookout.core.config.MetricConfig;
+
 /**
  * ActuatorDefaultRegistry
  *
  * @author yangguanchao
  * @since 2018/06/19
  */
-public class ActuatorDefaultRegistry {
+public class ActuatorDefaultRegistry extends DefaultRegistry{
+
+    public ActuatorDefaultRegistry(MetricConfig metricConfig) {
+        super(metricConfig);
+    }
 }
