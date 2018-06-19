@@ -37,10 +37,10 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
 
     private static final String                             LOOKOUT_SUFFIX         = "lookout.";
 
-    private static final String                             LOOKOUT_COUNTER_PREFIX = LOOKOUT_SUFFIX
+    public static final String                              LOOKOUT_COUNTER_PREFIX = LOOKOUT_SUFFIX
                                                                                      + "counter.";
 
-    private static final String                             LOOKOUT_GAUGE_PREFIX   = LOOKOUT_SUFFIX
+    public static final String                              LOOKOUT_GAUGE_PREFIX   = LOOKOUT_SUFFIX
                                                                                      + "gauge.";
 
     private final Registry                                  registry;

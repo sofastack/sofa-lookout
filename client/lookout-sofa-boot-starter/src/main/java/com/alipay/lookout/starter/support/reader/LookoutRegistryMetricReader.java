@@ -100,13 +100,13 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
 
     @Override
     public long count() {
-        Map<Id, com.alipay.lookout.api.Metric> lookoutDefaultMetrics = this.defaultRegistry
-            .getMetrics();
-        if (lookoutDefaultMetrics == null || lookoutDefaultMetrics.size() == 0) {
-            return 0;
-        } else {
-            return lookoutDefaultMetrics.size();
+        Iterator<com.alipay.lookout.api.Metric> iterator = this.defaultRegistry.iterator();
+        long count = 0;
+        while (iterator.hasNext()) {
+            iterator.next();
+            count++;
         }
+        return count;
     }
 
     @Override

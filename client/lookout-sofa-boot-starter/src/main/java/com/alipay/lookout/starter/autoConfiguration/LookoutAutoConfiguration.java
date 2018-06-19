@@ -164,14 +164,17 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnBean(Registry.class)
-    public MetricReaderPublicMetrics lookoutPublicMetrics(Registry lookoutMetricRegistry) {
+    public LookoutRegistryMetricReader lookoutRegistryMetricReader(Registry lookoutMetricRegistry) {
         DefaultRegistry defaultRegistry = this.getDefaultRegistry(lookoutMetricRegistry);
-        if (defaultRegistry != null) {
-            LookoutRegistryMetricReader reader = new LookoutRegistryMetricReader(defaultRegistry);
-            return new MetricReaderPublicMetrics(reader);
-        }
-        return null;
+        return new LookoutRegistryMetricReader(defaultRegistry);
+    }
+
+    @Bean
+    @ConditionalOnBean(LookoutRegistryMetricReader.class)
+    public MetricReaderPublicMetrics lookoutPublicMetrics(LookoutRegistryMetricReader lookoutRegistryMetricReader) {
+        return new MetricReaderPublicMetrics(lookoutRegistryMetricReader);
     }
 
     private LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {

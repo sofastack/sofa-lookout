@@ -19,7 +19,6 @@ package com.alipay.lookout.jvm;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.api.info.Info;
-import com.alipay.lookout.common.LookoutIdNameConstants;
 import com.alipay.lookout.spi.MetricsImporter;
 
 import java.util.Map;

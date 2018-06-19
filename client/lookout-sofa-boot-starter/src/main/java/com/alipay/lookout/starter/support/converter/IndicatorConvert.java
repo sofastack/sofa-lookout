@@ -19,10 +19,10 @@ package com.alipay.lookout.starter.support.converter;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Indicator;
 import com.alipay.lookout.api.Measurement;
-import com.alipay.lookout.api.Utils;
 import com.alipay.lookout.common.LookoutConstants;
-import com.alipay.lookout.common.LookoutIdNameConstants;
+import com.alipay.lookout.jvm.LookoutIdNameConstants;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
+import com.alipay.lookout.common.utils.CommonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.boot.actuate.metrics.Metric;
@@ -73,7 +73,7 @@ public class IndicatorConvert {
         Date date = new Date(indicator.getTimestamp());
         String namePrefix = "";
         if (id != null) {
-            namePrefix = Utils.toMetricName(id);
+            namePrefix = CommonUtil.toMetricName(id);
         }
         //ignore collection
         if (isIgnoredMetrics(namePrefix)) {

@@ -25,7 +25,7 @@ import java.util.Map;
  * standard implementation
  * Created by kevin.luy@alipay.com on 2017/1/26.
  */
-public final class DefaultId implements Id {
+final class DefaultId implements Id {
 
     private final String name;
     private final TagSet tags;

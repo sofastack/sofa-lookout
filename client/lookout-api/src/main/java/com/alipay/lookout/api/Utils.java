@@ -52,19 +52,4 @@ public final class Utils {
         }
         return null;
     }
-
-    /**
-     * Convert a dimensional metric id {@slink Id} to  a hierarchical metric name.
-     *
-     * @param id a dimensional metric id
-     * @return hierarchical metric name
-     */
-    public static String toMetricName(Id id) {
-        StringBuilder buf = new StringBuilder();
-        buf.append(id.name());
-        for (Tag t : id.tags()) {
-            buf.append('.').append(t.key()).append('-').append(t.value());
-        }
-        return buf.toString();
-    }
 }
