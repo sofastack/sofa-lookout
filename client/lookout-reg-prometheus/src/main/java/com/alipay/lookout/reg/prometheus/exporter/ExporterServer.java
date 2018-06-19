@@ -39,7 +39,8 @@ public class ExporterServer {
             httpServer = HttpServer.create(new InetSocketAddress(port), 2);
             httpServer.setExecutor(singleThreadPool);
         } catch (IOException e) {
-            throw new RuntimeException("prometheus exporter server create err!", e);
+            throw new RuntimeException("prometheus exporter server create err! And port = " + port,
+                e);
         }
     }
 

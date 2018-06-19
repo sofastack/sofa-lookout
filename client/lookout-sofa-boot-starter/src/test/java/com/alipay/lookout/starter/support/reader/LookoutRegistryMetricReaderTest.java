@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
 import org.springframework.boot.actuate.metrics.Metric;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import static org.junit.Assert.assertTrue;
  * @version 1.0
  * @since <pre>2018/06/15</pre>
  */
+@ActiveProfiles("reader")
 public class LookoutRegistryMetricReaderTest extends AbstractTestBase {
 
     @Autowired

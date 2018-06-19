@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.boot.actuate.metrics.GaugeService;
 import org.springframework.boot.actuate.metrics.Metric;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,6 +35,7 @@ import static org.junit.Assert.assertTrue;
  * @version 1.0
  * @since <pre>2018/06/19</pre>
  */
+@ActiveProfiles("metrics")
 public class LookoutSpringBootMetricsImplTest extends AbstractTestBase {
 
     @Autowired

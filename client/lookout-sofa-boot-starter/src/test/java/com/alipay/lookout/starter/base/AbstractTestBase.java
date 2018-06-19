@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.starter.base;
 
+import com.alipay.lookout.starter.support.reg.MetricsRegistryFactory;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
 
 /**
  * referenced document: http://docs.spring.io/spring-boot/docs/1.4.2.RELEASE/reference/htmlsingle/#boot-features-testing
@@ -38,12 +41,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public abstract class AbstractTestBase {
 
     @LocalServerPort
-    private int                definedPort;
+    private int                            definedPort;
 
     @Autowired
-    protected TestRestTemplate testRestTemplate;
+    protected TestRestTemplate             testRestTemplate;
 
-    protected String           urlHttpPrefix;
+    @Autowired
+    protected List<MetricsRegistryFactory> metricsRegistryFactoryList;
+
+    protected String                       urlHttpPrefix;
 
     @Before
     public void setUp() {

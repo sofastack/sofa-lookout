@@ -18,16 +18,33 @@ package com.alipay.lookout.starter.support.reg;
 
 import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.reg.prometheus.PrometheusRegistry;
+import org.springframework.beans.factory.DisposableBean;
 
 /**
  * Created by kevin.luy@alipay.com on 2018/5/11.
  */
 public class PrometheusMetricsRegistryFactory
                                              implements
-                                             MetricsRegistryFactory<PrometheusRegistry, MetricConfig> {
+                                             MetricsRegistryFactory<PrometheusRegistry, MetricConfig>,
+                                             DisposableBean {
+
+    /**
+     * singleton {@link PrometheusRegistry}
+     */
+    private PrometheusRegistry prometheusRegistry = null;
 
     @Override
-    public PrometheusRegistry get(MetricConfig metricConfig) {
-        return new PrometheusRegistry(metricConfig);
+    public synchronized PrometheusRegistry get(MetricConfig metricConfig) {
+        if (this.prometheusRegistry == null) {
+            this.prometheusRegistry = new PrometheusRegistry(metricConfig);
+        }
+        return this.prometheusRegistry;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if (this.prometheusRegistry != null) {
+            this.prometheusRegistry.close();
+        }
     }
 }
