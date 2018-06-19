@@ -96,41 +96,11 @@ public class LookoutSpringBootMetricsImplTest extends AbstractTestBase {
      */
     @Test
     public void testSubmit() throws Exception {
-
+        String gaugeName = "gaugeName";
+        double value = 10;
+        this.gaugeService.submit(gaugeName, value);
+        //get
+        Metric metric = this.lookoutRegistryMetricReader.findOne(gaugeName);
+        assertEquals(value, metric.getValue());
     }
-
-    /**
-     * Method: value()
-     */
-    @Test
-    public void testValue() throws Exception {
-
-    }
-
-    /**
-     * Method: setValue(double value)
-     */
-    @Test
-    public void testSetValue() throws Exception {
-
-    }
-
-    /**
-     * Method: wrapName(String prefix, String metricName)
-     */
-    @Test
-    public void testWrapName() throws Exception {
-
-        /* 
-        try { 
-           Method method = LookoutSpringBootMetricsImpl.getClass().getMethod("wrapName", String.class, String.class); 
-           method.setAccessible(true); 
-           method.invoke(<Object>, <Parameters>); 
-        } catch(NoSuchMethodException e) { 
-        } catch(IllegalAccessException e) { 
-        } catch(InvocationTargetException e) { 
-        } 
-        */
-    }
-
 }
