@@ -22,20 +22,29 @@ import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.client.DefaultLookoutClient;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.report.AddressService;
+import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 import com.alipay.lookout.starter.LookoutClientProperties;
-import com.alipay.lookout.starter.support.reg.DropWizardMetricsRegistryFactory;
-import com.alipay.lookout.starter.support.reg.LookoutServerRegistryFactory;
-import com.alipay.lookout.starter.support.reg.MetricsRegistryFactory;
-import com.alipay.lookout.starter.support.reg.PrometheusMetricsRegistryFactory;
+import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
+import com.alipay.lookout.starter.support.actuator.SpringBootActuatorRegistry;
+import com.alipay.lookout.starter.support.reader.LookoutRegistryMetricReader;
+import com.alipay.lookout.starter.support.reg.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.MetricsDropwizardAutoConfiguration;
+import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
+import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.actuate.metrics.GaugeService;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +61,7 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
 @AutoConfigureOrder(-100)
 @Configuration
 @EnableConfigurationProperties(LookoutClientProperties.class)
+@AutoConfigureBefore(MetricsDropwizardAutoConfiguration.class)
 public class LookoutAutoConfiguration implements BeanFactoryAware {
     private static final Logger                      logger = LoggerFactory
                                                                 .getLogger(LookoutAutoConfiguration.class);
@@ -76,9 +86,22 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnClass(name = "com.alipay.lookout.remote.step.LookoutRegistry")
-    public MetricsRegistryFactory lookoutServerRegistryFactory() {
-        return new LookoutServerRegistryFactory(metricObservers);
+    public AddressService lookoutAddressService(LookoutConfig config) {
+        return LookoutRegistry.getAddressService(config);
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "com.alipay.lookout.remote.step.LookoutRegistry")
+    public MetricsRegistryFactory lookoutServerRegistryFactory(AddressService addressService) {
+        return new LookoutServerRegistryFactory(metricObservers, addressService);
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.boot.actuate.metrics.Metric")
+    public SpringBootActuatorRegistryFactory springBootActuatorServerRegistryFactory() {
+        return new SpringBootActuatorRegistryFactory();
     }
 
     @Bean
@@ -130,6 +153,30 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         return lookoutClient.getRegistry();
     }
 
+    @Bean
+    @ConditionalOnMissingBean({ LookoutSpringBootMetricsImpl.class, CounterService.class,
+            GaugeService.class })
+    public LookoutSpringBootMetricsImpl lookoutMetricServices(Registry lookoutMetricRegistry) {
+        logger.info("Spring Boot Metrics binding to SOFALookout Implementation!");
+        return new LookoutSpringBootMetricsImpl(lookoutMetricRegistry);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(SpringBootActuatorRegistryFactory.class)
+    public LookoutRegistryMetricReader lookoutRegistryMetricReader(SpringBootActuatorRegistryFactory springBootActuatorRegistryFactory,
+                                                                   LookoutConfig lookoutConfig) {
+        SpringBootActuatorRegistry springBootActuatorRegistry = springBootActuatorRegistryFactory
+            .get(lookoutConfig);
+        return new LookoutRegistryMetricReader(springBootActuatorRegistry);
+    }
+
+    @Bean
+    @ConditionalOnBean(LookoutRegistryMetricReader.class)
+    public MetricReaderPublicMetrics lookoutPublicMetrics(LookoutRegistryMetricReader lookoutRegistryMetricReader) {
+        return new MetricReaderPublicMetrics(lookoutRegistryMetricReader);
+    }
+
     protected LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {
         LookoutConfig lookoutConfig = new LookoutConfig();
         lookoutConfig.setProperty(LOOKOUT_ENABLE, lookoutClientProperties.isEnable());
@@ -153,5 +200,4 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         }
         return lookoutConfig;
     }
-
 }

@@ -14,29 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.dropwizard.metrics;
+package com.alipay.lookout.starter.support.actuator;
 
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.common.utils.CommonUtil;
+import com.alipay.lookout.core.DefaultRegistry;
+import com.alipay.lookout.core.config.MetricConfig;
 
 /**
- * http://metrics20.org/
- * <p>
- * Created by kevin.luy@alipay.com on 2017/1/26.
+ * SpringBootActuatorRegistry
+ *
+ * @author yangguanchao
+ * @since 2018/06/19
  */
-final class NameUtils {
+public class SpringBootActuatorRegistry extends DefaultRegistry {
 
-    private NameUtils() {
+    public SpringBootActuatorRegistry(MetricConfig metricConfig) {
+        super(metricConfig);
     }
-
-    /**
-     * Convert a dimensional metric id {@slink Id} to  a hierarchical metric name.
-     *
-     * @param id a dimensional metric id
-     * @return hierarchical metric name
-     */
-    static String toMetricName(Id id) {
-        return CommonUtil.toMetricName(id);
-    }
-
 }

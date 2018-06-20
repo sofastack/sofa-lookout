@@ -14,29 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.dropwizard.metrics;
-
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.common.utils.CommonUtil;
+package com.alipay.lookout.jvm;
 
 /**
- * http://metrics20.org/
- * <p>
- * Created by kevin.luy@alipay.com on 2017/1/26.
+ * LookoutIdNameConstants
+ *
+ * @author yangguanchao
+ * @since 2018/01/27
  */
-final class NameUtils {
+public class LookoutIdNameConstants {
 
-    private NameUtils() {
-    }
+    public static final String JVM_SYSTEM_PROP_NAME = "jvm.system.properties";
 
-    /**
-     * Convert a dimensional metric id {@slink Id} to  a hierarchical metric name.
-     *
-     * @param id a dimensional metric id
-     * @return hierarchical metric name
-     */
-    static String toMetricName(Id id) {
-        return CommonUtil.toMetricName(id);
-    }
-
+    public static final String JVM_SYSTEM_ENV_NAME  = "jvm.system.env";
 }
