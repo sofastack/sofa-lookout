@@ -19,7 +19,6 @@ package com.alipay.lookout.starter.autoConfiguration;
 import com.alipay.lookout.api.NoopRegistry;
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.api.Registry;
-import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.client.DefaultLookoutClient;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
@@ -164,10 +163,11 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(Registry.class)
-    public LookoutRegistryMetricReader lookoutRegistryMetricReader(Registry lookoutMetricRegistry) {
-        SpringBootActuatorRegistry springBootActuatorRegistry = this
-            .getActuatorDefaultRegistry(lookoutMetricRegistry);
+    @ConditionalOnBean(SpringBootActuatorRegistryFactory.class)
+    public LookoutRegistryMetricReader lookoutRegistryMetricReader(SpringBootActuatorRegistryFactory springBootActuatorRegistryFactory,
+                                                                   LookoutConfig lookoutConfig) {
+        SpringBootActuatorRegistry springBootActuatorRegistry = springBootActuatorRegistryFactory
+            .get(lookoutConfig);
         return new LookoutRegistryMetricReader(springBootActuatorRegistry);
     }
 
@@ -199,35 +199,5 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
                 lookoutClientProperties.getPollingInterval());
         }
         return lookoutConfig;
-    }
-
-    protected SpringBootActuatorRegistry getActuatorDefaultRegistry(Registry lookoutMetricRegistry) {
-        if (lookoutMetricRegistry instanceof SpringBootActuatorRegistry) {
-            return (SpringBootActuatorRegistry) lookoutMetricRegistry;
-        }
-        if (lookoutMetricRegistry instanceof CompositeRegistry) {
-            CompositeRegistry compositeRegistry = (CompositeRegistry) lookoutMetricRegistry;
-            for (Registry registry : compositeRegistry.getRegistries()) {
-                if (registry instanceof SpringBootActuatorRegistry) {
-                    return (SpringBootActuatorRegistry) registry;
-                }
-            }
-        }
-        return null;
-    }
-
-    protected LookoutRegistry getLookoutRegistry(Registry lookoutMetricRegistry) {
-        if (lookoutMetricRegistry instanceof LookoutRegistry) {
-            return (LookoutRegistry) lookoutMetricRegistry;
-        }
-        if (lookoutMetricRegistry instanceof CompositeRegistry) {
-            CompositeRegistry compositeRegistry = (CompositeRegistry) lookoutMetricRegistry;
-            for (Registry registry : compositeRegistry.getRegistries()) {
-                if (registry instanceof LookoutRegistry) {
-                    return (LookoutRegistry) registry;
-                }
-            }
-        }
-        return null;
     }
 }

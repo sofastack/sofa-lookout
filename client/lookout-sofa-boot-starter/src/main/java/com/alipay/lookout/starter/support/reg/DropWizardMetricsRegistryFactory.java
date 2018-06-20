@@ -27,17 +27,23 @@ import com.codahale.metrics.MetricRegistry;
 public class DropWizardMetricsRegistryFactory
                                              implements
                                              MetricsRegistryFactory<DropWizardMetricsRegistry, MetricConfig> {
-    MetricRegistry metricRegistry;
+    private MetricRegistry            metricRegistry;
+
+    private DropWizardMetricsRegistry dropWizardMetricsRegistry;
 
     public DropWizardMetricsRegistryFactory(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
     }
 
     @Override
-    public DropWizardMetricsRegistry get(MetricConfig metricConfig) {
+    public synchronized DropWizardMetricsRegistry get(MetricConfig metricConfig) {
         if (metricRegistry == null) {
             return null;
         }
-        return new DropWizardMetricsRegistry(Clock.SYSTEM, metricRegistry);
+        if (this.dropWizardMetricsRegistry == null) {
+            this.dropWizardMetricsRegistry = new DropWizardMetricsRegistry(Clock.SYSTEM,
+                metricRegistry);
+        }
+        return this.dropWizardMetricsRegistry;
     }
 }

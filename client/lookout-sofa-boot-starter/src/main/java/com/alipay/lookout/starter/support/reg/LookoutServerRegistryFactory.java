@@ -32,8 +32,10 @@ import java.util.List;
  */
 public class LookoutServerRegistryFactory implements
                                          MetricsRegistryFactory<LookoutRegistry, LookoutConfig> {
-    private static final Logger                      logger = LookoutLoggerFactory
-                                                                .getLogger(LookoutServerRegistryFactory.class);
+    private static final Logger                      logger          = LookoutLoggerFactory
+                                                                         .getLogger(LookoutServerRegistryFactory.class);
+
+    private LookoutRegistry                          lookoutRegistry = null;
 
     private List<MetricObserver<LookoutMeasurement>> metricObservers;
 
@@ -50,14 +52,16 @@ public class LookoutServerRegistryFactory implements
     }
 
     @Override
-    public LookoutRegistry get(LookoutConfig metricConfig) {
-        LookoutRegistry lookoutRegistry = new LookoutRegistry(metricConfig, this.addressService);
-        //add observers to lookoutRegistry
-        if (!CollectionUtils.isEmpty(metricObservers)) {
-            for (MetricObserver observer : metricObservers)
-                lookoutRegistry.addMetricObserver(observer);
-            logger.info("add metricObservers:{} to lookout registry.", metricObservers);
+    public synchronized LookoutRegistry get(LookoutConfig metricConfig) {
+        if (this.lookoutRegistry == null) {
+            LookoutRegistry lookoutRegistry = new LookoutRegistry(metricConfig, this.addressService);
+            //add observers to lookoutRegistry
+            if (!CollectionUtils.isEmpty(metricObservers)) {
+                for (MetricObserver observer : metricObservers)
+                    lookoutRegistry.addMetricObserver(observer);
+                logger.info("add metricObservers:{} to lookout registry.", metricObservers);
+            }
         }
-        return lookoutRegistry;
+        return this.lookoutRegistry;
     }
 }

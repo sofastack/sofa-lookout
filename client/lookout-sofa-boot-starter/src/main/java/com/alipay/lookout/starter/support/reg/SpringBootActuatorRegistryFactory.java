@@ -29,8 +29,13 @@ public class SpringBootActuatorRegistryFactory
                                               implements
                                               MetricsRegistryFactory<SpringBootActuatorRegistry, LookoutConfig> {
 
+    private SpringBootActuatorRegistry springBootActuatorRegistry;
+
     @Override
-    public SpringBootActuatorRegistry get(LookoutConfig metricConfig) {
-        return new SpringBootActuatorRegistry(metricConfig);
+    public synchronized SpringBootActuatorRegistry get(LookoutConfig metricConfig) {
+        if (this.springBootActuatorRegistry == null) {
+            this.springBootActuatorRegistry = new SpringBootActuatorRegistry(metricConfig);
+        }
+        return this.springBootActuatorRegistry;
     }
 }
