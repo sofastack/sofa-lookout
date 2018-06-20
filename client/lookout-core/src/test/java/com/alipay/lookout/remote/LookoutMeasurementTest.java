@@ -16,8 +16,7 @@
  */
 package com.alipay.lookout.remote;
 
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Registry;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import org.junit.Assert;
@@ -76,6 +75,23 @@ public class LookoutMeasurementTest {
         String jsonStr = "\"lsjdfljalsjdfljsalflsajfdljslfjlja3\":\"xxxxxxxxxxxx3\"},\"aaaaaa.bbbbbbb.ccccc\":{\"xxx3\":3,\"yyy3\":3,\"zzz3\":3}}";
         System.out.println(jsonStr);
         Assert.assertTrue(str.contains(jsonStr));
+    }
+
+    @Test
+    public void testLookoutMeasurementFromMetric() {
+        Counter counter = registry.counter(registry.createId("a.b.c"));
+
+        LookoutMeasurement measurement = LookoutMeasurement.from(counter, null);
+        Assert.assertTrue("c".equals(measurement.getTags().get("_type_")));
+
+        DistributionSummary ds = registry.distributionSummary(registry.createId("a.b.d"));
+        measurement = LookoutMeasurement.from(ds, null);
+        Assert.assertTrue("d".equals(measurement.getTags().get("_type_")));
+
+        Timer timer = registry.timer(registry.createId("a.b.t"));
+        measurement = LookoutMeasurement.from(timer, null);
+        Assert.assertTrue("t".equals(measurement.getTags().get("_type_")));
+
     }
 
 }
