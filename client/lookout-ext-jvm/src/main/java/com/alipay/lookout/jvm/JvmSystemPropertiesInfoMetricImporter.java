@@ -31,7 +31,7 @@ public class JvmSystemPropertiesInfoMetricImporter implements MetricsImporter {
 
     @Override
     public void register(Registry registry) {
-        Id id = registry.createId("jvm.system.properties");
+        Id id = registry.createId(LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME);
         registry.info(id, new Info<Properties>() {
             @Override
             public Properties value() {
@@ -39,7 +39,7 @@ public class JvmSystemPropertiesInfoMetricImporter implements MetricsImporter {
             }
         });
 
-        Id envId = registry.createId("jvm.system.env");
+        Id envId = registry.createId(LookoutIdNameConstants.JVM_SYSTEM_ENV_NAME);
         registry.info(envId, new Info<Map<String, String>>() {
             @Override
             public Map<String, String> value() {

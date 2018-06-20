@@ -14,29 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.dropwizard.metrics;
+package com.alipay.lookout.common.utils;
 
 import com.alipay.lookout.api.Id;
-import com.alipay.lookout.common.utils.CommonUtil;
+import com.alipay.lookout.api.Tag;
 
 /**
- * http://metrics20.org/
- * <p>
- * Created by kevin.luy@alipay.com on 2017/1/26.
+ * CommonUtil
+ *
+ * @author yangguanchao
+ * @since 2018/06/19
  */
-final class NameUtils {
-
-    private NameUtils() {
-    }
+public class CommonUtil {
 
     /**
-     * Convert a dimensional metric id {@slink Id} to  a hierarchical metric name.
+     * Convert a dimensional metric id {@link Id} to  a hierarchical metric name.
      *
      * @param id a dimensional metric id
      * @return hierarchical metric name
      */
-    static String toMetricName(Id id) {
-        return CommonUtil.toMetricName(id);
+    public static String toMetricName(Id id) {
+        StringBuilder buf = new StringBuilder();
+        buf.append(id.name());
+        for (Tag t : id.tags()) {
+            buf.append('.').append(t.key()).append('-').append(t.value());
+        }
+        return buf.toString();
     }
-
 }

@@ -38,9 +38,11 @@ public class LookoutClientProperties {
     private int     maxMetricsNum                = DEFAULT_MAX_METRICS_NUM;
 
     private int     reportBatchSize              = DEFAULT_REPORT_BATCH_SIZE;
+
     private boolean autopollEnable               = true;
 
     private boolean autopollInfoIgnore           = true;
+
     private int     prometheusExporterServerPort = DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT;
 
     public long getPollingInterval() {

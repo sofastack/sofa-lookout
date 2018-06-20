@@ -47,29 +47,43 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
      */
     public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer,
                            LookoutConfig config) {
+        this(clock, observer, config, null);
+    }
+
+    public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer,
+                           LookoutConfig config, AddressService addressService) {
         super(clock, config);
         if (observer == null) {
-            observer = new HttpObserver(config, getAddressService(config), this,
-                new ReportDecider());
+            observer = new HttpObserver(config, addressService == null ? getAddressService(config)
+                : addressService, this, new ReportDecider());
         }
         addMetricObserver(observer);
         this.poller = new SchedulerPoller(this, config, metricObserverComposite);
         this.poller.start();
     }
 
-    public LookoutRegistry(LookoutConfig config) {
-        this(Clock.SYSTEM, null, config);
-    }
-
-    public LookoutRegistry(MetricObserver<LookoutMeasurement> observer) {
-        this(Clock.SYSTEM, observer, new LookoutConfig());
-    }
-
-    protected AddressService getAddressService(LookoutConfig config) {
+    /***
+     * Generate Lookout AddressService
+     * @param config lookout config
+     * @return AddressService generated
+     */
+    public static AddressService getAddressService(LookoutConfig config) {
         String addressServiceClassName = config.getString(LookoutConfig.ADDRESS_SERVICE_CLASS_NAME,
             DefaultAddressService.class.getName());
         return ClassUtil.newInstance(addressServiceClassName, new Class[] { String.class },
             new Object[] { config.getString(LookoutConfig.APP_NAME) });
+    }
+
+    public LookoutRegistry(LookoutConfig config) {
+        this(Clock.SYSTEM, null, config);
+    }
+
+    public LookoutRegistry(LookoutConfig config, AddressService addressService) {
+        this(Clock.SYSTEM, null, config, addressService);
+    }
+
+    public LookoutRegistry(MetricObserver<LookoutMeasurement> observer) {
+        this(Clock.SYSTEM, observer, new LookoutConfig());
     }
 
     @Override
@@ -79,8 +93,9 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
 
     @Override
     public void setCommonTag(String name, String value) {
-        if (name != null && value != null)
+        if (name != null && value != null) {
             commonTags.put(name, value);
+        }
     }
 
     @Override
