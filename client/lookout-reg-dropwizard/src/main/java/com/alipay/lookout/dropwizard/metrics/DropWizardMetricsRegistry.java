@@ -35,6 +35,7 @@ import static com.alipay.lookout.dropwizard.metrics.NameUtils.toMetricName;
 /**
  * Created by kevin.luy@alipay.com on 2017/1/26.
  */
+@Deprecated
 public class DropWizardMetricsRegistry extends MetricRegistry {
     protected final Logger                            logger        = LookoutLoggerFactory
                                                                         .getLogger(DropWizardMetricsRegistry.class);

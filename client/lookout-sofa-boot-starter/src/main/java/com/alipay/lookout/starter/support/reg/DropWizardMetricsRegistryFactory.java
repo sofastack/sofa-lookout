@@ -24,6 +24,7 @@ import com.codahale.metrics.MetricRegistry;
 /**
  * Created by kevin.luy@alipay.com on 2018/5/10.
  */
+@Deprecated
 public class DropWizardMetricsRegistryFactory
                                              implements
                                              MetricsRegistryFactory<DropWizardMetricsRegistry, MetricConfig> {

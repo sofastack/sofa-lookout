@@ -28,7 +28,7 @@ import com.alipay.lookout.api.Tag;
 public class CommonUtil {
 
     /**
-     * Convert a dimensional metric id {@slink Id} to  a hierarchical metric name.
+     * Convert a dimensional metric id {@link Id} to  a hierarchical metric name.
      *
      * @param id a dimensional metric id
      * @return hierarchical metric name
