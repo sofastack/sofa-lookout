@@ -20,7 +20,7 @@ import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Indicator;
 import com.alipay.lookout.api.MetricRegistry;
 import com.alipay.lookout.event.MetricRegistryListener;
-import com.alipay.lookout.starter.support.actuator.ActuatorDefaultRegistry;
+import com.alipay.lookout.starter.support.actuator.SpringBootActuatorRegistry;
 import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
 import com.alipay.lookout.starter.support.converter.IndicatorConvert;
 import org.apache.commons.lang3.StringUtils;
@@ -41,13 +41,13 @@ import java.util.List;
  */
 public class LookoutRegistryMetricReader implements MetricReader, MetricRegistryListener {
 
-    private final ActuatorDefaultRegistry actuatorDefaultRegistry;
+    private final SpringBootActuatorRegistry springBootActuatorRegistry;
 
-    public LookoutRegistryMetricReader(ActuatorDefaultRegistry actuatorDefaultRegistry) {
-        //lookout actuatorDefaultRegistry
-        this.actuatorDefaultRegistry = actuatorDefaultRegistry;
+    public LookoutRegistryMetricReader(SpringBootActuatorRegistry springBootActuatorRegistry) {
+        //lookout springBootActuatorRegistry
+        this.springBootActuatorRegistry = springBootActuatorRegistry;
         //event listener
-        this.actuatorDefaultRegistry.addListener(this);
+        this.springBootActuatorRegistry.addListener(this);
     }
 
     /***
@@ -62,7 +62,7 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
         }
         metricName = LookoutSpringBootMetricsImpl.LOOKOUT_PREFIX + metricName;
         //Standard Actuator Implementation
-        Id id = this.actuatorDefaultRegistry.createId(metricName);
+        Id id = this.springBootActuatorRegistry.createId(metricName);
         List<Metric> metricList = findMetricsById(id);
         if (metricList != null && metricList.size() > 0) {
             //Converted to lookout Metrics,default first
@@ -73,7 +73,7 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
     }
 
     private List<Metric> findMetricsById(Id id) {
-        com.alipay.lookout.api.Metric lookoutMetric = this.actuatorDefaultRegistry.get(id);
+        com.alipay.lookout.api.Metric lookoutMetric = this.springBootActuatorRegistry.get(id);
         if (lookoutMetric == null) {
             return null;
         }
@@ -83,7 +83,7 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
 
     @Override
     public Iterable<Metric<?>> findAll() {
-        final Iterator<com.alipay.lookout.api.Metric> lookoutIt = this.actuatorDefaultRegistry
+        final Iterator<com.alipay.lookout.api.Metric> lookoutIt = this.springBootActuatorRegistry
             .iterator();
         return new Iterable<Metric<?>>() {
             @Override
@@ -106,7 +106,8 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
 
     @Override
     public long count() {
-        Iterator<com.alipay.lookout.api.Metric> iterator = this.actuatorDefaultRegistry.iterator();
+        Iterator<com.alipay.lookout.api.Metric> iterator = this.springBootActuatorRegistry
+            .iterator();
         long count = 0;
         while (iterator.hasNext()) {
             iterator.next();

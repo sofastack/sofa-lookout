@@ -27,13 +27,10 @@ import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 import com.alipay.lookout.starter.LookoutClientProperties;
-import com.alipay.lookout.starter.support.actuator.ActuatorDefaultRegistry;
 import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
+import com.alipay.lookout.starter.support.actuator.SpringBootActuatorRegistry;
 import com.alipay.lookout.starter.support.reader.LookoutRegistryMetricReader;
-import com.alipay.lookout.starter.support.reg.DropWizardMetricsRegistryFactory;
-import com.alipay.lookout.starter.support.reg.LookoutServerRegistryFactory;
-import com.alipay.lookout.starter.support.reg.MetricsRegistryFactory;
-import com.alipay.lookout.starter.support.reg.PrometheusMetricsRegistryFactory;
+import com.alipay.lookout.starter.support.reg.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -103,6 +100,12 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     }
 
     @Bean
+    @ConditionalOnClass(name = "org.springframework.boot.actuate.metrics.Metric")
+    public SpringBootActuatorRegistryFactory springBootActuatorServerRegistryFactory() {
+        return new SpringBootActuatorRegistryFactory();
+    }
+
+    @Bean
     @ConditionalOnClass(name = "com.alipay.lookout.reg.prometheus.PrometheusRegistry")
     public MetricsRegistryFactory prometheusMetricsRegistryFactory() {
         return new PrometheusMetricsRegistryFactory();
@@ -145,10 +148,6 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         for (MetricsRegistryFactory metricsRegistryFactory : metricsRegistryFactoryList) {
             lookoutClient.addRegistry(metricsRegistryFactory.get(lookoutConfig));
         }
-        //add default registry
-        logger.info("register default actuator registry");
-        ActuatorDefaultRegistry actuatorDefaultRegistry = new ActuatorDefaultRegistry(lookoutConfig);
-        lookoutClient.addRegistry(actuatorDefaultRegistry);
         logger.info("register extended metrics.");
         lookoutClient.registerExtendedMetrics();
 
@@ -167,9 +166,9 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     @ConditionalOnMissingBean
     @ConditionalOnBean(Registry.class)
     public LookoutRegistryMetricReader lookoutRegistryMetricReader(Registry lookoutMetricRegistry) {
-        ActuatorDefaultRegistry actuatorDefaultRegistry = this
+        SpringBootActuatorRegistry springBootActuatorRegistry = this
             .getActuatorDefaultRegistry(lookoutMetricRegistry);
-        return new LookoutRegistryMetricReader(actuatorDefaultRegistry);
+        return new LookoutRegistryMetricReader(springBootActuatorRegistry);
     }
 
     @Bean
@@ -202,15 +201,15 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         return lookoutConfig;
     }
 
-    protected ActuatorDefaultRegistry getActuatorDefaultRegistry(Registry lookoutMetricRegistry) {
-        if (lookoutMetricRegistry instanceof ActuatorDefaultRegistry) {
-            return (ActuatorDefaultRegistry) lookoutMetricRegistry;
+    protected SpringBootActuatorRegistry getActuatorDefaultRegistry(Registry lookoutMetricRegistry) {
+        if (lookoutMetricRegistry instanceof SpringBootActuatorRegistry) {
+            return (SpringBootActuatorRegistry) lookoutMetricRegistry;
         }
         if (lookoutMetricRegistry instanceof CompositeRegistry) {
             CompositeRegistry compositeRegistry = (CompositeRegistry) lookoutMetricRegistry;
             for (Registry registry : compositeRegistry.getRegistries()) {
-                if (registry instanceof ActuatorDefaultRegistry) {
-                    return (ActuatorDefaultRegistry) registry;
+                if (registry instanceof SpringBootActuatorRegistry) {
+                    return (SpringBootActuatorRegistry) registry;
                 }
             }
         }

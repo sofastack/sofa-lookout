@@ -20,14 +20,14 @@ import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.core.config.MetricConfig;
 
 /**
- * ActuatorDefaultRegistry
+ * SpringBootActuatorRegistry
  *
  * @author yangguanchao
  * @since 2018/06/19
  */
-public class ActuatorDefaultRegistry extends DefaultRegistry {
+public class SpringBootActuatorRegistry extends DefaultRegistry {
 
-    public ActuatorDefaultRegistry(MetricConfig metricConfig) {
+    public SpringBootActuatorRegistry(MetricConfig metricConfig) {
         super(metricConfig);
     }
 }
