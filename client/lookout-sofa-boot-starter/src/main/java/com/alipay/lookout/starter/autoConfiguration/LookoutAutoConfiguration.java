@@ -141,7 +141,7 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
             return NoopRegistry.INSTANCE;
         }
         DefaultLookoutClient lookoutClient = new DefaultLookoutClient(
-                lookoutConfig.getString(APP_NAME));
+            lookoutConfig.getString(APP_NAME));
         for (MetricsRegistryFactory metricsRegistryFactory : metricsRegistryFactoryList) {
             lookoutClient.addRegistry(metricsRegistryFactory.get(lookoutConfig));
         }
@@ -178,7 +178,7 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         return new MetricReaderPublicMetrics(lookoutRegistryMetricReader);
     }
 
-    private LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {
+    protected LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {
         LookoutConfig lookoutConfig = new LookoutConfig();
         lookoutConfig.setProperty(LOOKOUT_ENABLE, lookoutClientProperties.isEnable());
         lookoutConfig.setProperty(LOOKOUT_AGENT_HOST_ADDRESS,

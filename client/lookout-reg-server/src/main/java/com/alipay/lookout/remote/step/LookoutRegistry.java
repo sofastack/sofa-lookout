@@ -45,7 +45,6 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
      * @param observer metric observer
      * @param config   lookout config
      */
-    @Deprecated
     public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer,
                            LookoutConfig config) {
         this(clock, observer, config, null);
