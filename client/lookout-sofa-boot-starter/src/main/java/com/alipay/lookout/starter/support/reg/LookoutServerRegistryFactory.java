@@ -54,11 +54,11 @@ public class LookoutServerRegistryFactory implements
     @Override
     public synchronized LookoutRegistry get(LookoutConfig metricConfig) {
         if (this.lookoutRegistry == null) {
-            LookoutRegistry lookoutRegistry = new LookoutRegistry(metricConfig, this.addressService);
+            this.lookoutRegistry = new LookoutRegistry(metricConfig, this.addressService);
             //add observers to lookoutRegistry
             if (!CollectionUtils.isEmpty(metricObservers)) {
                 for (MetricObserver observer : metricObservers)
-                    lookoutRegistry.addMetricObserver(observer);
+                    this.lookoutRegistry.addMetricObserver(observer);
                 logger.info("add metricObservers:{} to lookout registry.", metricObservers);
             }
         }
