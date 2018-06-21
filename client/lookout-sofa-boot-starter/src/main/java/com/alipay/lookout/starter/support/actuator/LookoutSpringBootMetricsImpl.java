@@ -35,9 +35,13 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class LookoutSpringBootMetricsImpl implements CounterService, GaugeService {
 
+    public static final String                              LOOKOUT_COUNTER_PREFIX = "counter.";
+
+    public static final String                              LOOKOUT_GAUGE_PREFIX   = "gauge.";
+
     private final Registry                                  registry;
 
-    private final ConcurrentMap<String, SimpleLookoutGauge> gauges = new ConcurrentHashMap<String, SimpleLookoutGauge>();
+    private final ConcurrentMap<String, SimpleLookoutGauge> gauges                 = new ConcurrentHashMap<String, SimpleLookoutGauge>();
 
     public LookoutSpringBootMetricsImpl(Registry registry) {
         this.registry = registry;
@@ -48,6 +52,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
+        metricName = wrapName(LOOKOUT_COUNTER_PREFIX, metricName);
         Id id = this.registry.createId(metricName);
         Counter counter = this.registry.counter(id);
         counter.inc();
@@ -58,6 +63,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
+        metricName = wrapName(LOOKOUT_COUNTER_PREFIX, metricName);
         Id id = this.registry.createId(metricName);
         Counter counter = this.registry.counter(id);
         counter.dec();
@@ -68,6 +74,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
+        metricName = wrapName(LOOKOUT_COUNTER_PREFIX, metricName);
         Id id = this.registry.createId(metricName);
         this.registry.removeMetric(id);
     }
@@ -77,6 +84,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
+        metricName = wrapName(LOOKOUT_GAUGE_PREFIX, metricName);
         SimpleLookoutGauge gauge = this.gauges.get(metricName);
         if (gauge == null) {
             SimpleLookoutGauge newGauge = new SimpleLookoutGauge(value);
@@ -88,6 +96,16 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
             }
         }
         gauge.setValue(value);
+    }
+
+    private String wrapName(String prefix, String metricName) {
+        if (StringUtils.isBlank(metricName)) {
+            throw new RuntimeException("Metric name can't be blank!");
+        }
+        if (metricName.startsWith(prefix)) {
+            return metricName;
+        }
+        return prefix + metricName;
     }
 
     private final static class SimpleLookoutGauge implements Gauge<Double> {
