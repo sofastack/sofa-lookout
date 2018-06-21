@@ -60,7 +60,6 @@ public class LookoutRegistryMetricReader implements MetricReader, MetricRegistry
         if (StringUtils.isBlank(metricName)) {
             return null;
         }
-        metricName = LookoutSpringBootMetricsImpl.LOOKOUT_PREFIX + metricName;
         //Standard Actuator Implementation
         Id id = this.springBootActuatorRegistry.createId(metricName);
         List<Metric> metricList = findMetricsById(id);

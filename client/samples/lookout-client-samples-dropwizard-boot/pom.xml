@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.alipay.sofa.lookout</groupId>
-    <artifactId>lookout-client-samples-boot</artifactId>
+    <artifactId>lookout-client-samples-dropwizard-boot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>lookout-client-samples-boot</name>
-    <description>Demo project for Spring Boot</description>
+    <name>lookout-client-samples-dropwizard-boot</name>
+    <description>Demo dropwizard project for Spring Boot</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -33,6 +33,15 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alipay.sofa.lookout</groupId>
+            <artifactId>lookout-reg-dropwizard</artifactId>
+            <version>${lookout.client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

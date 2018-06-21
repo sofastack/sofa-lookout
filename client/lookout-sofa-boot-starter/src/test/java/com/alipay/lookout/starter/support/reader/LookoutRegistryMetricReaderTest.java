@@ -28,8 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * LookoutRegistryMetricReader Tester.
@@ -52,6 +51,7 @@ public class LookoutRegistryMetricReaderTest extends AbstractTestBase {
      */
     @Test
     public void testFindOne() throws Exception {
+        assertNull(lookoutRegistryMetricReader.findOne(""));
         assertTrue(this.metricReaderPublicMetrics != null
                    && this.metricReaderPublicMetrics.size() > 0);
         assertNotNull(testRestTemplate);
