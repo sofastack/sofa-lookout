@@ -1,16 +1,12 @@
-## 这里演示与 SpringBoot Actuator 集成
+## 这里演示与 SpringBoot Actuator 集成,以 lookout 作为 metrics 注册表；
 
 - 添加依赖
 
 ```
-<dependency>
-    <groupId>com.alipay.sofa.lookout</groupId>
-    <artifactId>lookout-reg-dropwizard</artifactId>
-</dependency>
-<dependency>
-    <groupId>io.dropwizard.metrics</groupId>
-    <artifactId>metrics-core</artifactId>
-</dependency>
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+ </dependency>
 ```
 
 - 启动后访问：http://localhost:8080/metrics

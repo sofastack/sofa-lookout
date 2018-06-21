@@ -1,6 +1,7 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.alipay.lookout.starter.autoConfiguration.LookoutAutoConfiguration
+com.alipay.lookout.starter.autoConfiguration.LookoutAutoConfiguration,\
+com.alipay.lookout.starter.configuration.MetricsActuatorAutoConfiguration
 
 
 # Initializers
