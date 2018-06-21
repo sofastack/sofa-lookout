@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 如果使用 spring boot actuator 时生效配置，将 lookout 作为其默认的 metrics reg 实现
+ * use lookout registry as the default registry of spring boot actuator
  * Created by kevin.luy@alipay.com on 2018/6/21.
  */
 @AutoConfigureAfter(LookoutAutoConfiguration.class)

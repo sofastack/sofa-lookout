@@ -41,10 +41,10 @@ import static org.junit.Assert.*;
 public class LookoutRegistryMetricReaderTest extends AbstractTestBase {
 
     @Autowired
-    private List<MetricReaderPublicMetrics> metricReaderPublicMetrics = null;
+    private List<MetricReaderPublicMetrics> metricReaderPublicMetrics   = null;
 
     @Autowired
-    private LookoutRegistryMetricReader lookoutRegistryMetricReader = null;
+    private LookoutRegistryMetricReader     lookoutRegistryMetricReader = null;
 
     /**
      * Method: findOne(String metricName)
@@ -53,7 +53,7 @@ public class LookoutRegistryMetricReaderTest extends AbstractTestBase {
     public void testFindOne() throws Exception {
         assertNull(lookoutRegistryMetricReader.findOne(""));
         assertTrue(this.metricReaderPublicMetrics != null
-                && this.metricReaderPublicMetrics.size() > 0);
+                   && this.metricReaderPublicMetrics.size() > 0);
         assertNotNull(testRestTemplate);
         String endpointId = "mappings";
         String restUrl = urlHttpPrefix + "/" + endpointId;
