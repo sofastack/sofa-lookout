@@ -22,10 +22,13 @@ import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.api.composite.MixinMetric;
 import com.alipay.lookout.dropwizard.metrics.DropWizardMetricsRegistry;
+import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.actuate.metrics.dropwizard.DropwizardMetricServices;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -45,7 +48,10 @@ import java.util.concurrent.TimeUnit;
 public class LookoutStarterTest {
 
     @Autowired
-    Registry registry;
+    Registry               registry;
+
+    @Autowired
+    private CounterService counterService;
 
     @Test
     public void testDropwizardMetrics() {
@@ -76,6 +82,15 @@ public class LookoutStarterTest {
         Assert.assertEquals(1, mixinMetric2.timer("timetest").count());
         Assert.assertEquals(1, mixinMetric2.distributionSummary("dstest").count());
 
+    }
+
+    /**
+     *  默认如果classpath 中有 dropwizard ,则优先生效桥接到dropwizard
+     */
+    @Test
+    public void testLookoutCounterService() {
+        Assert.assertFalse(counterService instanceof LookoutSpringBootMetricsImpl);
+        Assert.assertTrue(counterService instanceof DropwizardMetricServices);
     }
 
 }
