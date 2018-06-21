@@ -28,8 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * LookoutRegistryMetricReader Tester.
@@ -42,18 +41,19 @@ import static org.junit.Assert.assertTrue;
 public class LookoutRegistryMetricReaderTest extends AbstractTestBase {
 
     @Autowired
-    private List<MetricReaderPublicMetrics> metricReaderPublicMetrics   = null;
+    private List<MetricReaderPublicMetrics> metricReaderPublicMetrics = null;
 
     @Autowired
-    private LookoutRegistryMetricReader     lookoutRegistryMetricReader = null;
+    private LookoutRegistryMetricReader lookoutRegistryMetricReader = null;
 
     /**
      * Method: findOne(String metricName)
      */
     @Test
     public void testFindOne() throws Exception {
+        assertNull(lookoutRegistryMetricReader.findOne(""));
         assertTrue(this.metricReaderPublicMetrics != null
-                   && this.metricReaderPublicMetrics.size() > 0);
+                && this.metricReaderPublicMetrics.size() > 0);
         assertNotNull(testRestTemplate);
         String endpointId = "mappings";
         String restUrl = urlHttpPrefix + "/" + endpointId;

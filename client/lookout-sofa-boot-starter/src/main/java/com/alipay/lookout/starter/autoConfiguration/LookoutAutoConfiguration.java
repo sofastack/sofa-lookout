@@ -115,8 +115,7 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
             com.codahale.metrics.MetricRegistry metricRegistry = beanFactory
                 .getBean(com.codahale.metrics.MetricRegistry.class);
             if (metricRegistry == null) {
-                logger
-                    .warn("spring boot actuator does not use dropwizard service,so lookout ignore dropwizard too!");
+                logger.warn("spring boot actuator does not use dropwizard service,so lookout ignore dropwizard too!");
             } else {
                 return new DropWizardMetricsRegistryFactory(metricRegistry);
             }
