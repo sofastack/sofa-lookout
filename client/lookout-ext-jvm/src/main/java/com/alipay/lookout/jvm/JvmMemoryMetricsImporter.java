@@ -20,20 +20,29 @@ import com.alipay.lookout.api.Gauge;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.api.composite.MixinMetric;
+import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.spi.MetricsImporter;
+import org.slf4j.Logger;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.util.List;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/2/16.
  */
 public class JvmMemoryMetricsImporter implements MetricsImporter {
+    private static final Logger LOGGER          = LookoutLoggerFactory
+                                                    .getLogger(JvmMemoryMetricsImporter.class);
+    private static final String CODE_CACHE_NAME = "Code Cache";
+
     @Override
     public void register(Registry registry) {
         Id id = registry.createId("jvm.memory");
         MixinMetric mixin = registry.mixinMetric(id);
         heapImport(mixin);
         nonheapImport(mixin);
+        codeCacheImport(mixin);
     }
 
     private void nonheapImport(MixinMetric mixin) {
@@ -89,5 +98,49 @@ public class JvmMemoryMetricsImporter implements MetricsImporter {
                 return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
             }
         });
+    }
+
+    private void codeCacheImport(MixinMetric mixin) {
+        final MemoryPoolMXBean codeCacheMXBean = getCodeCacheMXBean();
+        if (codeCacheMXBean == null) {
+            LOGGER.info("can't get code cache MemoryPoolMXBean, won't report code cache usage.");
+            return;
+        }
+
+        mixin.gauge("codecache.init", new Gauge<Long>() {
+            @Override
+            public Long value() {
+                return codeCacheMXBean.getUsage().getInit();
+            }
+        });
+        mixin.gauge("codecache.used", new Gauge<Long>() {
+            @Override
+            public Long value() {
+                return codeCacheMXBean.getUsage().getUsed();
+            }
+        });
+        mixin.gauge("codecache.committed", new Gauge<Long>() {
+            @Override
+            public Long value() {
+                return codeCacheMXBean.getUsage().getCommitted();
+            }
+        });
+        mixin.gauge("codecache.max", new Gauge<Long>() {
+            @Override
+            public Long value() {
+                return codeCacheMXBean.getUsage().getMax();
+            }
+        });
+    }
+
+    private MemoryPoolMXBean getCodeCacheMXBean() {
+        List<MemoryPoolMXBean> memoryPoolMXBeans = ManagementFactory.getMemoryPoolMXBeans();
+        for (MemoryPoolMXBean memoryPoolMXBean : memoryPoolMXBeans) {
+            if (CODE_CACHE_NAME.equals(memoryPoolMXBean.getName())) {
+                return memoryPoolMXBean;
+            }
+        }
+
+        return null;
     }
 }

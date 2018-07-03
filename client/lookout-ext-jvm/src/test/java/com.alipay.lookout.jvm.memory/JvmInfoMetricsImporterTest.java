@@ -77,6 +77,15 @@ public class JvmInfoMetricsImporterTest {
         Assert.assertTrue(gauge.value().longValue() >= 0);
         gauge = mixin.gauge("heap.max", null);
         Assert.assertTrue(gauge.value().longValue() >= -1);
+
+        gauge = mixin.gauge("codecache.init", null);
+        Assert.assertTrue(gauge.value().longValue() >= 0);
+        gauge = mixin.gauge("codecache.used", null);
+        Assert.assertTrue(gauge.value().longValue() >= 0);
+        gauge = mixin.gauge("codecache.committed", null);
+        Assert.assertTrue(gauge.value().longValue() >= 0);
+        gauge = mixin.gauge("codecache.max", null);
+        Assert.assertTrue(gauge.value().longValue() >= -1);
     }
 
     @Test
