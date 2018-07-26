@@ -16,16 +16,21 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.*;
+import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.api.Counter;
+import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.Indicator;
+import com.alipay.lookout.api.Statistic;
 import com.alipay.lookout.step.StepLong;
 
 /**
  * 时间步长内的累计值（而DefaultCounter是从启动时到当前的统计）
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutCounter implements Counter {
+public class LookoutCounter implements Counter, CanSetStep {
 
-    private final Id       id;
+    private final Id id;
     private final StepLong value;
 
     LookoutCounter(Id id, Clock clock, long step) {
@@ -55,7 +60,6 @@ public class LookoutCounter implements Counter {
         value.getCurrent().addAndGet(amount);
     }
 
-    @Override
     public void dec() {
         dec(1);
     }
@@ -68,5 +72,10 @@ public class LookoutCounter implements Counter {
     @Override
     public long count() {
         return value.poll();
+    }
+
+    @Override
+    public void setStep(long step) {
+        this.value.setStep(step);
     }
 }

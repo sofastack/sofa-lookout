@@ -17,8 +17,9 @@
 package com.alipay.lookout.api;
 
 /**
+ * TODO 怎么全大写的名字
  * metric priority tag suggest auto poll interval
- *
+ * <p>
  * Created by kevin.luy@alipay.com on 2017/2/23.
  */
 public enum PRIORITY {

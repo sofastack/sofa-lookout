@@ -44,10 +44,10 @@ final class DefaultCounter implements Counter {
     }
 
     @Override
-    public Indicator measure() {
+    public Indicator<Long> measure() {
         long now = clock.wallTime();
         long v = count.get();
-        return new Indicator(now, id, v);
+        return new Indicator<Long>(now, id, v);
     }
 
     @Override

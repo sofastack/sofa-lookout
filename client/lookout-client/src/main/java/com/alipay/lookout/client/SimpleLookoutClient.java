@@ -17,6 +17,7 @@
 package com.alipay.lookout.client;
 
 import com.alipay.lookout.api.BasicTag;
+import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Lookout;
 import com.alipay.lookout.api.MetricRegistry;
 import com.alipay.lookout.api.Registry;
@@ -25,8 +26,14 @@ import com.alipay.lookout.core.AbstractRegistry;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
+import com.alipay.lookout.remote.report.xflush.Listener;
+import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
+import com.alipay.lookout.remote.step.PollerController;
+import com.alipay.lookout.remote.step.SettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -40,7 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class SimpleLookoutClient extends AbstractLookoutClient {
     private static final AtomicInteger state = new AtomicInteger(0);
-    private final LookoutConfig        lookoutConfig;
+    private final LookoutConfig lookoutConfig;
 
     public SimpleLookoutClient(String appName, MetricRegistry... registries) {
         this(appName, null, registries);
@@ -61,14 +68,19 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
         }
         lookoutConfig = config != null ? config : new LookoutConfig();
         registries = registries.length > 0 ? registries
-            : new MetricRegistry[] { new LookoutRegistry(lookoutConfig) };
+            : new MetricRegistry[]{new LookoutRegistry(lookoutConfig)};
 
         lookoutConfig.setProperty(LookoutConfig.APP_NAME, appName);
         if (!lookoutConfig.getBoolean(LookoutConfig.LOOKOUT_ENABLE, true)) {
             return;
         }
 
+        // final List<LookoutRegistry> lookoutRegistryList = new ArrayList<LookoutRegistry>();
+
         for (MetricRegistry registry : registries) {
+            // if (registry instanceof LookoutRegistry) {
+            //    lookoutRegistryList.add((LookoutRegistry) registry);
+            // }
             if (registry instanceof AbstractRegistry
                 && ((AbstractRegistry) registry).getConfig() != lookoutConfig) {
                 // reset with the same configuration
@@ -79,9 +91,44 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             super.addRegistry(registry);
         }
 
+        // if (lookoutConfig.getBoolean(LookoutConfig.XFLUSH_EXPORTER_ENABLE, true)) {
+        //     registerFooRegistry(lookoutRegistryList);
+        // }
+
+
         logger.debug("set global registry to Lookout");
         // init global registry
         Lookout.setRegistry(getRegistry());
+    }
+
+    private void registerFooRegistry(final List<LookoutRegistry> lookoutRegistryList) {
+        SettableStepRegistry settableStepRegistry = new SettableStepRegistry(Clock.SYSTEM, lookoutConfig);
+        settableStepRegistry.registerExtendedMetrics();
+        PollerController controller = new PollerController(settableStepRegistry);
+        XFlushHttpExporter exporter = new XFlushHttpExporter(controller, lookoutConfig);
+        // 如果exporter处于激活状态就禁止lookout的自动上报
+        exporter.addListener(new Listener() {
+            @Override
+            public void onActive() {
+                for (LookoutRegistry lookoutRegistry : lookoutRegistryList) {
+                    lookoutRegistry.getMetricObserverComposite().setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onIdle() {
+                for (LookoutRegistry lookoutRegistry : lookoutRegistryList) {
+                    lookoutRegistry.getMetricObserverComposite().setEnabled(true);
+                }
+            }
+        });
+
+        try {
+            exporter.start();
+            super.addRegistry(settableStepRegistry);
+        } catch (IOException e) {
+            logger.error("fail to start XFlushHttpExporter", e);
+        }
     }
 
     /**

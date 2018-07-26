@@ -14,27 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.report;
-
-import com.alipay.lookout.api.MetricRegistry;
+package com.alipay.lookout.remote.report.xflush;
 
 /**
- * Created by kevin.luy@alipay.com on 2017/2/13.
+ * 以固定的间隔时间采集一个registry的数据
+ *
+ * @author xiangfeng.xzc
+ * @date 2018/7/17
  */
-public abstract class AbstractPoller<T> implements MetricPoller<T> {
-
-    private final MetricRegistry registry;
-
-    /**
-     *
-     * @param registry target
-     */
-    public AbstractPoller(MetricRegistry registry) {
-        this.registry = registry;
-    }
-
-    protected MetricRegistry registry() {
-        return registry;
-    }
-
+@Deprecated
+public class FixedRatePoller {
 }

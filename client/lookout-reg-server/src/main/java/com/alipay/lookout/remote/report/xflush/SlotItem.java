@@ -14,27 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.report;
+package com.alipay.lookout.remote.report.xflush;
 
-import com.alipay.lookout.api.MetricRegistry;
+import java.util.List;
 
 /**
- * Created by kevin.luy@alipay.com on 2017/2/13.
+ * @author xiangfeng.xzc
+ * @date 2018/7/17
  */
-public abstract class AbstractPoller<T> implements MetricPoller<T> {
+public class SlotItem {
+    private long cursor;
+    private List<MetricDto> data;
 
-    private final MetricRegistry registry;
-
-    /**
-     *
-     * @param registry target
-     */
-    public AbstractPoller(MetricRegistry registry) {
-        this.registry = registry;
+    public SlotItem() {
     }
 
-    protected MetricRegistry registry() {
-        return registry;
+    public SlotItem(long cursor, List<MetricDto> data) {
+        this.cursor = cursor;
+        this.data = data;
     }
 
+    public long getCursor() {
+        return cursor;
+    }
+
+    public void setCursor(long cursor) {
+        this.cursor = cursor;
+    }
+
+    public List<MetricDto> getData() {
+        return data;
+    }
+
+    public void setData(List<MetricDto> data) {
+        this.data = data;
+    }
 }

@@ -21,7 +21,11 @@ import com.alipay.lookout.common.utils.ClassUtil;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
-import com.alipay.lookout.remote.report.*;
+import com.alipay.lookout.remote.report.AddressService;
+import com.alipay.lookout.remote.report.DefaultAddressService;
+import com.alipay.lookout.remote.report.HttpObserver;
+import com.alipay.lookout.remote.report.MetricObserverMeasurementsFilter;
+import com.alipay.lookout.remote.report.SchedulerPoller;
 import com.alipay.lookout.remote.report.support.ReportDecider;
 import com.alipay.lookout.report.MetricObserver;
 
@@ -34,8 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class LookoutRegistry extends StepRegistry implements CommonTagsAccessor {
 
-    private SchedulerPoller               poller;
-    private final Map<String, String>     commonTags              = new ConcurrentHashMap<String, String>();
+    private SchedulerPoller poller;
+    private final Map<String, String> commonTags = new ConcurrentHashMap<String, String>();
     private final MetricObserverComposite metricObserverComposite = new MetricObserverComposite();
 
     /**
@@ -70,8 +74,8 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
     public static AddressService getAddressService(LookoutConfig config) {
         String addressServiceClassName = config.getString(LookoutConfig.ADDRESS_SERVICE_CLASS_NAME,
             DefaultAddressService.class.getName());
-        return ClassUtil.newInstance(addressServiceClassName, new Class[] { String.class },
-            new Object[] { config.getString(LookoutConfig.APP_NAME) });
+        return ClassUtil.newInstance(addressServiceClassName, new Class[]{String.class},
+            new Object[]{config.getString(LookoutConfig.APP_NAME)});
     }
 
     public LookoutRegistry(LookoutConfig config) {
@@ -130,5 +134,9 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
     public void addMetricObserverMeasurementsFilter(MetricObserverMeasurementsFilter metricObserverMeasurementsFilter) {
         metricObserverComposite
             .addMetricObserverMeasurementsFilter(metricObserverMeasurementsFilter);
+    }
+
+    public MetricObserverComposite getMetricObserverComposite() {
+        return metricObserverComposite;
     }
 }

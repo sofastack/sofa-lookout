@@ -22,6 +22,15 @@ import com.alipay.lookout.api.Metric;
  * Created by kevin.luy@alipay.com on 2017/2/20.
  */
 public interface MetricFilter {
+    /**
+     * 总是返回true的Filter
+     */
+    MetricFilter TRUE = new MetricFilter() {
+                          @Override
+                          public boolean matches(Metric metric) {
+                              return true;
+                          }
+                      };
 
     boolean matches(Metric metric);
 

@@ -17,7 +17,7 @@ package com.alipay.lookout.step;
 
 /**
  * Base for {@link StepLong} and {@link StepDouble}.
- */
+    */
 public interface StepValue {
 
     /** Get the value for the last completed interval as a rate per second. */

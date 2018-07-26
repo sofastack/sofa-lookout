@@ -19,16 +19,16 @@ package com.alipay.lookout.event;
 import com.alipay.lookout.api.Metric;
 
 /**
- * registry events listener
- * Created by kevin.luy@alipay.com on 2017/3/15.
- */
+     * registry events listener
+     * Created by kevin.luy@alipay.com on 2017/3/15.
+     */
 public interface MetricRegistryListener {
 
     /**
      * action on a event when a metric is removed from the registry
      *
-     * @param metric a metric
-     */
+    * @param metric a metric
+    */
     void onRemoved(Metric metric);
 
     /**

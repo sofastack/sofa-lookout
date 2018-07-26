@@ -42,15 +42,15 @@ public final class Indicator<T> {
     public Indicator(long timestamp, Id id, T value) {
         this.timestamp = timestamp;
         this.id = id;
-        this.measurements = Collections.<Measurement<T>> singleton(new Measurement(value));
+        this.measurements = Collections.singleton(new Measurement<T>(value));
     }
 
-    public Indicator addMeasurement(String name, T value) {
-        measurements.add(new Measurement(name, value));
+    public Indicator<T> addMeasurement(String name, T value) {
+        measurements.add(new Measurement<T>(name, value));
         return this;
     }
 
-    public Indicator addMeasurement(Measurement measurement) {
+    public Indicator<T> addMeasurement(Measurement<T> measurement) {
         measurements.add(measurement);
         return this;
     }

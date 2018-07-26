@@ -16,7 +16,14 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.*;
+import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.api.Counter;
+import com.alipay.lookout.api.DistributionSummary;
+import com.alipay.lookout.api.Gauge;
+import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.Metric;
+import com.alipay.lookout.api.Timer;
 import com.alipay.lookout.api.info.Info;
 import com.alipay.lookout.common.utils.PriorityTagUtil;
 import com.alipay.lookout.core.AbstractRegistry;
@@ -33,10 +40,10 @@ public class StepRegistry extends AbstractRegistry {
     protected final Clock clock;                //未对齐时间
 
     //for LookoutMixinMetric
-    private long          fixedStepMillis = -1l;
+    private volatile long fixedStepMillis = -1L;
 
     public StepRegistry(Clock clock, LookoutConfig config) {
-        this(clock, config, -1l);
+        this(clock, config, -1L);
     }
 
     /**
@@ -131,5 +138,31 @@ public class StepRegistry extends AbstractRegistry {
             stepClock = old != null ? old : stepClock;//old first
         }
         return stepClock;
+    }
+
+    /**
+     * 重新设置step, 将会修改所有的metric
+     *
+     * @param step
+     */
+    protected synchronized void setStep(long step) {
+        if (this.fixedStepMillis == step) {
+            return;
+        }
+        this.fixedStepMillis = step;
+        for (Metric m : this) {
+            if (m instanceof CanSetStep) {
+                ((CanSetStep) m).setStep(step);
+            }
+        }
+    }
+
+    /**
+     * 获取采样间隔时间
+     *
+     * @return
+     */
+    public long getFixedStepMillis() {
+        return fixedStepMillis;
     }
 }

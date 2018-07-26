@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Netflix, Inc.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,11 +30,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class StepLong implements StepValue {
 
-    private final long       init;
-    private final Clock      clock;
-    private final long       step;
+    private final long init;
+    private final Clock clock;
+    private volatile long step;
 
-    private volatile long    previous;
+    private volatile long previous;
     private final AtomicLong current;
 
     private final AtomicLong lastInitPos;
@@ -49,6 +49,23 @@ public class StepLong implements StepValue {
         previous = init;
         current = new AtomicLong(init);
         lastInitPos = new AtomicLong(clock.wallTime() / step);
+    }
+
+    /**
+     * 重试设置step, 会导致短时间内采样数据错误
+     *
+     * @param step
+     */
+    public void setStep(long step) {
+        if (step <= 0) {
+            throw new IllegalArgumentException("step must greater than 0");
+        }
+        // TODO step 应该不需要是volatile的
+        long lastPos = clock.wallTime() / step;
+        this.step = step;
+        this.lastInitPos.set(lastPos);
+        this.previous = this.init;
+        this.current.set(this.init);
     }
 
     private void rollCount(long now) {
@@ -107,6 +124,6 @@ public class StepLong implements StepValue {
     @Override
     public String toString() {
         return "StepLong{init=" + init + ", previous=" + previous + ", current=" + current.get()
-               + ", lastInitPos=" + lastInitPos.get() + '}';
+            + ", lastInitPos=" + lastInitPos.get() + '}';
     }
 }

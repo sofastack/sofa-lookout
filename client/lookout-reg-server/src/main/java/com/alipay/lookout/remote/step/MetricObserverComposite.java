@@ -19,15 +19,22 @@ package com.alipay.lookout.remote.step;
 import com.alipay.lookout.remote.report.MetricObserverMeasurementsFilter;
 import com.alipay.lookout.report.MetricObserver;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/8/17.
  */
-final class MetricObserverComposite<T> implements MetricObserver<T> {
-    private final List<MetricObserver<T>>                   metricObserverList                = new CopyOnWriteArrayList<MetricObserver<T>>();
-    private final List<MetricObserverMeasurementsFilter<T>> metricObserverMeasurementsFilters = new ArrayList<MetricObserverMeasurementsFilter<T>>();
+public final class MetricObserverComposite<T> implements MetricObserver<T> {
+    private final List<MetricObserver<T>> metricObserverList = new CopyOnWriteArrayList<MetricObserver<T>>();
+    private final List<MetricObserverMeasurementsFilter<T>> metricObserverMeasurementsFilters = new
+        ArrayList<MetricObserverMeasurementsFilter<T>>();
+
+    private volatile boolean enabled = true;
 
     public MetricObserverComposite(MetricObserver<T>... metricObservers) {
         if (metricObservers != null) {
@@ -70,6 +77,9 @@ final class MetricObserverComposite<T> implements MetricObserver<T> {
 
     @Override
     public boolean isEnable() {
+        if (!enabled) {
+            return false;
+        }
         for (MetricObserver mo : metricObserverList) {
             if (mo.isEnable()) {
                 return true;
@@ -84,5 +94,9 @@ final class MetricObserverComposite<T> implements MetricObserver<T> {
 
     public void addMetricObserverMeasurementsFilter(MetricObserverMeasurementsFilter metricObserverMeasurementsFilter) {
         metricObserverMeasurementsFilters.add(metricObserverMeasurementsFilter);
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -16,7 +16,13 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.*;
+import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.api.DistributionSummary;
+import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.Indicator;
+import com.alipay.lookout.api.Measurement;
+import com.alipay.lookout.api.Statistic;
 import com.alipay.lookout.step.StepLong;
 import com.alipay.lookout.step.StepValue;
 
@@ -25,9 +31,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutDistributionSummary implements DistributionSummary {
+public class LookoutDistributionSummary implements DistributionSummary, CanSetStep {
 
-    private final Id       id;
+    private final Id id;
     private final StepLong count;
     private final StepLong total;
     private final StepLong max;
@@ -56,12 +62,19 @@ public class LookoutDistributionSummary implements DistributionSummary {
         return indicator;
     }
 
-    private Measurement newMeasurement(String mid, StepValue v) {
-        return new Measurement(mid, v.pollAsRate());
+    private Measurement<Double> newMeasurement(String mid, StepValue v) {
+        return new Measurement<Double>(mid, v.pollAsRate());
     }
 
-    private Measurement newMaxMeasurement(String mid, StepLong max) {
-        return new Measurement(mid, max.poll());
+    private Measurement<Long> newMaxMeasurement(String mid, StepLong max) {
+        return new Measurement<Long>(mid, max.poll());
+    }
+
+    @Override
+    public void setStep(long step) {
+        count.setStep(step);
+        total.setStep(step);
+        max.setStep(step);
     }
 
     @Override

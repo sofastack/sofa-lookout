@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.api.composite;
 
+import com.alipay.lookout.api.CanSetStep;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Indicator;
 import com.alipay.lookout.api.Metric;
@@ -26,11 +27,11 @@ import java.util.Collection;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/14.
  */
-abstract class CompositeMetric implements Metric {
+abstract class CompositeMetric implements Metric, CanSetStep {
     /**
      * Identifier for the meter.
      */
-    protected final Id                   id;
+    protected final Id id;
 
     /**
      * Underlying registries that are keeping the data.
@@ -53,4 +54,14 @@ abstract class CompositeMetric implements Metric {
     }
 
     protected abstract <T extends Metric> T getMetric(Registry registry);
+
+    @Override
+    public void setStep(long step) {
+        for (Registry r : registries) {
+            Metric m = getMetric(r);
+            if (m instanceof CanSetStep) {
+                ((CanSetStep) m).setStep(step);
+            }
+        }
+    }
 }

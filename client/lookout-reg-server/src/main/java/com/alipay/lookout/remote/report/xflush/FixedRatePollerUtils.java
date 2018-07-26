@@ -14,27 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.report;
+package com.alipay.lookout.remote.report.xflush;
 
-import com.alipay.lookout.api.MetricRegistry;
+import com.alipay.lookout.api.Gauge;
+import com.alipay.lookout.api.Metric;
+import com.alipay.lookout.common.top.RollableTopGauge;
+import com.alipay.lookout.core.CommonTagsAccessor;
+import com.alipay.lookout.core.GaugeWrapper;
+import com.alipay.lookout.core.InfoWrapper;
+import com.alipay.lookout.remote.model.LookoutMeasurement;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * Created by kevin.luy@alipay.com on 2017/2/13.
+ * @author xiangfeng.xzc
+ * @date 2018/7/17
  */
-public abstract class AbstractPoller<T> implements MetricPoller<T> {
-
-    private final MetricRegistry registry;
-
-    /**
-     *
-     * @param registry target
-     */
-    public AbstractPoller(MetricRegistry registry) {
-        this.registry = registry;
-    }
-
-    protected MetricRegistry registry() {
-        return registry;
+public final class FixedRatePollerUtils {
+    private FixedRatePollerUtils() {
     }
 
 }

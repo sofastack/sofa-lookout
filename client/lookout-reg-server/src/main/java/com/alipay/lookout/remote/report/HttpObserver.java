@@ -27,6 +27,7 @@ import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
 import com.alipay.lookout.report.MetricObserver;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpGet;
@@ -42,12 +43,24 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.alipay.lookout.core.config.LookoutConfig.*;
+import static com.alipay.lookout.core.config.LookoutConfig.DEFAULT_REPORT_BATCH_SIZE;
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AGENT_HOST_ADDRESS;
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AGENT_SERVER_PORT;
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AGENT_TEST_URL;
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AUTOPOLL_ENABLE;
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_REPORT_BATCH_SIZE;
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_REPORT_COMPRESSION_THRESHOLD;
 
 /**
+ * 将数据push到lookout-gateway
  * Created by kevin.luy@alipay.com on 2017/2/7.
  */
 public class HttpObserver implements MetricObserver<LookoutMeasurement> {
@@ -192,6 +205,9 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
      * @return measurement list
      */
     public List<List<LookoutMeasurement>> getBatches(List<LookoutMeasurement> ms, int batchSize) {
+        if (ms.size() <= batchSize) {
+            return Collections.singletonList(ms);
+        }
         List<List<LookoutMeasurement>> batches = new ArrayList();
         for (int i = 0; i < ms.size(); i += batchSize) {
             List<LookoutMeasurement> batch = ms.subList(i, Math.min(ms.size(), i + batchSize));
@@ -249,6 +265,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             compressed = Snappy.compress(msg, Charset.forName(UTF_8));
         } catch (IOException e) {
             logger.info(">>WARNING: snappy compress report msg err:{}", e.getMessage());
+            return;
         }
         httpPost.setEntity(new ByteArrayEntity(compressed));
         sendHttpDataSilently(httpPost, metadata);
