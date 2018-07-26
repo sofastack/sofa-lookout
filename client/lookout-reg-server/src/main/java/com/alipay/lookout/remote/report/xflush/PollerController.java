@@ -1,4 +1,4 @@
-package com.alipay.lookout.remote.step;
+package com.alipay.lookout.remote.report.xflush;
 
 import com.alipay.lookout.api.Gauge;
 import com.alipay.lookout.api.Metric;
@@ -7,9 +7,6 @@ import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.GaugeWrapper;
 import com.alipay.lookout.core.InfoWrapper;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
-import com.alipay.lookout.remote.report.xflush.MetricCache;
-import com.alipay.lookout.remote.report.xflush.MetricDto;
-import com.alipay.lookout.remote.report.xflush.SlotItem;
 import com.google.common.primitives.Longs;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;

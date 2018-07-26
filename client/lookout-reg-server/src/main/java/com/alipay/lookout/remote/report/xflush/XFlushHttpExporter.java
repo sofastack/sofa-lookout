@@ -19,7 +19,6 @@ package com.alipay.lookout.remote.report.xflush;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.lookout.core.config.LookoutConfig;
-import com.alipay.lookout.remote.step.PollerController;
 import com.google.common.collect.Sets;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

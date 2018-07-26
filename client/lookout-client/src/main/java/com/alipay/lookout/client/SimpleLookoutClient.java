@@ -28,8 +28,8 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.report.xflush.Listener;
 import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
-import com.alipay.lookout.remote.step.PollerController;
-import com.alipay.lookout.remote.step.SettableStepRegistry;
+import com.alipay.lookout.remote.report.xflush.PollerController;
+import com.alipay.lookout.remote.report.xflush.SettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import java.io.IOException;

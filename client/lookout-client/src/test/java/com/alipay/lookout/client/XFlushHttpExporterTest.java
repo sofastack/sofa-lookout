@@ -23,9 +23,9 @@ import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.xflush.Listener;
 import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
-import com.alipay.lookout.remote.step.SettableStepRegistry;
+import com.alipay.lookout.remote.report.xflush.SettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
-import com.alipay.lookout.remote.step.PollerController;
+import com.alipay.lookout.remote.report.xflush.PollerController;
 
 import org.junit.Ignore;
 import org.junit.Test;
