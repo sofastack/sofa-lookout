@@ -31,7 +31,7 @@ abstract class CompositeMetric implements Metric, CanSetStep {
     /**
      * Identifier for the meter.
      */
-    protected final Id id;
+    protected final Id                   id;
 
     /**
      * Underlying registries that are keeping the data.

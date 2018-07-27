@@ -30,11 +30,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Created by kevin.luy@alipay.com on 2017/8/17.
  */
 public final class MetricObserverComposite<T> implements MetricObserver<T> {
-    private final List<MetricObserver<T>> metricObserverList = new CopyOnWriteArrayList<MetricObserver<T>>();
-    private final List<MetricObserverMeasurementsFilter<T>> metricObserverMeasurementsFilters = new
-        ArrayList<MetricObserverMeasurementsFilter<T>>();
+    private final List<MetricObserver<T>>                   metricObserverList                = new CopyOnWriteArrayList<MetricObserver<T>>();
+    private final List<MetricObserverMeasurementsFilter<T>> metricObserverMeasurementsFilters = new ArrayList<MetricObserverMeasurementsFilter<T>>();
 
-    private volatile boolean enabled = true;
+    private volatile boolean                                enabled                           = true;
 
     public MetricObserverComposite(MetricObserver<T>... metricObservers) {
         if (metricObservers != null) {

@@ -16,37 +16,26 @@
  */
 package com.alipay.lookout.remote.report.xflush;
 
-import java.util.List;
+import com.alipay.lookout.api.Clock;
 
 /**
  * @author xiangfeng.xzc
- * @date 2018/7/17
+ * @date 2018/7/27
  */
-public class SlotItem {
-    private long cursor;
-    private List<MetricDto> data;
+public class TestClock implements Clock {
+    private volatile long wallTime;
 
-    public SlotItem() {
+    @Override
+    public long wallTime() {
+        return wallTime;
     }
 
-    public SlotItem(long cursor, List<MetricDto> data) {
-        this.cursor = cursor;
-        this.data = data;
+    @Override
+    public long monotonicTime() {
+        return wallTime * 1000;
     }
 
-    public long getCursor() {
-        return cursor;
-    }
-
-    public void setCursor(long cursor) {
-        this.cursor = cursor;
-    }
-
-    public List<MetricDto> getData() {
-        return data;
-    }
-
-    public void setData(List<MetricDto> data) {
-        this.data = data;
+    public void setWallTime(long wallTime) {
+        this.wallTime = wallTime;
     }
 }

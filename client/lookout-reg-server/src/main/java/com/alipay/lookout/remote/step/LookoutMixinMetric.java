@@ -34,9 +34,9 @@ import static com.alipay.lookout.common.LookoutConstants.DOT;
  * Created by kevin.luy@alipay.com on 2017/3/26.
  */
 final class LookoutMixinMetric implements MixinMetric, CanSetStep {
-    private final Id id;
+    private final Id           id;
     private final StepRegistry registry; //inner registry with fixed StepMillis
-    private final StepClock stepClock;
+    private final StepClock    stepClock;
 
     public LookoutMixinMetric(Id id, StepRegistry registry, StepClock stepClock) {
         this.id = id;

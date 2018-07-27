@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class LookoutDistributionSummary implements DistributionSummary, CanSetStep {
 
-    private final Id id;
+    private final Id       id;
     private final StepLong count;
     private final StepLong total;
     private final StepLong max;

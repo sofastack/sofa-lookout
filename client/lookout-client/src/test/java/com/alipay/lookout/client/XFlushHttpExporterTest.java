@@ -22,10 +22,10 @@ import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.xflush.Listener;
-import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
-import com.alipay.lookout.remote.report.xflush.SettableStepRegistry;
-import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.remote.report.xflush.PollerController;
+import com.alipay.lookout.remote.report.xflush.SettableStepRegistry;
+import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
+import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,8 +51,7 @@ public class XFlushHttpExporterTest {
 
         PollerController fc = new PollerController(dr);
 
-        XFlushHttpExporter e = new XFlushHttpExporter(fc, config);
-        e.addListener(new Listener() {
+        fc.addListener(new Listener() {
             @Override
             public void onActive() {
                 lookoutRegistry.getMetricObserverComposite().setEnabled(false);
@@ -65,6 +64,8 @@ public class XFlushHttpExporterTest {
                 System.out.println("idle");
             }
         });
+
+        XFlushHttpExporter e = new XFlushHttpExporter(fc);
         e.start();
 
         Registry r = client.getRegistry();

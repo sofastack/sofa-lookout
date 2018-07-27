@@ -27,12 +27,11 @@ import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.report.xflush.Listener;
-import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
 import com.alipay.lookout.remote.report.xflush.PollerController;
 import com.alipay.lookout.remote.report.xflush.SettableStepRegistry;
+import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -47,7 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class SimpleLookoutClient extends AbstractLookoutClient {
     private static final AtomicInteger state = new AtomicInteger(0);
-    private final LookoutConfig lookoutConfig;
+    private final LookoutConfig        lookoutConfig;
 
     public SimpleLookoutClient(String appName, MetricRegistry... registries) {
         this(appName, null, registries);
@@ -68,7 +67,7 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
         }
         lookoutConfig = config != null ? config : new LookoutConfig();
         registries = registries.length > 0 ? registries
-            : new MetricRegistry[]{new LookoutRegistry(lookoutConfig)};
+            : new MetricRegistry[] { new LookoutRegistry(lookoutConfig) };
 
         lookoutConfig.setProperty(LookoutConfig.APP_NAME, appName);
         if (!lookoutConfig.getBoolean(LookoutConfig.LOOKOUT_ENABLE, true)) {
@@ -95,19 +94,18 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
         //     registerFooRegistry(lookoutRegistryList);
         // }
 
-
         logger.debug("set global registry to Lookout");
         // init global registry
         Lookout.setRegistry(getRegistry());
     }
 
-    private void registerFooRegistry(final List<LookoutRegistry> lookoutRegistryList) {
-        SettableStepRegistry settableStepRegistry = new SettableStepRegistry(Clock.SYSTEM, lookoutConfig);
+    private void registerRegistryForXFlush(final List<LookoutRegistry> lookoutRegistryList) {
+        SettableStepRegistry settableStepRegistry = new SettableStepRegistry(Clock.SYSTEM,
+            lookoutConfig);
         settableStepRegistry.registerExtendedMetrics();
         PollerController controller = new PollerController(settableStepRegistry);
-        XFlushHttpExporter exporter = new XFlushHttpExporter(controller, lookoutConfig);
         // 如果exporter处于激活状态就禁止lookout的自动上报
-        exporter.addListener(new Listener() {
+        controller.addListener(new Listener() {
             @Override
             public void onActive() {
                 for (LookoutRegistry lookoutRegistry : lookoutRegistryList) {
@@ -124,9 +122,11 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
         });
 
         try {
+            XFlushHttpExporter exporter = new XFlushHttpExporter(controller);
             exporter.start();
             super.addRegistry(settableStepRegistry);
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            controller.close();
             logger.error("fail to start XFlushHttpExporter", e);
         }
     }

@@ -38,8 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class LookoutRegistry extends StepRegistry implements CommonTagsAccessor {
 
-    private SchedulerPoller poller;
-    private final Map<String, String> commonTags = new ConcurrentHashMap<String, String>();
+    private SchedulerPoller               poller;
+    private final Map<String, String>     commonTags              = new ConcurrentHashMap<String, String>();
     private final MetricObserverComposite metricObserverComposite = new MetricObserverComposite();
 
     /**
@@ -74,8 +74,8 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
     public static AddressService getAddressService(LookoutConfig config) {
         String addressServiceClassName = config.getString(LookoutConfig.ADDRESS_SERVICE_CLASS_NAME,
             DefaultAddressService.class.getName());
-        return ClassUtil.newInstance(addressServiceClassName, new Class[]{String.class},
-            new Object[]{config.getString(LookoutConfig.APP_NAME)});
+        return ClassUtil.newInstance(addressServiceClassName, new Class[] { String.class },
+            new Object[] { config.getString(LookoutConfig.APP_NAME) });
     }
 
     public LookoutRegistry(LookoutConfig config) {

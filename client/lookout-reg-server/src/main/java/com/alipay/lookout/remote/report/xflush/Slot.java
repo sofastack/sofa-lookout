@@ -14,19 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.api;
+package com.alipay.lookout.remote.report.xflush;
+
+import java.util.List;
 
 /**
- * 暴露一个接口用于修改 step
- *
  * @author xiangfeng.xzc
- * @date 2018/7/26
+ * @date 2018/7/17
  */
-public interface CanSetStep {
-    /**
-     * 设置新的step
-     *
-     * @param step 新的步长, 必须>0
-     */
-    void setStep(long step);
+public class Slot {
+    private long            cursor = -1;
+    private List<MetricDto> data   = null;
+
+    public Slot() {
+    }
+
+    public Slot(long cursor, List<MetricDto> data) {
+        this.cursor = cursor;
+        this.data = data;
+    }
+
+    public void clear() {
+        this.cursor = -1;
+        this.data = null;
+    }
+
+    public long getCursor() {
+        return cursor;
+    }
+
+    public void setCursor(long cursor) {
+        this.cursor = cursor;
+    }
+
+    public List<MetricDto> getData() {
+        return data;
+    }
+
+    public void setData(List<MetricDto> data) {
+        this.data = data;
+    }
 }

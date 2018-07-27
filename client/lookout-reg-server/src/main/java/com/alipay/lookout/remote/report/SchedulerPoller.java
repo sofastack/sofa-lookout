@@ -56,7 +56,7 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     private ScheduledService           scheduler;
 
     //====>config
-    private volatile boolean              enabled              = true;
+    private volatile boolean           enabled              = true;
     private MetricObserver             metricObserver;
     private final LookoutConfig        config;
     private final int                  numThreads           = 3;

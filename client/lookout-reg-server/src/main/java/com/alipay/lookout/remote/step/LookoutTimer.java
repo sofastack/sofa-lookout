@@ -34,8 +34,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 class LookoutTimer implements Timer, CanSetStep {
 
-    private final Id id;
-    private final Clock clock;
+    private final Id       id;
+    private final Clock    clock;
     private final StepLong count;
     private final StepLong total;
     private final StepLong max;

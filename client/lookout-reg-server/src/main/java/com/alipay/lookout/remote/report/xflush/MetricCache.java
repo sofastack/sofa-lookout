@@ -16,6 +16,9 @@
  */
 package com.alipay.lookout.remote.report.xflush;
 
+import com.alipay.lookout.api.Clock;
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,16 +28,17 @@ import java.util.Set;
  * @date 2018/7/12
  */
 public class MetricCache {
-    private final long bucketIntervalMills;
-    private Slot[] slots;
+    private final long  rate;
+    private Slot[]      slots;
+    private final Clock clock;
 
     @SuppressWarnings("unchecked")
-    public MetricCache(long slotIntervalMills, int slotCount) {
-        if (slotIntervalMills <= 0 || slotCount <= 0) {
-            throw new IllegalArgumentException();
-        }
-        // TODO check params, bucketIntervalMills 有一个最大值和最小值的限制
-        this.bucketIntervalMills = slotIntervalMills;
+    public MetricCache(Clock clock, long rate, int slotCount) {
+        Preconditions.checkArgument(rate > 0, "rate must greater than 0");
+        Preconditions.checkArgument(slotCount > 0, "slotCount must greater than 0");
+
+        this.clock = clock;
+        this.rate = rate;
         this.slots = new Slot[slotCount];
         for (int i = 0; i < slotCount; ++i) {
             this.slots[i] = new Slot();
@@ -45,22 +49,24 @@ public class MetricCache {
      * 如果存在原始的cache, 那么尽量保留原始origin里的数据
      *
      * @param origin
-     * @param slotIntervalMills
+     * @param rate
      * @param slotCount
      */
-    public MetricCache(MetricCache origin, long slotIntervalMills, int slotCount) {
-        if (slotIntervalMills <= 0 || slotCount <= 0) {
-            throw new IllegalArgumentException();
-        }
-        this.bucketIntervalMills = slotIntervalMills;
+    public MetricCache(MetricCache origin, long rate, int slotCount) {
+        Preconditions.checkNotNull(origin);
+        Preconditions.checkArgument(rate > 0, "rate must greater than 0");
+        Preconditions.checkArgument(slotCount > 0, "slotCount must greater than 0");
+
+        this.clock = origin.clock;
+        this.rate = rate;
         this.slots = new Slot[slotCount];
 
         // 尽量保存原有的正在使用的slot, 这样可以减少数据丢失
         int i = 0;
         for (Slot slot : origin.slots) {
-            if (slot.using) {
+            if (slot.getCursor() > 0) {
                 this.slots[i++] = slot;
-                if (i == slotCount) {
+                if (i >= slotCount) {
                     break;
                 }
             }
@@ -70,46 +76,41 @@ public class MetricCache {
         }
     }
 
-    public synchronized List<SlotItem> getNextData(Set<Long> successCursors) {
-        List<SlotItem> result = new ArrayList<SlotItem>();
-
-        // 找到最后一个成功的cursor
-        long maxSuccessCursor = 0;
-        if (!successCursors.isEmpty()) {
-            for (long x : successCursors) {
-                maxSuccessCursor = Math.max(maxSuccessCursor, x);
-            }
-        }
-
-        for (Slot slot : slots) {
-            if (slot.using) {
-                if (successCursors.contains(slot.cursor)) {
-                    slot.clear();
-                } else {
-                    result.add(slot.toFoo());
+    public List<Slot> getNextData(Set<Long> successCursors) {
+        List<Slot> result = new ArrayList<Slot>();
+        synchronized (this) {
+            for (Slot slot : slots) {
+                if (slot.getCursor() > 0) {
+                    if (successCursors != null && successCursors.contains(slot.getCursor())) {
+                        // 清理掉已经完成的slot
+                        slot.clear();
+                    } else {
+                        // 其余slot加入结果
+                        result.add(slot);
+                    }
                 }
             }
         }
-
         return result;
     }
-
 
     /**
      * 找出一个可用的位置, 第一个available=true 或者 所有slot里, cursor最小的那个
      *
      * @return
      */
-    private Slot findAvailableSlot() {
-        Slot oldestSlot = null;
-        for (Slot slot : slots) {
-            if (!slot.using) {
-                return slot;
-            } else if (oldestSlot == null || slot.cursor < oldestSlot.cursor) {
-                oldestSlot = slot;
+    private int findAvailableSlot() {
+        int oldestSlotIndex = -1;
+        for (int i = 0; i < slots.length; i++) {
+            Slot slot = slots[i];
+            if (slot.getCursor() < 0) {
+                return i;
+            } else if (oldestSlotIndex == -1
+                       || slot.getCursor() < slots[oldestSlotIndex].getCursor()) {
+                oldestSlotIndex = i;
             }
         }
-        return oldestSlot;
+        return oldestSlotIndex;
     }
 
     public synchronized void clear() {
@@ -120,35 +121,12 @@ public class MetricCache {
 
     public synchronized void add(List<MetricDto> data) {
         long cursor = getCurrentCursor();
-        Slot slot = findAvailableSlot();
-        if (slot.using) {
-            // force replace! a warn here
-        } else {
-            slot.using = true;
-        }
-        slot.cursor = cursor;
-        slot.data = data;
-        this.notifyAll();
+        int index = findAvailableSlot();
+        slots[index] = new Slot(cursor, data);
     }
 
-    public final long getCurrentCursor() {
+    private long getCurrentCursor() {
         // 将当前时间对齐的结果作为cursor
-        return System.currentTimeMillis() / bucketIntervalMills * bucketIntervalMills;
-    }
-
-    private static class Slot {
-        long cursor = -1;
-        List<MetricDto> data = null;
-        boolean using = false;
-
-        SlotItem toFoo() {
-            return new SlotItem(cursor, data);
-        }
-
-        void clear() {
-            cursor = -1;
-            data = null;
-            using = false;
-        }
+        return clock.wallTime() / rate * rate;
     }
 }

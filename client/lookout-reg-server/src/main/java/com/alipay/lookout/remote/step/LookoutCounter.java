@@ -30,7 +30,7 @@ import com.alipay.lookout.step.StepLong;
  */
 public class LookoutCounter implements Counter, CanSetStep {
 
-    private final Id id;
+    private final Id       id;
     private final StepLong value;
 
     LookoutCounter(Id id, Clock clock, long step) {

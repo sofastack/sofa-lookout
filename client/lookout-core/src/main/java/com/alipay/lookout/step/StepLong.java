@@ -30,11 +30,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class StepLong implements StepValue {
 
-    private final long init;
-    private final Clock clock;
-    private volatile long step;
+    private final long       init;
+    private final Clock      clock;
+    private volatile long    step;
 
-    private volatile long previous;
+    private volatile long    previous;
     private final AtomicLong current;
 
     private final AtomicLong lastInitPos;
@@ -124,6 +124,6 @@ public class StepLong implements StepValue {
     @Override
     public String toString() {
         return "StepLong{init=" + init + ", previous=" + previous + ", current=" + current.get()
-            + ", lastInitPos=" + lastInitPos.get() + '}';
+               + ", lastInitPos=" + lastInitPos.get() + '}';
     }
 }
