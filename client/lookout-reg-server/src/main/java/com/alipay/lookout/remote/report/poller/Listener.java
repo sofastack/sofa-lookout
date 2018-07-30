@@ -14,44 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.xflush;
-
-import java.util.List;
+package com.alipay.lookout.remote.report.poller;
 
 /**
+ * 用于监听 poller 激活 和 空闲 的事件
+ *
  * @author xiangfeng.xzc
- * @date 2018/7/17
+ * @date 2018/7/19
  */
-public class Slot {
-    private long            cursor = -1;
-    private List<MetricDto> data   = null;
+public interface Listener {
+    /**
+     * 当poller激活时
+     */
+    void onActive();
 
-    public Slot() {
-    }
-
-    public Slot(long cursor, List<MetricDto> data) {
-        this.cursor = cursor;
-        this.data = data;
-    }
-
-    public void clear() {
-        this.cursor = -1;
-        this.data = null;
-    }
-
-    public long getCursor() {
-        return cursor;
-    }
-
-    public void setCursor(long cursor) {
-        this.cursor = cursor;
-    }
-
-    public List<MetricDto> getData() {
-        return data;
-    }
-
-    public void setData(List<MetricDto> data) {
-        this.data = data;
-    }
+    /**
+     * 当poller空闲时
+     */
+    void onIdle();
 }

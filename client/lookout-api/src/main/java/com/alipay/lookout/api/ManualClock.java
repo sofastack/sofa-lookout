@@ -16,37 +16,33 @@
  */
 package com.alipay.lookout.api;
 
-import java.util.concurrent.atomic.AtomicLong;
-
+/**
+ * 一个可以手动调整的Clock实现, 常用于单元测试
+ *
+ * @author xiangfeng.xzc
+ * @date 2018/7/27
+ */
 public class ManualClock implements Clock {
-
-    private final AtomicLong wall;
-    private final AtomicLong monotonic;
-
-    public ManualClock() {
-        this(0L, 0L);
-    }
-
-    public ManualClock(long wallInit, long monotonicInit) {
-        wall = new AtomicLong(wallInit);
-        monotonic = new AtomicLong(monotonicInit);
-    }
+    private volatile long wallTime;
+    private volatile long monotonicTime;
 
     @Override
     public long wallTime() {
-        return wall.get();
+        return wallTime;
     }
 
     @Override
     public long monotonicTime() {
-        return monotonic.get();
+        return monotonicTime;
     }
 
-    public void setWallTime(long t) {
-        wall.set(t);
+    public void setWallTime(long wallTime) {
+        this.wallTime = wallTime;
+        this.monotonicTime = wallTime * 1000L;
     }
 
-    public void setMonotonicTime(long t) {
-        monotonic.set(t);
+    public void setMonotonicTime(long monotonicTime) {
+        this.wallTime = monotonicTime / 1000L;
+        this.monotonicTime = monotonicTime;
     }
 }

@@ -14,28 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.xflush;
+package com.alipay.lookout.api;
 
-import com.alipay.lookout.api.Clock;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author xiangfeng.xzc
- * @date 2018/7/27
+ * @date 2018/7/30
  */
-public class TestClock implements Clock {
-    private volatile long wallTime;
+public class ManualClockTest {
+    @Test
+    public void test() {
+        ManualClock clock = new ManualClock();
+        clock.setWallTime(100L);
+        assertEquals(100L, clock.wallTime());
+        assertEquals(100000L, clock.monotonicTime());
 
-    @Override
-    public long wallTime() {
-        return wallTime;
-    }
+        clock.setWallTime(200L);
+        assertEquals(200L, clock.wallTime());
+        assertEquals(200000L, clock.monotonicTime());
 
-    @Override
-    public long monotonicTime() {
-        return wallTime * 1000;
-    }
-
-    public void setWallTime(long wallTime) {
-        this.wallTime = wallTime;
+        clock.setMonotonicTime(345678L);
+        assertEquals(345L, clock.wallTime());
+        assertEquals(345678L, clock.monotonicTime());
     }
 }

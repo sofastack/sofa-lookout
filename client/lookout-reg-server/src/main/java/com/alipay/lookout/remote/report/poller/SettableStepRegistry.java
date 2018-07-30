@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.xflush;
+package com.alipay.lookout.remote.report.poller;
 
 import com.alipay.lookout.api.CanSetStep;
 import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.api.Id;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.step.StepRegistry;
@@ -43,8 +44,8 @@ public class SettableStepRegistry extends StepRegistry implements CanSetStep, Co
         super(clock, config, INIT_STEP_MILLS);
     }
 
-    public SettableStepRegistry(Clock clock, LookoutConfig config, long initStepMills) {
-        super(clock, config, initStepMills);
+    public SettableStepRegistry(Clock clock, LookoutConfig config, long initStep) {
+        super(clock, config, initStep);
     }
 
     @Override
@@ -69,6 +70,17 @@ public class SettableStepRegistry extends StepRegistry implements CanSetStep, Co
     @Override
     public void removeCommonTag(String name) {
         commonTags.remove(name);
+    }
+
+    /**
+     * SettableStepRegistry 的metrics有相同的rate
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    protected long getStepMillis(Id id) {
+        return fixedStepMillis;
     }
 
     @Override

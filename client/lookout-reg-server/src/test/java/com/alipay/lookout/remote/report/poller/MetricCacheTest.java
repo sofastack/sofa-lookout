@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.xflush;
+package com.alipay.lookout.remote.report.poller;
 
+import com.alipay.lookout.api.ManualClock;
 import com.google.common.collect.Sets;
 
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class MetricCacheTest {
     public void test() {
         Set<Long> emptySet = Collections.emptySet();
 
-        TestClock tc = new TestClock();
+        ManualClock tc = new ManualClock();
         tc.setWallTime(1000);
 
         MetricCache mc = new MetricCache(tc, 1000, 4);

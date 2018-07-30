@@ -51,7 +51,7 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     /**
      * 对于 xFlush exporter, 多久没有请求拉取数据就进入idle状态
      */
-    public static final String                      XFLUSH_EXPORTER_IDLE_SECONDS            = "lookout.xflush.exporter.idle.seconds";
+    public static final String                      XFLUSH_EXPORTER_IDLE_SECONDS            = "lookout.poller.exporter.idle.seconds";
 
     /**
      * priority->Millsecond

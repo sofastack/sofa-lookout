@@ -26,10 +26,10 @@ import com.alipay.lookout.core.AbstractRegistry;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
-import com.alipay.lookout.remote.report.xflush.Listener;
-import com.alipay.lookout.remote.report.xflush.PollerController;
-import com.alipay.lookout.remote.report.xflush.SettableStepRegistry;
-import com.alipay.lookout.remote.report.xflush.XFlushHttpExporter;
+import com.alipay.lookout.remote.report.poller.Listener;
+import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
+import com.alipay.lookout.remote.report.poller.PollerController;
+import com.alipay.lookout.remote.report.poller.SettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import java.util.List;
@@ -122,12 +122,12 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
         });
 
         try {
-            XFlushHttpExporter exporter = new XFlushHttpExporter(controller);
+            MetricsHttpExporter exporter = new MetricsHttpExporter(controller);
             exporter.start();
             super.addRegistry(settableStepRegistry);
         } catch (Throwable e) {
             controller.close();
-            logger.error("fail to start XFlushHttpExporter", e);
+            logger.error("fail to start MetricsHttpExporter", e);
         }
     }
 

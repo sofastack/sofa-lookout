@@ -37,10 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by kevin.luy@alipay.com on 2017/3/26.
  */
 public class StepRegistry extends AbstractRegistry {
-    protected final Clock clock;                //未对齐时间
+    protected final Clock   clock;                //未对齐时间
 
     //for LookoutMixinMetric
-    private volatile long fixedStepMillis = -1L;
+    protected volatile long fixedStepMillis = -1L;
 
     public StepRegistry(Clock clock, LookoutConfig config) {
         this(clock, config, -1L);
@@ -73,7 +73,7 @@ public class StepRegistry extends AbstractRegistry {
         return new LookoutDistributionSummary(id, clock, getStepMillis(id));
     }
 
-    private long getStepMillis(Id id) {
+    protected long getStepMillis(Id id) {
         if (fixedStepMillis > 0) {
             return fixedStepMillis;
         }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.xflush;
+package com.alipay.lookout.remote.report.poller;
 
 import com.alipay.lookout.api.Gauge;
 import com.alipay.lookout.api.Metric;
@@ -28,6 +28,7 @@ import com.google.common.primitives.Longs;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  * @author xiangfeng.xzc
  * @date 2018/7/26
  */
-public class PollerController {
+public class PollerController implements Closeable {
     private static final int              DEFAULT_SLOT_COUNT = 100;
 
     /**
@@ -349,6 +350,7 @@ public class PollerController {
         this.listeners.remove(listener);
     }
 
+    @Override
     public void close() {
         if (this.scheduledExecutorService != null) {
             this.scheduledExecutorService.shutdown();

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.xflush;
+package com.alipay.lookout.remote.report.poller;
 
 import com.alipay.lookout.api.Clock;
 import com.google.common.base.Preconditions;
@@ -64,7 +64,7 @@ public class MetricCache {
         // 尽量保存原有的正在使用的slot, 这样可以减少数据丢失
         int i = 0;
         for (Slot slot : origin.slots) {
-            if (slot.getCursor() > 0) {
+            if (slot.getCursor() >= 0) {
                 this.slots[i++] = slot;
                 if (i >= slotCount) {
                     break;
@@ -80,7 +80,7 @@ public class MetricCache {
         List<Slot> result = new ArrayList<Slot>();
         synchronized (this) {
             for (Slot slot : slots) {
-                if (slot.getCursor() > 0) {
+                if (slot.getCursor() >= 0) {
                     if (successCursors != null && successCursors.contains(slot.getCursor())) {
                         // 清理掉已经完成的slot
                         slot.clear();

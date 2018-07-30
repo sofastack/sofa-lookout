@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.xflush;
+package com.alipay.lookout.remote.report.poller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -40,7 +40,7 @@ import java.util.zip.GZIPOutputStream;
  * @author xiangfeng.xzc
  * @date 2018/7/17
  */
-public class XFlushHttpExporter {
+public class MetricsHttpExporter {
     private static final Charset   UTF8            = Charset.forName("UTF-8");
     private static final int       DEFAULT_BACKLOG = 2;
     private static final int       DEFAULT_PORT    = 19399;
@@ -49,11 +49,11 @@ public class XFlushHttpExporter {
     private final int              backlog;
     private HttpServer             httpServer;
 
-    public XFlushHttpExporter(PollerController controller) {
+    public MetricsHttpExporter(PollerController controller) {
         this(controller, DEFAULT_PORT, DEFAULT_BACKLOG);
     }
 
-    public XFlushHttpExporter(PollerController controller, int port, int backlog) {
+    public MetricsHttpExporter(PollerController controller, int port, int backlog) {
         this.controller = controller;
         this.port = port;
         this.backlog = backlog;

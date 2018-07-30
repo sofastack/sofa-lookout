@@ -14,39 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.api;
+package com.alipay.lookout.remote.report.poller;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
 
-public class ManualClock implements Clock {
+/**
+ * @author xiangfeng.xzc
+ * @date 2018/7/17
+ */
+public class Slot {
+    private long            cursor = -1;
+    private List<MetricDto> data   = null;
 
-    private final AtomicLong wall;
-    private final AtomicLong monotonic;
-
-    public ManualClock() {
-        this(0L, 0L);
+    public Slot() {
     }
 
-    public ManualClock(long wallInit, long monotonicInit) {
-        wall = new AtomicLong(wallInit);
-        monotonic = new AtomicLong(monotonicInit);
+    public Slot(long cursor, List<MetricDto> data) {
+        this.cursor = cursor;
+        this.data = data;
     }
 
-    @Override
-    public long wallTime() {
-        return wall.get();
+    public void clear() {
+        this.cursor = -1;
+        this.data = null;
     }
 
-    @Override
-    public long monotonicTime() {
-        return monotonic.get();
+    public long getCursor() {
+        return cursor;
     }
 
-    public void setWallTime(long t) {
-        wall.set(t);
+    public void setCursor(long cursor) {
+        this.cursor = cursor;
     }
 
-    public void setMonotonicTime(long t) {
-        monotonic.set(t);
+    public List<MetricDto> getData() {
+        return data;
+    }
+
+    public void setData(List<MetricDto> data) {
+        this.data = data;
     }
 }
