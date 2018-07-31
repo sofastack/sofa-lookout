@@ -126,4 +126,8 @@ public class StepLong implements StepValue {
         return "StepLong{init=" + init + ", previous=" + previous + ", current=" + current.get()
                + ", lastInitPos=" + lastInitPos.get() + '}';
     }
+
+    public long getStep() {
+        return step;
+    }
 }

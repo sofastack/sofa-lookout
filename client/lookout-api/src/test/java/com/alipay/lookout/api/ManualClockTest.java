@@ -30,14 +30,14 @@ public class ManualClockTest {
         ManualClock clock = new ManualClock();
         clock.setWallTime(100L);
         assertEquals(100L, clock.wallTime());
-        assertEquals(100000L, clock.monotonicTime());
+        assertEquals(100000000L, clock.monotonicTime());
 
         clock.setWallTime(200L);
         assertEquals(200L, clock.wallTime());
-        assertEquals(200000L, clock.monotonicTime());
+        assertEquals(200000000L, clock.monotonicTime());
 
-        clock.setMonotonicTime(345678L);
+        clock.setMonotonicTime(345678000L);
         assertEquals(345L, clock.wallTime());
-        assertEquals(345678L, clock.monotonicTime());
+        assertEquals(345678000L, clock.monotonicTime());
     }
 }

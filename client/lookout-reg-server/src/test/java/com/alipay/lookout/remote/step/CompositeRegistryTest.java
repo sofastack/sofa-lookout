@@ -16,24 +16,60 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.*;
-import com.alipay.lookout.core.DefaultRegistry;
+import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.api.Counter;
+import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.ManualClock;
+import com.alipay.lookout.api.MetricRegistry;
+import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.api.composite.MixinMetric;
-import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.common.LookoutConstants;
+import com.alipay.lookout.core.DefaultRegistry;
+import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.SchedulerPoller;
+import com.alipay.lookout.remote.report.poller.SettableStepRegistry;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/2/15.
  */
 public class CompositeRegistryTest {
 
+    private CompositeRegistry    compositeRegistry;
+    private SettableStepRegistry settableStepRegistry;
+
+    @Before
+    public void before() {
+        compositeRegistry = new CompositeRegistry(Clock.SYSTEM);
+        compositeRegistry.add(new DefaultRegistry());
+        settableStepRegistry = new SettableStepRegistry(Clock.SYSTEM, new LookoutConfig());
+        compositeRegistry.add(settableStepRegistry);
+    }
+
+    @Test
+    public void test_counter() {
+        Id counterId = compositeRegistry.createId("counter");
+        Counter counter = compositeRegistry.counter(counterId);
+        assertThat(counter).isInstanceOf(CanSetStep.class);
+        CanSetStep css = (CanSetStep) counter;
+        css.setStep(10);
+        LookoutCounter counter2 = (LookoutCounter) settableStepRegistry.counter(counterId);
+        assertThat(counter2.getStep()).isEqualTo(10);
+
+        css.setStep(20);
+        assertThat(counter2.getStep()).isEqualTo(20);
+    }
+
     @Test
     public void testCompositeRemoteAndDefaultRegistry() {
-        MockClock clock = new MockClock();
+        ManualClock clock = new ManualClock();
         CompositeRegistry registry = new CompositeRegistry(clock);
         MetricRegistry defaultRegistry = new DefaultRegistry(clock);
         registry.add(defaultRegistry);

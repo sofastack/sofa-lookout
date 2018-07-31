@@ -26,6 +26,14 @@ public class ManualClock implements Clock {
     private volatile long wallTime;
     private volatile long monotonicTime;
 
+    public ManualClock() {
+    }
+
+    public ManualClock(long wallTime, long monotonicTime) {
+        this.wallTime = wallTime;
+        this.monotonicTime = monotonicTime;
+    }
+
     @Override
     public long wallTime() {
         return wallTime;
@@ -38,11 +46,11 @@ public class ManualClock implements Clock {
 
     public void setWallTime(long wallTime) {
         this.wallTime = wallTime;
-        this.monotonicTime = wallTime * 1000L;
+        this.monotonicTime = wallTime * 1000000L;
     }
 
     public void setMonotonicTime(long monotonicTime) {
-        this.wallTime = monotonicTime / 1000L;
+        this.wallTime = monotonicTime / 1000000L;
         this.monotonicTime = monotonicTime;
     }
 }

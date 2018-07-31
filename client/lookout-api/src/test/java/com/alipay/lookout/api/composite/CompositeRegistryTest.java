@@ -64,7 +64,7 @@ public class CompositeRegistryTest {
         Registry r = NoopRegistry.INSTANCE;
         List<Registry> list = new ArrayList<Registry>();
         list.add(r);
-        Counter counter = new CompositeCounter(r.createId("xx"), list);
+        CompositeCounter counter = new CompositeCounter(r.createId("xx"), list);
         counter.dec(1);
         counter.dec();
         counter.inc(2);

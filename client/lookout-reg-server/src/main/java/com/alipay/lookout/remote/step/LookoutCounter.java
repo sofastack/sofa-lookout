@@ -78,4 +78,8 @@ public class LookoutCounter implements Counter, CanSetStep {
     public void setStep(long step) {
         this.value.setStep(step);
     }
+
+    public long getStep() {
+        return this.value.getStep();
+    }
 }

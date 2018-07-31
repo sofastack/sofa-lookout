@@ -14,10 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.step;
+package com.alipay.lookout.core;
 
-import com.alipay.lookout.api.ManualClock;
+import org.junit.Test;
 
-@Deprecated
-public class MockClock extends ManualClock {
+import static org.junit.Assert.*;
+
+/**
+ * @author xiangfeng.xzc
+ * @date 2018/7/30
+ */
+public class DefaultRegistryTest {
+    @Test
+    public void test_propagate() {
+        DefaultRegistry r = new DefaultRegistry();
+        RuntimeException re = new RuntimeException();
+        try {
+            r.propagate("msg", re);
+            assertFalse(true);
+        } catch (Exception e) {
+            assertEquals(re, e);
+        }
+
+        Exception ce = new Exception();
+        try {
+            r.propagate("msg", ce);
+            assertFalse(true);
+        } catch (Exception e) {
+            assertTrue(e instanceof RuntimeException);
+            assertEquals(ce, e.getCause());
+        }
+    }
 }
