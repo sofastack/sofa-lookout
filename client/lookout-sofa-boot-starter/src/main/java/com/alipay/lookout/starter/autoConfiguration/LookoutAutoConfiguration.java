@@ -112,6 +112,9 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
             "com.codahale.metrics.MetricRegistry" })
     public DropWizardMetricsRegistryFactory dropWizardMetricsRegistryFactory() {
         try {
+            /*
+             * In order to avoid [com.codahale.metrics.MetricRegistry] class not found.
+             */
             com.codahale.metrics.MetricRegistry metricRegistry = beanFactory
                 .getBean(com.codahale.metrics.MetricRegistry.class);
             if (metricRegistry == null) {

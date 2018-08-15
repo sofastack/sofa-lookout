@@ -68,13 +68,15 @@ public class LookoutSpringBootMetricsImplTest extends AbstractTestBase {
      */
     @Test
     public void testIncrement() throws Exception {
-        String metricName = "metricName";
-        this.counterService.increment(metricName);
+        String originName = "metricName";
+        String metricName = originName;
+        this.counterService.increment(originName);
+        metricName = LookoutSpringBootMetricsImpl.LOOKOUT_COUNTER_PREFIX + metricName;
         Metric metric = this.lookoutRegistryMetricReader.findOne(metricName);
         assertTrue(metric != null);
         assertEquals(1L, metric.getValue());
         //decrement
-        this.counterService.decrement(metricName);
+        this.counterService.decrement(originName);
         metric = this.lookoutRegistryMetricReader.findOne(metricName);
         assertTrue(metric != null);
         assertEquals(0L, metric.getValue());
@@ -85,11 +87,13 @@ public class LookoutSpringBootMetricsImplTest extends AbstractTestBase {
      */
     @Test
     public void testReset() throws Exception {
-        String metricName = "metricName1";
-        this.counterService.increment(metricName);
+        String originName = "metricName1";
+        String metricName = originName;
+        this.counterService.increment(originName);
+        metricName = LookoutSpringBootMetricsImpl.LOOKOUT_COUNTER_PREFIX + metricName;
         Metric metric = this.lookoutRegistryMetricReader.findOne(metricName);
         assertTrue(metric != null);
-        this.counterService.reset(metricName);
+        this.counterService.reset(originName);
         assertTrue(this.lookoutRegistryMetricReader.findOne(metricName) == null);
     }
 
@@ -102,6 +106,7 @@ public class LookoutSpringBootMetricsImplTest extends AbstractTestBase {
         double value = 10;
         this.gaugeService.submit(gaugeName, value);
         //get
+        gaugeName = LookoutSpringBootMetricsImpl.LOOKOUT_GAUGE_PREFIX + gaugeName;
         Metric metric = this.lookoutRegistryMetricReader.findOne(gaugeName);
         assertEquals(value, metric.getValue());
     }

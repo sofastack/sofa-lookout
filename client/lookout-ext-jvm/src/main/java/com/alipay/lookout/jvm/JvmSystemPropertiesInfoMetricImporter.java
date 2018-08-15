@@ -18,7 +18,8 @@ package com.alipay.lookout.jvm;
 
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Registry;
-import com.alipay.lookout.api.info.Info;
+import com.alipay.lookout.api.info.AutoPollFriendlyInfo;
+import com.alipay.lookout.api.info.AutoPollSuggestion;
 import com.alipay.lookout.spi.MetricsImporter;
 
 import java.util.Map;
@@ -32,7 +33,18 @@ public class JvmSystemPropertiesInfoMetricImporter implements MetricsImporter {
     @Override
     public void register(Registry registry) {
         Id id = registry.createId(LookoutIdNameConstants.JVM_SYSTEM_PROP_NAME);
-        registry.info(id, new Info<Properties>() {
+        registry.info(id, new AutoPollFriendlyInfo<Properties>() {
+            @Override
+            public AutoPollSuggestion autoPollSuggest() {
+                return AutoPollSuggestion.POLL_WHEN_UPDATED;
+            }
+
+            @Override
+            public long lastModifiedTime() {
+                //only report once on startup
+                return -1;
+            }
+
             @Override
             public Properties value() {
                 return System.getProperties();
@@ -40,7 +52,18 @@ public class JvmSystemPropertiesInfoMetricImporter implements MetricsImporter {
         });
 
         Id envId = registry.createId(LookoutIdNameConstants.JVM_SYSTEM_ENV_NAME);
-        registry.info(envId, new Info<Map<String, String>>() {
+        registry.info(envId, new AutoPollFriendlyInfo<Map<String, String>>() {
+            @Override
+            public AutoPollSuggestion autoPollSuggest() {
+                return AutoPollSuggestion.POLL_WHEN_UPDATED;
+            }
+
+            @Override
+            public long lastModifiedTime() {
+                //only report once on startup
+                return -1;
+            }
+
             @Override
             public Map<String, String> value() {
                 return System.getenv();
