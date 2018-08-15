@@ -36,11 +36,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PollerControllerTest {
     @Test
     public void test() throws Exception {
-        SettableStepRegistry r = new SettableStepRegistry(Clock.SYSTEM, new LookoutConfig(), 1000L);
+        ResettableStepRegistry r = new ResettableStepRegistry(Clock.SYSTEM, new LookoutConfig(),
+            1000L);
 
         r.counter(r.createId("foo"));
 
         PollerController controller = new PollerController(r, 10);
+
         try {
             Thread.sleep(100);
             Set<Long> success = new HashSet<Long>();

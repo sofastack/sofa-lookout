@@ -23,7 +23,8 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.poller.Listener;
 import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
 import com.alipay.lookout.remote.report.poller.PollerController;
-import com.alipay.lookout.remote.report.poller.SettableStepRegistry;
+import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
+import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -35,43 +36,59 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static org.junit.Assert.*;
 
 /**
  * @author xiangfeng.xzc
  * @date 2018/7/17
  */
 public class MetricsHttpExporterTest {
-    @Test
-    public void test() throws IOException, InterruptedException {
-        LookoutConfig config = new LookoutConfig();
-
-        // final LookoutRegistry lookoutRegistry = new LookoutRegistry(config);
-        // lookoutRegistry.registerExtendedMetrics();
-
-        SettableStepRegistry dr = new SettableStepRegistry(Clock.SYSTEM, config, 1000L);
-        dr.registerExtendedMetrics();
-
-        // SimpleLookoutClient client = new SimpleLookoutClient("foo", lookoutRegistry, dr);
-        // dr.registerExtendedMetrics();
-
-        PollerController fc = new PollerController(dr);
-
-        fc.addListener(new Listener() {
+    private void bind(PollerController controller,
+                      final Collection<LookoutRegistry> lookoutRegistries) {
+        controller.addListener(new Listener() {
             @Override
             public void onActive() {
-                // lookoutRegistry.getMetricObserverComposite().setEnabled(false);
+                for (LookoutRegistry r : lookoutRegistries) {
+                    r.getMetricObserverComposite().setEnabled(false);
+                }
                 System.out.println("active");
             }
 
             @Override
             public void onIdle() {
-                // lookoutRegistry.getMetricObserverComposite().setEnabled(true);
+                for (LookoutRegistry r : lookoutRegistries) {
+                    r.getMetricObserverComposite().setEnabled(false);
+                }
                 System.out.println("idle");
             }
         });
 
-        MetricsHttpExporter e = new MetricsHttpExporter(fc);
+    }
+
+    @Test
+    public void test() throws IOException, InterruptedException {
+        LookoutConfig config = new LookoutConfig();
+        final LookoutRegistry lookoutRegistry = new LookoutRegistry(config);
+        // 通常只会有一个LookoutRegistry
+        final Collection<LookoutRegistry> lookoutRegistries = new ArrayList<LookoutRegistry>(1);
+        lookoutRegistries.add(lookoutRegistry);
+
+        ResettableStepRegistry ssr = new ResettableStepRegistry(Clock.SYSTEM, config, 1000L);
+        // 使用者需要自行构建该 PollerController
+        // 能不能将逻辑做到 client 里?
+
+        // Registry registry = client.getRegistry();
+
+        PollerController pc = new PollerController(ssr);
+        bind(pc, lookoutRegistries);
+
+        MetricsHttpExporter e = new MetricsHttpExporter(pc);
         e.start();
+
+        // SimpleLookoutClient client = new SimpleLookoutClient("foo", config, lookoutRegistry, ssr);
 
         Thread.sleep(1200);
 
@@ -82,7 +99,7 @@ public class MetricsHttpExporterTest {
             try {
                 String content = EntityUtils.toString(response.getEntity());
                 JSONObject r = JSON.parseObject(content);
-                System.out.println(r);
+                assertNotNull(r);
             } finally {
                 HttpClientUtils.closeQuietly(response);
             }

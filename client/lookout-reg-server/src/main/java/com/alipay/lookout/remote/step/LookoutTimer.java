@@ -16,7 +16,7 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Indicator;
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-class LookoutTimer implements Timer, CanSetStep {
+class LookoutTimer implements Timer, ResettableStep {
 
     private final Id       id;
     private final Clock    clock;

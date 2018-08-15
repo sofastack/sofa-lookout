@@ -29,9 +29,10 @@ import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.report.poller.Listener;
 import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
 import com.alipay.lookout.remote.report.poller.PollerController;
-import com.alipay.lookout.remote.report.poller.SettableStepRegistry;
+import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -74,12 +75,7 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             return;
         }
 
-        // final List<LookoutRegistry> lookoutRegistryList = new ArrayList<LookoutRegistry>();
-
         for (MetricRegistry registry : registries) {
-            // if (registry instanceof LookoutRegistry) {
-            //    lookoutRegistryList.add((LookoutRegistry) registry);
-            // }
             if (registry instanceof AbstractRegistry
                 && ((AbstractRegistry) registry).getConfig() != lookoutConfig) {
                 // reset with the same configuration
@@ -90,43 +86,48 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             super.addRegistry(registry);
         }
 
-        // if (lookoutConfig.getBoolean(LookoutConfig.XFLUSH_EXPORTER_ENABLE, true)) {
-        //     registerFooRegistry(lookoutRegistryList);
-        // }
+        exportPoller();
 
         logger.debug("set global registry to Lookout");
         // init global registry
         Lookout.setRegistry(getRegistry());
     }
 
-    private void registerRegistryForXFlush(final List<LookoutRegistry> lookoutRegistryList) {
-        SettableStepRegistry settableStepRegistry = new SettableStepRegistry(Clock.SYSTEM,
+    private void exportPoller() {
+        if (!lookoutConfig.getBoolean(LookoutConfig.POLLER_EXPORTER_ENABLED, true)) {
+            return;
+        }
+        ResettableStepRegistry resettableStepRegistry = new ResettableStepRegistry(Clock.SYSTEM,
             lookoutConfig);
-        settableStepRegistry.registerExtendedMetrics();
-        PollerController controller = new PollerController(settableStepRegistry);
-        // 如果exporter处于激活状态就禁止lookout的自动上报
+        resettableStepRegistry.registerExtendedMetrics();
+
+        final List<LookoutRegistry> lookoutRegistryList = new ArrayList<LookoutRegistry>();
+        for (Registry r : super.getInnerCompositeRegistry().getRegistries()) {
+            if (r instanceof LookoutRegistry) {
+                lookoutRegistryList.add((LookoutRegistry) r);
+            }
+        }
+        PollerController controller = new PollerController(resettableStepRegistry);
         controller.addListener(new Listener() {
             @Override
             public void onActive() {
-                for (LookoutRegistry lookoutRegistry : lookoutRegistryList) {
-                    lookoutRegistry.getMetricObserverComposite().setEnabled(false);
+                for (LookoutRegistry r : lookoutRegistryList) {
+                    r.getMetricObserverComposite().setEnabled(false);
                 }
             }
 
             @Override
             public void onIdle() {
-                for (LookoutRegistry lookoutRegistry : lookoutRegistryList) {
-                    lookoutRegistry.getMetricObserverComposite().setEnabled(true);
+                for (LookoutRegistry r : lookoutRegistryList) {
+                    r.getMetricObserverComposite().setEnabled(false);
                 }
             }
         });
-
         try {
             MetricsHttpExporter exporter = new MetricsHttpExporter(controller);
             exporter.start();
-            super.addRegistry(settableStepRegistry);
-        } catch (Throwable e) {
-            controller.close();
+            super.addRegistry(resettableStepRegistry);
+        } catch (Exception e) {
             logger.error("fail to start MetricsHttpExporter", e);
         }
     }
@@ -152,4 +153,5 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             }
         }
     }
+
 }

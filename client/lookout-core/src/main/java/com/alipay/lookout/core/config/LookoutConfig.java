@@ -49,9 +49,14 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      ADDRESS_SERVICE_CLASS_NAME              = "lookout.address.service.class.name";
 
     /**
-     * 对于 xFlush exporter, 多久没有请求拉取数据就进入idle状态
+     * 是否提供一个接口, 让外界拉取数据
      */
-    public static final String                      XFLUSH_EXPORTER_IDLE_SECONDS            = "lookout.poller.exporter.idle.seconds";
+    public static final String                      POLLER_EXPORTER_ENABLED                 = "lookout.poller.enabled";
+
+    /**
+     * 多久没有请求拉取数据就进入idle状态
+     */
+    public static final String                      POLLER_EXPORTER_IDLE_SECONDS            = "lookout.poller.exporter.idle.seconds";
 
     /**
      * priority->Millsecond

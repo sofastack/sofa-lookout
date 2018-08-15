@@ -16,7 +16,7 @@
  */
 package com.alipay.lookout.remote.report.poller;
 
-import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.core.CommonTagsAccessor;
@@ -32,19 +32,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author xiangfeng.xzc
  * @date 2018/7/26
  */
-public class SettableStepRegistry extends StepRegistry implements CanSetStep, CommonTagsAccessor {
+public class ResettableStepRegistry extends StepRegistry implements ResettableStep,
+                                                        CommonTagsAccessor {
     /**
      * 默认的采样间隔时间
      */
-    private static final long         INIT_STEP_MILLS = 10000;
+    private static final long         INIT_STEP_MILLS = 30000;
 
     private final Map<String, String> commonTags      = new ConcurrentHashMap<String, String>();
 
-    public SettableStepRegistry(Clock clock, LookoutConfig config) {
+    public ResettableStepRegistry(Clock clock, LookoutConfig config) {
         super(clock, config, INIT_STEP_MILLS);
     }
 
-    public SettableStepRegistry(Clock clock, LookoutConfig config, long initStep) {
+    public ResettableStepRegistry(Clock clock, LookoutConfig config, long initStep) {
         super(clock, config, initStep);
     }
 
@@ -73,7 +74,7 @@ public class SettableStepRegistry extends StepRegistry implements CanSetStep, Co
     }
 
     /**
-     * SettableStepRegistry 的metrics有相同的rate
+     * ResettableStepRegistry 的metrics有相同的rate
      *
      * @param id
      * @return

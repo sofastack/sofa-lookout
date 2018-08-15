@@ -30,10 +30,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author xiangfeng.xzc
  * @date 2018/7/30
  */
-public class SettableStepRegistryTest {
+public class ResettableStepRegistryTest {
     @Test
     public void test() {
-        SettableStepRegistry r = new SettableStepRegistry(Clock.SYSTEM, new LookoutConfig(), 1000L);
+        ResettableStepRegistry r = new ResettableStepRegistry(Clock.SYSTEM, new LookoutConfig(),
+            1000L);
         assertThat(r.getCommonTagValue("foo")).isNull();
         r.setCommonTag("foo", "bar");
         assertThat(r.getCommonTagValue("foo")).isEqualTo("bar");

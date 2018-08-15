@@ -16,7 +16,7 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.DistributionSummary;
 import com.alipay.lookout.api.Id;
@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutDistributionSummary implements DistributionSummary, CanSetStep {
+public class LookoutDistributionSummary implements DistributionSummary, ResettableStep {
 
     private final Id       id;
     private final StepLong count;

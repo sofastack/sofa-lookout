@@ -16,7 +16,7 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.CanSetStep;
+import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Counter;
 import com.alipay.lookout.api.DistributionSummary;
@@ -151,8 +151,8 @@ public class StepRegistry extends AbstractRegistry {
         }
         this.fixedStepMillis = step;
         for (Metric m : this) {
-            if (m instanceof CanSetStep) {
-                ((CanSetStep) m).setStep(step);
+            if (m instanceof ResettableStep) {
+                ((ResettableStep) m).setStep(step);
             }
         }
     }

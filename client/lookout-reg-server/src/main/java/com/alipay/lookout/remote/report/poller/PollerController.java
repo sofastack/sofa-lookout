@@ -27,6 +27,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -48,82 +50,87 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/7/26
  */
 public class PollerController implements Closeable {
-    private static final int              DEFAULT_SLOT_COUNT = 100;
+    private static final Logger LOGGER = LoggerFactory
+        .getLogger(PollerController.class);
 
+    private static final int DEFAULT_SLOT_COUNT = 3;
+
+    private static final int DEFAULT_IDLE_SECONDS = 3600;
     /**
      * 比较器 按照cursor倒序排序
      */
-    private static final Comparator<Slot> COMPARATOR         = new Comparator<Slot>() {
-                                                                 @Override
-                                                                 public int compare(Slot o1, Slot o2) {
-                                                                     return Longs.compare(
-                                                                         o2.getCursor(),
-                                                                         o1.getCursor());
-                                                                 }
-                                                             };
+    private static final Comparator<Slot> COMPARATOR = new Comparator<Slot>() {
+        @Override
+        public int compare(Slot o1,
+                           Slot o2) {
+            return Longs.compare(
+                o2.getCursor(),
+                o1.getCursor());
+        }
+    };
 
     /**
      * 注册中心
      */
-    private final SettableStepRegistry    registry;
+    private final ResettableStepRegistry registry;
 
     /**
      * 只有1个线程的调度器
      */
-    private ScheduledExecutorService      scheduledExecutorService;
+    private ScheduledExecutorService scheduledExecutorService;
 
     /**
-     * 采样间隔时间, step将会扩散到registry包含的所有实现了 CanSetStep 接口的 metric
+     * 采样间隔时间, step将会扩散到registry包含的所有实现了 ResettableStep 接口的 metric
      */
-    private volatile long                 step               = -1;
+    private volatile long step = -1;
 
     /**
      * 槽数量
      */
-    private volatile int                  slotCount;
+    private volatile int slotCount;
 
     /**
      * 缓存
      */
-    private volatile MetricCache          metricCache;
+    private volatile MetricCache metricCache;
 
     /**
      * 是否处于激活状态(最近有poll过数据)
      */
-    private boolean                       active             = false;
+    private boolean active = false;
 
     /**
      * 定时poll数据的task的future
      */
-    private ScheduledFuture<?>            pollFuture;
+    private ScheduledFuture<?> idleFuture;
 
     /**
      * 监听器
      */
-    private final List<Listener>          listeners          = new CopyOnWriteArrayList<Listener>();
+    private final List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
 
     /**
      * 空闲检测定时的future
      */
-    private ScheduledFuture<?>            idleFuture;
+    private ScheduledFuture<?> pollerFuture;
 
     /**
      * 多少时间没有请求就算是空闲
      */
-    private final int                     idleSeconds;
+    private final int idleSeconds;
 
-    public PollerController(SettableStepRegistry registry) {
+    public PollerController(ResettableStepRegistry registry) {
         this(registry, DEFAULT_SLOT_COUNT);
     }
 
-    public PollerController(SettableStepRegistry registry, int initSlotCount) {
+    public PollerController(ResettableStepRegistry registry, int initSlotCount) {
         this.registry = registry;
         ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("PollerController %d")
             .build();
         scheduledExecutorService = new ScheduledThreadPoolExecutor(1, tf,
             new ThreadPoolExecutor.AbortPolicy());
-        idleSeconds = registry.getConfig().getInteger(LookoutConfig.XFLUSH_EXPORTER_IDLE_SECONDS,
-            60);
+        idleSeconds = registry.getConfig().getInteger(LookoutConfig.POLLER_EXPORTER_IDLE_SECONDS,
+            DEFAULT_IDLE_SECONDS);
         update(registry.getFixedStepMillis(), initSlotCount);
     }
 
@@ -173,10 +180,12 @@ public class PollerController implements Closeable {
         }
         synchronized (this) {
             this.step = step;
-            if (idleFuture != null) {
-                idleFuture.cancel(true);
-                idleFuture = null;
+
+            if (this.pollerFuture != null) {
+                pollerFuture.cancel(true);
             }
+            this.pollerFuture = null;
+
             // 认为step<=0则无需启动任务
             if (step <= 0) {
                 this.metricCache = null;
@@ -189,15 +198,14 @@ public class PollerController implements Closeable {
                 @Override
                 public void run() {
                     MetricCache cache = PollerController.this.metricCache;
-                    if (cache == null) {
+                    if (!active || cache == null) {
                         return;
                     }
                     List<MetricDto> result = getMetricDtos(true);
                     cache.add(result);
                 }
             };
-            // 这里应该不需要对齐时间
-            idleFuture = scheduledExecutorService.scheduleAtFixedRate(runnable, 0, step,
+            pollerFuture = scheduledExecutorService.scheduleAtFixedRate(runnable, 0, step,
                 TimeUnit.MILLISECONDS);
         }
     }
@@ -303,13 +311,13 @@ public class PollerController implements Closeable {
         }
 
         // 取消旧的计时器
-        ScheduledFuture<?> oldFuture = this.pollFuture;
+        ScheduledFuture<?> oldFuture = this.idleFuture;
         if (oldFuture != null && !oldFuture.isDone()) {
             oldFuture.cancel(true);
         }
 
         // 5分钟后进入idle状态
-        this.pollFuture = scheduledExecutorService.schedule(new Runnable() {
+        this.idleFuture = scheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
                 synchronized (PollerController.this) {
@@ -321,12 +329,18 @@ public class PollerController implements Closeable {
     }
 
     private void triggerIdle() {
+        // idle时不再poller 同时也清理掉cache
+        this.metricCache.clear();
+
+        LOGGER.warn("PollerController is now idle");
         for (Listener listener : listeners) {
             listener.onIdle();
         }
     }
 
     private void triggerActive() {
+        LOGGER.warn("PollerController is now active");
+
         for (Listener listener : listeners) {
             listener.onActive();
         }

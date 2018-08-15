@@ -22,7 +22,7 @@ package com.alipay.lookout.api;
  * @author xiangfeng.xzc
  * @date 2018/7/26
  */
-public interface CanSetStep {
+public interface ResettableStep {
     /**
      * 设置新的step
      *

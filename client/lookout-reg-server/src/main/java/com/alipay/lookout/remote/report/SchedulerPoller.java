@@ -39,7 +39,6 @@ import com.alipay.lookout.spi.MetricFilter;
 import com.alipay.lookout.step.MeasurableScheduler;
 import com.alipay.lookout.step.ScheduledService;
 import com.google.common.collect.Maps;
-
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     private ScheduledService           scheduler;
 
     //====>config
-    private volatile boolean           enabled              = true;
+    private final boolean              enabled              = true;
     private MetricObserver             metricObserver;
     private final LookoutConfig        config;
     private final int                  numThreads           = 3;
@@ -99,26 +98,26 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     /**
      * Start the scheduler to collect metrics data.
      */
-    public synchronized void start() {
+    public void start() {
         if (scheduler == null) {
             // Setup main collection for publishing to lookup
-            logger.debug("scheduler poller is starting...");
-            MetricRegistry r = compositeRegistry != null ? compositeRegistry : registry();
-            scheduler = new MeasurableScheduler(r, "poller", numThreads);
+            if (enabled) {
+                logger.debug("scheduler poller is starting...");
+                MetricRegistry r = compositeRegistry != null ? compositeRegistry : registry();
+                scheduler = new MeasurableScheduler(r, "poller", numThreads);
 
-            reScheduleSupport = new ReScheduleSupport(scheduler, config, registry().clock());
-            reScheduleSupport.reschedulePoll(new Function<MetricFilter, Object>() {
-                @Override
-                public Object apply(MetricFilter metricFilter) {
-                    collectData(metricFilter);
-                    return null;
-                }
-            });
-            logger.debug("scheduler poller is started!");
-            // if (enabled) {
-            // } else {
-            //     logger.info("publishing is not enabled");
-            // }
+                reScheduleSupport = new ReScheduleSupport(scheduler, config, registry().clock());
+                reScheduleSupport.reschedulePoll(new Function<MetricFilter, Object>() {
+                    @Override
+                    public Object apply(MetricFilter metricFilter) {
+                        collectData(metricFilter);
+                        return null;
+                    }
+                });
+                logger.debug("scheduler poller is started!");
+            } else {
+                logger.info("publishing is not enabled");
+            }
         } else {
             logger.warn("registry already started, ignoring duplicate request");
         }
@@ -156,7 +155,6 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
                     poll0(metricObserver, ((PriorityMetricFilter) metricFilter).getPriority(), null);
                     return;
                 }
-                // TODO 这里有NPE问题
                 //else normal filter
                 poll0(metricObserver, null, metricFilter);
             } catch (Throwable e) {
@@ -229,16 +227,8 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     private Iterator<Metric> getMetricsIterator(PRIORITY priority) {
         if (priority == null) {
             return registry().iterator();
-        } else {
-            return priorityMetricsCache.getMetricByPriority(priority).iterator();
         }
+        return priorityMetricsCache.getMetricByPriority(priority).iterator();
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 }
