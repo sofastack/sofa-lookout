@@ -18,3 +18,4 @@ tree.log
 tmp/
 *.log
 *.DS_Store
+pom.xml.versionsBackup
