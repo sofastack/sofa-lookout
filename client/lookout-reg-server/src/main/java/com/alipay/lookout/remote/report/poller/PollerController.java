@@ -201,7 +201,7 @@ public class PollerController implements Closeable {
                     if (!active || cache == null) {
                         return;
                     }
-                    List<MetricDto> result = getMetricDtos(true);
+                    List<MetricDto> result = getMetricDtos();
                     cache.add(result);
                 }
             };
@@ -269,7 +269,7 @@ public class PollerController implements Closeable {
         return step;
     }
 
-    private List<MetricDto> getMetricDtos(boolean ignoreInfo) {
+    private List<MetricDto> getMetricDtos() {
 
         List<MetricDto> results = new ArrayList<MetricDto>();
 
@@ -277,10 +277,6 @@ public class PollerController implements Closeable {
         Iterator<Metric> it = registry.iterator();
         while (it.hasNext()) {
             Metric metric = it.next();
-            // TODO 更好地处理info型metric
-            if (ignoreInfo && metric instanceof InfoWrapper) {
-                continue;
-            }
             if (metric instanceof GaugeWrapper) {
                 Gauge gauge = ((GaugeWrapper) metric).getOriginalOne();
                 if (gauge instanceof RollableTopGauge) {
