@@ -50,74 +50,74 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/7/26
  */
 public class PollerController implements Closeable {
-    private static final Logger LOGGER = LoggerFactory
-        .getLogger(PollerController.class);
+    private static final Logger           LOGGER               = LoggerFactory
+                                                                   .getLogger(PollerController.class);
 
-    private static final int DEFAULT_SLOT_COUNT = 3;
+    private static final int              DEFAULT_SLOT_COUNT   = 3;
 
-    private static final int DEFAULT_IDLE_SECONDS = 3600;
+    private static final int              DEFAULT_IDLE_SECONDS = 3600;
     /**
      * 比较器 按照cursor倒序排序
      */
-    private static final Comparator<Slot> COMPARATOR = new Comparator<Slot>() {
-        @Override
-        public int compare(Slot o1,
-                           Slot o2) {
-            return Longs.compare(
-                o2.getCursor(),
-                o1.getCursor());
-        }
-    };
+    private static final Comparator<Slot> COMPARATOR           = new Comparator<Slot>() {
+                                                                   @Override
+                                                                   public int compare(Slot o1,
+                                                                                      Slot o2) {
+                                                                       return Longs.compare(
+                                                                           o2.getCursor(),
+                                                                           o1.getCursor());
+                                                                   }
+                                                               };
 
     /**
      * 注册中心
      */
-    private final ResettableStepRegistry registry;
+    private final ResettableStepRegistry  registry;
 
     /**
      * 只有1个线程的调度器
      */
-    private ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService      scheduledExecutorService;
 
     /**
      * 采样间隔时间, step将会扩散到registry包含的所有实现了 ResettableStep 接口的 metric
      */
-    private volatile long step = -1;
+    private volatile long                 step                 = -1;
 
     /**
      * 槽数量
      */
-    private volatile int slotCount;
+    private volatile int                  slotCount;
 
     /**
      * 缓存
      */
-    private volatile MetricCache metricCache;
+    private volatile MetricCache          metricCache;
 
     /**
      * 是否处于激活状态(最近有poll过数据)
      */
-    private boolean active = false;
+    private boolean                       active               = false;
 
     /**
      * 定时poll数据的task的future
      */
-    private ScheduledFuture<?> idleFuture;
+    private ScheduledFuture<?>            idleFuture;
 
     /**
      * 监听器
      */
-    private final List<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+    private final List<Listener>          listeners            = new CopyOnWriteArrayList<Listener>();
 
     /**
      * 空闲检测定时的future
      */
-    private ScheduledFuture<?> pollerFuture;
+    private ScheduledFuture<?>            pollerFuture;
 
     /**
      * 多少时间没有请求就算是空闲
      */
-    private final int idleSeconds;
+    private final int                     idleSeconds;
 
     public PollerController(ResettableStepRegistry registry) {
         this(registry, DEFAULT_SLOT_COUNT);

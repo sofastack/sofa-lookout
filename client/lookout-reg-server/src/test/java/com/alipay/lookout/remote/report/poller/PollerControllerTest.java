@@ -36,19 +36,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PollerControllerTest {
     @Test
     public void test() throws Exception {
-        ResettableStepRegistry r = new ResettableStepRegistry(Clock.SYSTEM, new LookoutConfig(),
-            1000L);
+        LookoutConfig config = new LookoutConfig();
+        ResettableStepRegistry r = new ResettableStepRegistry(Clock.SYSTEM, config, 1000L);
 
         r.counter(r.createId("foo"));
 
         PollerController controller = new PollerController(r, 10);
 
         try {
-            Thread.sleep(100);
             Set<Long> success = new HashSet<Long>();
+            // sleep 200ms 错开时间 防止定时器偶然的时间误差
+            Thread.sleep(200);
+            // trigger
             List<Slot> data = controller.getNextData(success);
-            success = extractCursors(data);
+            assertThat(data).isEmpty();
+            Thread.sleep(1000);
+            data = controller.getNextData(success);
             assertThat(data).hasSize(1);
+            success = extractCursors(data);
             data = controller.getNextData(success);
             assertThat(data).isEmpty();
             Thread.sleep(1000);
@@ -59,7 +64,7 @@ public class PollerControllerTest {
 
             Thread.sleep(2000);
 
-            data = controller.getNextData(Collections.<Long> emptySet());
+            data = controller.getNextData(Collections.<Long>emptySet());
             assertThat(data).hasSize(3);
 
             success = extractCursors(data);
