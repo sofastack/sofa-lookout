@@ -174,4 +174,7 @@ public class MetricsHttpExporter {
         return new URIBuilder(exchange.getRequestURI()).getQueryParams();
     }
 
+    public PollerController getController() {
+        return controller;
+    }
 }

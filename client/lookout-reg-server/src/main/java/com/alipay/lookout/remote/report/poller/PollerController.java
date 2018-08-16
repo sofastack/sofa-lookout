@@ -371,4 +371,8 @@ public class PollerController implements Closeable {
             this.scheduledExecutorService = null;
         }
     }
+
+    public ResettableStepRegistry getRegistry() {
+        return registry;
+    }
 }

@@ -17,7 +17,6 @@
 package com.alipay.lookout.client;
 
 import com.alipay.lookout.api.BasicTag;
-import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Lookout;
 import com.alipay.lookout.api.MetricRegistry;
 import com.alipay.lookout.api.Registry;
@@ -26,14 +25,9 @@ import com.alipay.lookout.core.AbstractRegistry;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
-import com.alipay.lookout.remote.report.poller.Listener;
-import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
-import com.alipay.lookout.remote.report.poller.PollerController;
 import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -47,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class SimpleLookoutClient extends AbstractLookoutClient {
     private static final AtomicInteger state = new AtomicInteger(0);
-    private final LookoutConfig        lookoutConfig;
+    private final LookoutConfig lookoutConfig;
 
     public SimpleLookoutClient(String appName, MetricRegistry... registries) {
         this(appName, null, registries);
@@ -68,7 +62,7 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
         }
         lookoutConfig = config != null ? config : new LookoutConfig();
         registries = registries.length > 0 ? registries
-            : new MetricRegistry[] { new LookoutRegistry(lookoutConfig) };
+            : new MetricRegistry[]{new LookoutRegistry(lookoutConfig)};
 
         lookoutConfig.setProperty(LookoutConfig.APP_NAME, appName);
         if (!lookoutConfig.getBoolean(LookoutConfig.LOOKOUT_ENABLE, true)) {
@@ -94,38 +88,14 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
     }
 
     private void exportPoller() {
-        if (!lookoutConfig.getBoolean(LookoutConfig.POLLER_EXPORTER_ENABLED, true)) {
+        if (!lookoutConfig.getBoolean(LookoutConfig.POLLER_EXPORTER_ENABLED, false)) {
             return;
         }
-        ResettableStepRegistry resettableStepRegistry = new ResettableStepRegistry(Clock.SYSTEM,
-            lookoutConfig);
-        resettableStepRegistry.registerExtendedMetrics();
-
-        final List<LookoutRegistry> lookoutRegistryList = new ArrayList<LookoutRegistry>();
-        for (Registry r : super.getInnerCompositeRegistry().getRegistries()) {
-            if (r instanceof LookoutRegistry) {
-                lookoutRegistryList.add((LookoutRegistry) r);
-            }
-        }
-        PollerController controller = new PollerController(resettableStepRegistry);
-        controller.addListener(new Listener() {
-            @Override
-            public void onActive() {
-                for (LookoutRegistry r : lookoutRegistryList) {
-                    r.getMetricObserverComposite().setEnabled(false);
-                }
-            }
-
-            @Override
-            public void onIdle() {
-                for (LookoutRegistry r : lookoutRegistryList) {
-                    r.getMetricObserverComposite().setEnabled(false);
-                }
-            }
-        });
         try {
-            MetricsHttpExporter exporter = new MetricsHttpExporter(controller);
-            exporter.start();
+            ResettableStepRegistry resettableStepRegistry = PollerUtils.exportHttp(lookoutConfig, this)
+                .getController()
+                .getRegistry();
+            resettableStepRegistry.registerExtendedMetrics();
             super.addRegistry(resettableStepRegistry);
         } catch (Exception e) {
             logger.error("fail to start MetricsHttpExporter", e);
