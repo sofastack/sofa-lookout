@@ -60,8 +60,7 @@ public class DefaultLookoutClient extends AbstractLookoutClient {
     public synchronized void registerExporter(LookoutConfig config) {
         try {
             ResettableStepRegistry resettableStepRegistry = PollerUtils.exportHttp(config, this)
-                .getController()
-                .getRegistry();
+                .getController().getRegistry();
             resettableStepRegistry.registerExtendedMetrics();
             super.addRegistry(resettableStepRegistry);
         } catch (Exception e) {

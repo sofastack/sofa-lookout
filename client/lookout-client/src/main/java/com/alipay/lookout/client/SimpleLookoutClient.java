@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class SimpleLookoutClient extends AbstractLookoutClient {
     private static final AtomicInteger state = new AtomicInteger(0);
-    private final LookoutConfig lookoutConfig;
+    private final LookoutConfig        lookoutConfig;
 
     public SimpleLookoutClient(String appName, MetricRegistry... registries) {
         this(appName, null, registries);
@@ -62,7 +62,7 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
         }
         lookoutConfig = config != null ? config : new LookoutConfig();
         registries = registries.length > 0 ? registries
-            : new MetricRegistry[]{new LookoutRegistry(lookoutConfig)};
+            : new MetricRegistry[] { new LookoutRegistry(lookoutConfig) };
 
         lookoutConfig.setProperty(LookoutConfig.APP_NAME, appName);
         if (!lookoutConfig.getBoolean(LookoutConfig.LOOKOUT_ENABLE, true)) {
@@ -92,9 +92,8 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             return;
         }
         try {
-            ResettableStepRegistry resettableStepRegistry = PollerUtils.exportHttp(lookoutConfig, this)
-                .getController()
-                .getRegistry();
+            ResettableStepRegistry resettableStepRegistry = PollerUtils
+                .exportHttp(lookoutConfig, this).getController().getRegistry();
             resettableStepRegistry.registerExtendedMetrics();
             super.addRegistry(resettableStepRegistry);
         } catch (Exception e) {

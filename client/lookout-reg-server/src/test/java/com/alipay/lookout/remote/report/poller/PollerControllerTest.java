@@ -64,7 +64,7 @@ public class PollerControllerTest {
 
             Thread.sleep(2000);
 
-            data = controller.getNextData(Collections.<Long>emptySet());
+            data = controller.getNextData(Collections.<Long> emptySet());
             assertThat(data).hasSize(3);
 
             success = extractCursors(data);
