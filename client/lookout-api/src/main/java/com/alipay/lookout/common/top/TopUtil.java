@@ -30,23 +30,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class TopUtil {
 
-    private static final String                   TOP_NUM_TAG_KEY    = "n";
+    private static final String TOP_NUM_TAG_KEY = "n";
 
-    static Executor                               executor           = new ThreadPoolExecutor(
-                                                                         Runtime.getRuntime()
-                                                                             .availableProcessors(),
-                                                                         Runtime.getRuntime()
-                                                                             .availableProcessors(),
-                                                                         0L,
-                                                                         TimeUnit.MILLISECONDS,
-                                                                         new LinkedBlockingQueue<Runnable>(
-                                                                             10000),
-                                                                         getNamedThreadFactory(),
-                                                                         new ThreadPoolExecutor.DiscardPolicy()); //TODO ADD lookout log?
+    static Executor executor = new ThreadPoolExecutor(
+            Runtime.getRuntime()
+                    .availableProcessors(),
+            Runtime.getRuntime()
+                    .availableProcessors(),
+            0L,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(
+                    10000),
+            getNamedThreadFactory(),
+            new ThreadPoolExecutor.DiscardPolicy()); //TODO ADD lookout log?
 
-    static final ConcurrentHashMap<Id, TopGauger> cache              = new ConcurrentHashMap<Id, TopGauger>();
+    static final ConcurrentHashMap<Id, TopGauger> cache = new ConcurrentHashMap<Id, TopGauger>();
     //防止用户使用失误，导致cache过多；
-    static final int                              MAX_TOP_CACHE_SIZE = 200;
+    static final int MAX_TOP_CACHE_SIZE = 200;
 
     private TopUtil() {
     }
@@ -70,7 +70,7 @@ public final class TopUtil {
 
     public static TopGauger topGauger(final Registry registry, final Id id, final int maxNumber,
                                       final Order order) {
-        if (registry instanceof NoopRegistry) {
+        if (registry instanceof NoopRegistry || (id == NoopRegistry.INSTANCE.createId(null))) {
             return NoopTopGauger.INSTANCE;
         }
         Id key = id.withTag(TOP_NUM_TAG_KEY, String.valueOf(maxNumber));
@@ -113,7 +113,7 @@ public final class TopUtil {
 
     {
         private final K key;
-        private V       value;
+        private V value;
 
         public Entry(K key, V value) {
             this.key = key;
@@ -157,10 +157,10 @@ public final class TopUtil {
         //工厂复用时友好
         private static final AtomicInteger poolId = new AtomicInteger();
 
-        private final AtomicInteger        nextId = new AtomicInteger();
-        private final String               prefix;
-        private final boolean              daemon;
-        private final int                  priority;
+        private final AtomicInteger nextId = new AtomicInteger();
+        private final String prefix;
+        private final boolean daemon;
+        private final int priority;
 
         public DefaultThreadFactory(String poolName) {
             this(poolName, false, Thread.NORM_PRIORITY);
@@ -181,8 +181,8 @@ public final class TopUtil {
 
             if (priority < Thread.MIN_PRIORITY || priority > Thread.MAX_PRIORITY) {
                 throw new IllegalArgumentException(
-                    "priority: " + priority
-                            + " (expected: Thread.MIN_PRIORITY <= priority <= Thread.MAX_PRIORITY)");
+                        "priority: " + priority
+                                + " (expected: Thread.MIN_PRIORITY <= priority <= Thread.MAX_PRIORITY)");
             }
 
             prefix = poolName + '-' + poolId.incrementAndGet() + '-';

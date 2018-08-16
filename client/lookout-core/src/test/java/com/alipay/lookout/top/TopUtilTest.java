@@ -18,6 +18,7 @@ package com.alipay.lookout.top;
 
 import com.alipay.lookout.api.BasicTag;
 import com.alipay.lookout.api.Metric;
+import com.alipay.lookout.api.NoopRegistry;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.top.TopGauger;
 import com.alipay.lookout.common.top.TopUtil;
@@ -37,7 +38,7 @@ public class TopUtilTest {
 
     @Test
     public void testDescTopGauge() throws NoSuchFieldException, IllegalAccessException,
-                                  InterruptedException {
+            InterruptedException {
 
         Registry registry = new DefaultRegistry();
 
@@ -67,12 +68,12 @@ public class TopUtilTest {
 
     @Test
     public void testAscTopGauge() throws NoSuchFieldException, IllegalAccessException,
-                                 InterruptedException {
+            InterruptedException {
 
         Registry registry = new DefaultRegistry();
 
         TopGauger topGauger = TopUtil.topGauger(registry, registry.createId("top3sql"), 2,
-            TopUtil.Order.ASC);
+                TopUtil.Order.ASC);
 
         topGauger.record(1000l, new BasicTag("sql1", "select1"));
         topGauger.record(2000l, new BasicTag("sql2", "select2"));
@@ -96,6 +97,13 @@ public class TopUtilTest {
         Assert.assertEquals(2, i);
         Assert.assertTrue(s.contains("select2"));
         Assert.assertTrue(s.contains("select1"));
+    }
+
+
+    @Test
+    public void testTopGaugeWithNoopId() {
+        TopGauger topGauger = TopUtil.topGauger(new DefaultRegistry(), NoopRegistry.INSTANCE.createId("xx"), 4);
+        Assert.assertTrue(topGauger.getClass().getName().contains("NoopTopGauger"));
     }
 
 }
