@@ -18,6 +18,7 @@ package com.alipay.lookout.core.config;
 
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.common.Assert;
+
 import org.apache.commons.configuration2.MapConfiguration;
 
 import java.util.HashMap;
@@ -48,6 +49,16 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      ADDRESS_SERVICE_CLASS_NAME              = "lookout.address.service.class.name";
 
     /**
+     * 是否提供一个接口, 让外界拉取数据
+     */
+    public static final String                      POLLER_EXPORTER_ENABLED                 = "lookout.poller.enabled";
+
+    /**
+     * 多久没有请求拉取数据就进入idle状态
+     */
+    public static final String                      POLLER_EXPORTER_IDLE_SECONDS            = "lookout.poller.exporter.idle.seconds";
+
+    /**
      * priority->Millsecond
      **/
     private final ConcurrentHashMap<PRIORITY, Long> stepMap                                 = new ConcurrentHashMap<PRIORITY, Long>(
@@ -55,9 +66,9 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
 
     public LookoutConfig() {
         super(new HashMap<String, Object>());
-        stepMap.put(PRIORITY.HIGH, 2000l);//2S
-        stepMap.put(PRIORITY.NORMAL, 30000l);//3OS
-        stepMap.put(PRIORITY.LOW, 60000l);//1MIN
+        stepMap.put(PRIORITY.HIGH, 2000L);//2S
+        stepMap.put(PRIORITY.NORMAL, 30000L);//3OS
+        stepMap.put(PRIORITY.LOW, 60000L);//1MIN
     }
 
     public long stepMillis(PRIORITY priority) {

@@ -17,6 +17,7 @@
 package com.alipay.lookout.step;
 
 import com.alipay.lookout.api.ManualClock;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,5 +75,32 @@ public class StepLongTest {
         clock.setWallTime(20L);
         Assert.assertEquals(0L, v.getCurrent().get());
         Assert.assertEquals(0L, v.poll());
+    }
+
+    @Test
+    public void test_setStep() {
+        StepLong v = new StepLong(0, clock, 10L);
+        v.getCurrent().incrementAndGet();
+        clock.setWallTime(10L);
+        Assert.assertEquals(0L, v.getCurrent().get());
+        Assert.assertEquals(1L, v.poll());
+
+        v.getCurrent().incrementAndGet();
+        v.getCurrent().incrementAndGet();
+        clock.setWallTime(20L);
+        Assert.assertEquals(0L, v.getCurrent().get());
+        Assert.assertEquals(2L, v.poll());
+
+        // 将步长修改成20L, 会导致 StepLong 立即清空内部数据
+        v.setStep(20L);
+
+        v.getCurrent().incrementAndGet();
+        v.getCurrent().incrementAndGet();
+        v.getCurrent().incrementAndGet();
+        v.getCurrent().incrementAndGet();
+        clock.setWallTime(50L);
+        Assert.assertEquals(0L, v.getCurrent().get());
+        Assert.assertEquals(4L, v.poll());
+
     }
 }

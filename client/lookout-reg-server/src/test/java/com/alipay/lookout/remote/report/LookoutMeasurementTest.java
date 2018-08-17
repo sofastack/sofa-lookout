@@ -23,7 +23,6 @@ import com.alipay.lookout.core.GaugeWrapper;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.step.LookoutRegistry;
-import com.alipay.lookout.remote.step.MockClock;
 import com.alipay.lookout.report.LogObserver;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -39,7 +38,7 @@ public class LookoutMeasurementTest {
     static List<LookoutMeasurement> measurements;
     static Registry                 registry = new DefaultRegistry();
     static Id                       id       = registry.createId("aaaaaa.bbbbbbb.ccccc");
-    static MockClock                clock    = new MockClock();
+    static ManualClock              clock    = new ManualClock();
 
     @BeforeClass
     public static void init() {

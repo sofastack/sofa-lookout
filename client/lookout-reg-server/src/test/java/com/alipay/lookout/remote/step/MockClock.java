@@ -16,39 +16,8 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.api.ManualClock;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-public class MockClock implements Clock {
-
-    private final AtomicLong wall;
-    private final AtomicLong monotonic;
-
-    public MockClock() {
-        this(0L, 0L);
-    }
-
-    public MockClock(long wallInit, long monotonicInit) {
-        wall = new AtomicLong(wallInit);
-        monotonic = new AtomicLong(monotonicInit);
-    }
-
-    @Override
-    public long wallTime() {
-        return wall.get();
-    }
-
-    @Override
-    public long monotonicTime() {
-        return monotonic.get();
-    }
-
-    public void setWallTime(long t) {
-        wall.set(t);
-    }
-
-    public void setMonotonicTime(long t) {
-        monotonic.set(t);
-    }
+@Deprecated
+public class MockClock extends ManualClock {
 }

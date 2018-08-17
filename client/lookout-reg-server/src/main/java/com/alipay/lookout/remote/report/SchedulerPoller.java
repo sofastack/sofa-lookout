@@ -225,17 +225,10 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     }
 
     private Iterator<Metric> getMetricsIterator(PRIORITY priority) {
-        if (priority == null)
+        if (priority == null) {
             return registry().iterator();
-        switch (priority) {
-            case HIGH:
-                return priorityMetricsCache.getHighMetircs().iterator();
-            case NORMAL:
-                return priorityMetricsCache.getNormalMetircs().iterator();
-            case LOW:
-                return priorityMetricsCache.getLowMetircs().iterator();
         }
-        return null;
+        return priorityMetricsCache.getMetricByPriority(priority).iterator();
     }
 
 }

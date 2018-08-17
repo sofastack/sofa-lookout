@@ -19,7 +19,6 @@ package com.alipay.lookout.api;
 import com.alipay.lookout.common.Assert;
 
 /**
- *
  * Created by kevin.luy@alipay.com on 2017/2/14.
  */
 public final class Measurement<T> {
@@ -29,7 +28,8 @@ public final class Measurement<T> {
 
     /**
      * Create a new instance.
-     * @param name name
+     *
+     * @param name  name
      * @param value value
      */
     public Measurement(String name, T value) {
@@ -39,6 +39,7 @@ public final class Measurement<T> {
     }
 
     public Measurement(T value) {
+        // name 默认是 "value"
         this.name = EMPTY_STR;
         this.value = value;
     }
@@ -49,7 +50,8 @@ public final class Measurement<T> {
 
     /**
      * Value for the measurement.
-     * @return  value
+     *
+     * @return value
      */
     public T value() {
         return value;

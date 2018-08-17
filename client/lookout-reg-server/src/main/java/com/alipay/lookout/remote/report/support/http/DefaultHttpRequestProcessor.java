@@ -21,6 +21,7 @@ import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.utils.NetworkUtil;
 import com.alipay.lookout.remote.report.support.ReportDecider;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.alipay.lookout.common.LookoutConstants.LOW_PRIORITY_TAG;
 
 /**
+ * 将数据推送到 lookout-gateway 上
  * Created by kevin.luy@alipay.com on 2017/4/13.
  */
 public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {

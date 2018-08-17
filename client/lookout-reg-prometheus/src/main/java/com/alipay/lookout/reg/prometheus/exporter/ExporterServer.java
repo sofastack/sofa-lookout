@@ -23,9 +23,14 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
+ * 使用sun自带的简单的httpserver
  * Created by kevin.luy@alipay.com on 2018/5/10.
  */
 public class ExporterServer {
@@ -57,7 +62,8 @@ public class ExporterServer {
         httpServer.createContext("/", new HttpHandler() {
             @Override
             public void handle(HttpExchange httpExchange) throws IOException {
-                byte[] respContents = "<html><head><title>Lookout Client Exporter</title></head><body><h1>Lookout Client Exporter</h1><p><a href=\"/metrics\">Metrics</a></p></body></html>"
+                byte[] respContents = ("<html><head><title>Lookout Client Exporter</title></head><body><h1>Lookout "
+                                       + "Client Exporter</h1><p><a href=\"/metrics\">Metrics</a></p></body></html>")
                     .getBytes("UTF-8");
                 httpExchange.getResponseHeaders().add("Content-Type", "text/html; charset=UTF-8");
                 httpExchange.sendResponseHeaders(200, respContents.length);

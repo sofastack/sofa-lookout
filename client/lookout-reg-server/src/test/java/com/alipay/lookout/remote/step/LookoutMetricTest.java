@@ -17,6 +17,7 @@
 package com.alipay.lookout.remote.step;
 
 import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.ManualClock;
 import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import org.junit.Assert;
@@ -31,7 +32,7 @@ public class LookoutMetricTest {
 
     @Test
     public void testLookoutTime() {
-        MockClock clock = new MockClock();
+        ManualClock clock = new ManualClock();
         StepRegistry r = new StepRegistry(clock, new LookoutConfig());
         Id id = r.createId("aa");
         LookoutTimer timer = new LookoutTimer(id, clock, 1000);
@@ -52,7 +53,7 @@ public class LookoutMetricTest {
 
     @Test
     public void testLookoutCounter() {
-        MockClock clock = new MockClock();
+        ManualClock clock = new ManualClock();
         //StepRegistry r = new StepRegistry(clock, new LookoutConfig());
         Id id = new DefaultRegistry().createId("aa");
         LookoutCounter counter = new LookoutCounter(id, clock, 500);
@@ -73,7 +74,7 @@ public class LookoutMetricTest {
 
     @Test
     public void testLookoutCounterPollerLater() {
-        MockClock clock = new MockClock();
+        ManualClock clock = new ManualClock();
         StepRegistry r = new StepRegistry(clock, new LookoutConfig());
         Id id = r.createId("aa");
         LookoutCounter counter = new LookoutCounter(id, clock, 1000);
