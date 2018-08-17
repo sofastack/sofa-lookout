@@ -19,6 +19,7 @@ package com.alipay.lookout.api;
 import java.util.Map;
 
 /**
+ * 抽象实现, 实现了id的构建 和 clock 的支持
  * Created by kevin.luy@alipay.com on 2017/2/14.
  */
 public abstract class MetricRegistry implements Registry {

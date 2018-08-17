@@ -16,7 +16,15 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.*;
+import com.alipay.lookout.api.ResettableStep;
+import com.alipay.lookout.api.Counter;
+import com.alipay.lookout.api.DistributionSummary;
+import com.alipay.lookout.api.Gauge;
+import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.Indicator;
+import com.alipay.lookout.api.Measurement;
+import com.alipay.lookout.api.Metric;
+import com.alipay.lookout.api.Timer;
 import com.alipay.lookout.api.composite.MixinMetric;
 import com.alipay.lookout.core.common.MeasurementUtil;
 
@@ -25,7 +33,7 @@ import static com.alipay.lookout.common.LookoutConstants.DOT;
 /**
  * Created by kevin.luy@alipay.com on 2017/3/26.
  */
-final class LookoutMixinMetric implements MixinMetric {
+final class LookoutMixinMetric implements MixinMetric, ResettableStep {
     private final Id           id;
     private final StepRegistry registry; //inner registry with fixed StepMillis
     private final StepClock    stepClock;
@@ -34,6 +42,15 @@ final class LookoutMixinMetric implements MixinMetric {
         this.id = id;
         this.registry = registry;
         this.stepClock = stepClock;
+    }
+
+    @Override
+    public void setStep(long step) {
+        for (Metric m : registry) {
+            if (m instanceof ResettableStep) {
+                ((ResettableStep) m).setStep(step);
+            }
+        }
     }
 
     @Override
@@ -81,5 +98,4 @@ final class LookoutMixinMetric implements MixinMetric {
         }
         return indicator;
     }
-
 }

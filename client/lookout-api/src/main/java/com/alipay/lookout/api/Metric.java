@@ -24,12 +24,14 @@ public interface Metric {
 
     /**
      * Identifier used to lookup this metric in the registry.
+     *
      * @return id
      */
     Id id();
 
     /**
      * Get the set of measurements
+     *
      * @return indicator a set of measurements
      */
     Indicator measure();

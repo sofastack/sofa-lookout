@@ -21,7 +21,7 @@ import com.alipay.lookout.core.config.MetricConfig;
 
 /**
  * Created by kevin.luy@alipay.com on 2018/5/10.
- */
+    */
 public interface MetricsRegistryFactory<T extends MetricRegistry, C extends MetricConfig> {
 
     /**

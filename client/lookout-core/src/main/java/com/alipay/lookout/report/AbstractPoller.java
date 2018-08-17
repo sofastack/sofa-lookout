@@ -21,7 +21,7 @@ import com.alipay.lookout.api.MetricRegistry;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/13.
  */
-public abstract class AbstractPoller<T> implements MetricPoller {
+public abstract class AbstractPoller<T> implements MetricPoller<T> {
 
     private final MetricRegistry registry;
 

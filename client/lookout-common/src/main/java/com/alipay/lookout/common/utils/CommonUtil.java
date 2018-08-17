@@ -29,6 +29,7 @@ public class CommonUtil {
 
     /**
      * Convert a dimensional metric id {@link Id} to  a hierarchical metric name.
+     * 转成 ${name}.${key1}-${value1}.${key2}-${value2}... 的格式
      *
      * @param id a dimensional metric id
      * @return hierarchical metric name

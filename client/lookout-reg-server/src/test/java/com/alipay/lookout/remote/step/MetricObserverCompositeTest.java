@@ -17,6 +17,7 @@
 package com.alipay.lookout.remote.step;
 
 import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.ManualClock;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
@@ -36,7 +37,7 @@ import java.util.Map;
  */
 public class MetricObserverCompositeTest {
 
-    MockClock                clock = new MockClock();
+    ManualClock              clock = new ManualClock();
     List<LookoutMeasurement> measurements;
 
     @Before
