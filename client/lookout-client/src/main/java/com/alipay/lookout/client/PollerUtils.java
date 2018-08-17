@@ -18,6 +18,7 @@ package com.alipay.lookout.client;
 
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Registry;
+import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.poller.Listener;
 import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
@@ -26,7 +27,6 @@ import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
  * @date 2018/8/16
  */
 final class PollerUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PollerUtils.class);
+    private static final Logger LOGGER = LookoutLoggerFactory.getLogger(PollerUtils.class);
 
     private PollerUtils() {
     }

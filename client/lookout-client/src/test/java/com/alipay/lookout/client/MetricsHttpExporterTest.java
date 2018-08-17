@@ -94,9 +94,10 @@ public class MetricsHttpExporterTest {
 
         CloseableHttpClient hc = HttpClients.createDefault();
         try {
-            HttpClientUtils.closeQuietly(hc.execute(RequestBuilder.get("http://localhost:19399/clear")
-                .build()));
-            HttpUriRequest request = RequestBuilder.get("http://localhost:19399/get?success=1,2,3").build();
+            HttpClientUtils.closeQuietly(hc.execute(RequestBuilder.get(
+                "http://localhost:19399/clear").build()));
+            HttpUriRequest request = RequestBuilder.get("http://localhost:19399/get?success=1,2,3")
+                .build();
             CloseableHttpResponse response = hc.execute(request);
             try {
                 String content = EntityUtils.toString(response.getEntity());

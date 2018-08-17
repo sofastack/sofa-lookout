@@ -38,10 +38,10 @@ public class MetricCacheTest {
         ManualClock tc = new ManualClock();
         tc.setWallTime(1000);
         MetricCache mc = new MetricCache(tc, 1000, 4);
-        mc.add(Collections.<MetricDto>emptyList());
-        assertFalse(mc.getNextData(Collections.<Long>emptySet()).isEmpty());
+        mc.add(Collections.<MetricDto> emptyList());
+        assertFalse(mc.getNextData(Collections.<Long> emptySet()).isEmpty());
         mc.clear();
-        assertTrue(mc.getNextData(Collections.<Long>emptySet()).isEmpty());
+        assertTrue(mc.getNextData(Collections.<Long> emptySet()).isEmpty());
     }
 
     @Test
@@ -49,9 +49,9 @@ public class MetricCacheTest {
         ManualClock tc = new ManualClock();
         tc.setWallTime(1000);
         MetricCache mc = new MetricCache(tc, 1000, 4);
-        mc.add(Collections.<MetricDto>emptyList());
+        mc.add(Collections.<MetricDto> emptyList());
         MetricCache mc2 = new MetricCache(mc, 10, 10);
-        assertNotNull(mc2.getNextData(Collections.<Long>emptySet()));
+        assertNotNull(mc2.getNextData(Collections.<Long> emptySet()));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class MetricCacheTest {
         assertThat(slots).isEmpty();
 
         tc.setWallTime(2000);
-        mc.add(Collections.<MetricDto>emptyList());
+        mc.add(Collections.<MetricDto> emptyList());
         slots = mc.getNextData(emptySet);
         assertThat(slots).hasSize(1);
         assertThat(slots.get(0).getCursor()).isEqualTo(2000L);
@@ -76,16 +76,16 @@ public class MetricCacheTest {
         assertThat(slots).hasSize(1);
         assertThat(slots.get(0).getCursor()).isEqualTo(2000L);
 
-        mc.add(Collections.<MetricDto>emptyList());
+        mc.add(Collections.<MetricDto> emptyList());
         slots = mc.getNextData(emptySet);
         assertThat(slots).hasSize(2);
         assertThat(slots.get(0).getCursor()).isEqualTo(2000L);
         assertThat(slots.get(1).getCursor()).isEqualTo(3000L);
 
         tc.setWallTime(4000);
-        mc.add(Collections.<MetricDto>emptyList());
+        mc.add(Collections.<MetricDto> emptyList());
         tc.setWallTime(5000);
-        mc.add(Collections.<MetricDto>emptyList());
+        mc.add(Collections.<MetricDto> emptyList());
 
         slots = mc.getNextData(emptySet);
         assertThat(slots).hasSize(4);
@@ -95,7 +95,7 @@ public class MetricCacheTest {
         assertThat(slots.get(3).getCursor()).isEqualTo(5000L);
 
         tc.setWallTime(6000);
-        mc.add(Collections.<MetricDto>emptyList());
+        mc.add(Collections.<MetricDto> emptyList());
 
         slots = mc.getNextData(emptySet);
         assertThat(slots).hasSize(4);
