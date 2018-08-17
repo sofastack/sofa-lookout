@@ -34,6 +34,19 @@ public class PriorityMetricsCache implements MetricRegistryListener {
     private final Set<Metric> normalMetircs = Sets.newConcurrentHashSet();
     private final Set<Metric> lowMetircs    = Sets.newConcurrentHashSet();
 
+    public Set<Metric> getMetricByPriority(PRIORITY priority) {
+        switch (priority) {
+            case LOW:
+                return lowMetircs;
+            case NORMAL:
+                return normalMetircs;
+            case HIGH:
+                return highMetircs;
+            default:
+                return null;
+        }
+    }
+
     public Set<Metric> getHighMetircs() {
         return highMetircs;
     }

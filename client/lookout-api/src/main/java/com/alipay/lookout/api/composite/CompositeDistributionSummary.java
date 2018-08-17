@@ -55,4 +55,5 @@ class CompositeDistributionSummary extends CompositeMetric implements Distributi
     protected DistributionSummary getMetric(Registry registry) {
         return registry.distributionSummary(id);
     }
+
 }

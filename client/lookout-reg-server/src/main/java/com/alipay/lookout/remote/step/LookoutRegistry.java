@@ -21,7 +21,11 @@ import com.alipay.lookout.common.utils.ClassUtil;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
-import com.alipay.lookout.remote.report.*;
+import com.alipay.lookout.remote.report.AddressService;
+import com.alipay.lookout.remote.report.DefaultAddressService;
+import com.alipay.lookout.remote.report.HttpObserver;
+import com.alipay.lookout.remote.report.MetricObserverMeasurementsFilter;
+import com.alipay.lookout.remote.report.SchedulerPoller;
 import com.alipay.lookout.remote.report.support.ReportDecider;
 import com.alipay.lookout.report.MetricObserver;
 
@@ -130,5 +134,9 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
     public void addMetricObserverMeasurementsFilter(MetricObserverMeasurementsFilter metricObserverMeasurementsFilter) {
         metricObserverComposite
             .addMetricObserverMeasurementsFilter(metricObserverMeasurementsFilter);
+    }
+
+    public MetricObserverComposite getMetricObserverComposite() {
+        return metricObserverComposite;
     }
 }

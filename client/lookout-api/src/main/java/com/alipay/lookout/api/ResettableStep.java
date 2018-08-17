@@ -16,37 +16,17 @@
  */
 package com.alipay.lookout.api;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-public class ManualClock implements Clock {
-
-    private final AtomicLong wall;
-    private final AtomicLong monotonic;
-
-    public ManualClock() {
-        this(0L, 0L);
-    }
-
-    public ManualClock(long wallInit, long monotonicInit) {
-        wall = new AtomicLong(wallInit);
-        monotonic = new AtomicLong(monotonicInit);
-    }
-
-    @Override
-    public long wallTime() {
-        return wall.get();
-    }
-
-    @Override
-    public long monotonicTime() {
-        return monotonic.get();
-    }
-
-    public void setWallTime(long t) {
-        wall.set(t);
-    }
-
-    public void setMonotonicTime(long t) {
-        monotonic.set(t);
-    }
+/**
+ * 暴露一个接口用于修改 step
+ *
+ * @author xiangfeng.xzc
+ * @date 2018/7/26
+ */
+public interface ResettableStep {
+    /**
+     * 设置新的step
+     *
+     * @param step 新的步长, 必须>0
+     */
+    void setStep(long step);
 }

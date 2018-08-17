@@ -17,11 +17,11 @@
 package com.alipay.lookout.remote.report;
 
 import com.alipay.lookout.api.Clock;
+import com.alipay.lookout.api.ManualClock;
 import com.alipay.lookout.api.NoopRegistry;
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.jdk8.Function;
-import com.alipay.lookout.remote.step.MockClock;
 import com.alipay.lookout.spi.MetricFilter;
 import com.alipay.lookout.step.MeasurableScheduler;
 import com.alipay.lookout.step.ScheduledService;
@@ -111,14 +111,14 @@ public class ReScheduleSupportTest {
         //380-544 ,
         //System.out.println(stepBoundary + "," + (stepBoundary + stepSize));
 
-        long val = ReScheduleSupport.getInitialDelay(60000, new MockClock(now, 1l));
+        long val = ReScheduleSupport.getInitialDelay(60000, new ManualClock(now, 1l));
         Assert.assertEquals(now - min, val);
         System.out.println("=============================too small===================");
         now = 1522675385000l;
         min = now / stepSize * stepSize;
         System.out.println(min + "," + (min + stepSize));
 
-        val = ReScheduleSupport.getInitialDelay(60000, new MockClock(now, 1l));
+        val = ReScheduleSupport.getInitialDelay(60000, new ManualClock(now, 1l));
         Assert.assertEquals(now - min + stepSize / 10, val);
 
         System.out.println("=============================too big===================");
@@ -127,7 +127,7 @@ public class ReScheduleSupportTest {
         long max = min + stepSize;
         System.out.println(min + "," + max);
 
-        val = ReScheduleSupport.getInitialDelay(60000, new MockClock(now, 1l));
+        val = ReScheduleSupport.getInitialDelay(60000, new ManualClock(now, 1l));
         Assert.assertEquals(stepSize - (max - now + stepSize / 10), val);
     }
 }

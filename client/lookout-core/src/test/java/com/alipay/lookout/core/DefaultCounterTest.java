@@ -18,6 +18,7 @@ package com.alipay.lookout.core;
 
 import com.alipay.lookout.api.Counter;
 import com.alipay.lookout.api.ManualClock;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -16,12 +16,21 @@
  */
 package com.alipay.lookout.remote.model;
 
-import com.alipay.lookout.api.*;
+import com.alipay.lookout.api.Counter;
+import com.alipay.lookout.api.DistributionSummary;
+import com.alipay.lookout.api.Gauge;
+import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.Indicator;
+import com.alipay.lookout.api.Measurement;
+import com.alipay.lookout.api.Metric;
+import com.alipay.lookout.api.Tag;
+import com.alipay.lookout.api.Timer;
 import com.alipay.lookout.api.composite.MixinMetric;
 import com.alipay.lookout.api.info.Info;
 import com.alipay.lookout.common.Assert;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.common.MeasurementUtil;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -47,12 +56,18 @@ public class LookoutMeasurement {
     private final Map<String, String> tags;
 
     private final Id                  metricId;
+    private final Date                date;
 
     public LookoutMeasurement(Date date, Id id) {
+        this.date = date;
         metas.put(TIME_KEY, date);
         tags = new HashMap<String, String>();
         metas.put(TAGS_KEY, tags);
         this.metricId = id;
+    }
+
+    public Date getDate() {
+        return date;
     }
 
     public Id metricId() {

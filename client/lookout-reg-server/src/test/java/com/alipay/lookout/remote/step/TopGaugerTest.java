@@ -17,6 +17,7 @@
 package com.alipay.lookout.remote.step;
 
 import com.alipay.lookout.api.BasicTag;
+import com.alipay.lookout.api.ManualClock;
 import com.alipay.lookout.api.Metric;
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.common.top.TopGauger;
@@ -45,14 +46,14 @@ public class TopGaugerTest {
     public void testRefreshTopGauge() throws NoSuchFieldException, IllegalAccessException,
                                      InterruptedException, NoSuchMethodException,
                                      InvocationTargetException {
-        MockClock clock = new MockClock();
+        ManualClock clock = new ManualClock();
         LookoutRegistry registry = LookoutRegistryTest.registry;
 
         TopGauger topGauger = TopUtil.topGauger(registry, registry.createId("top2sql"), 2);
 
-        topGauger.record(1000l, new BasicTag("sql1", "select1"));
-        topGauger.record(2000l, new BasicTag("sql2", "select2"));
-        topGauger.record(3000l, new BasicTag("sql3", "select3"));
+        topGauger.record(1000L, new BasicTag("sql1", "select1"));
+        topGauger.record(2000L, new BasicTag("sql2", "select2"));
+        topGauger.record(3000L, new BasicTag("sql3", "select3"));
         //wait
         Thread.sleep(1000);
         //poll遍历一边；
@@ -66,8 +67,8 @@ public class TopGaugerTest {
         method.invoke(poller, null, null);
 
         //再更新top
-        topGauger.record(9000l, new BasicTag("sql4", "select4"));
-        topGauger.record(5000l, new BasicTag("sql5", "select5"));
+        topGauger.record(9000L, new BasicTag("sql4", "select4"));
+        topGauger.record(5000L, new BasicTag("sql5", "select5"));
 
         //wait a sec
         Field field = TopUtil.class.getDeclaredField("executor");
