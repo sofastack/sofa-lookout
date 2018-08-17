@@ -18,9 +18,9 @@ package com.alipay.lookout.remote.report.poller;
 
 import com.alipay.lookout.api.Gauge;
 import com.alipay.lookout.api.Metric;
+import com.alipay.lookout.api.info.Info;
 import com.alipay.lookout.common.top.RollableTopGauge;
 import com.alipay.lookout.core.GaugeWrapper;
-import com.alipay.lookout.core.InfoWrapper;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.google.common.base.Preconditions;
@@ -273,10 +273,15 @@ public class PollerController implements Closeable {
 
         List<MetricDto> results = new ArrayList<MetricDto>();
 
+        boolean ignoreInfo = registry.getConfig().getBoolean(
+            LookoutConfig.LOOKOUT_AUTOPOLL_INFO_METRIC_IGNORE, true);
         long polledTime = System.currentTimeMillis();
         Iterator<Metric> it = registry.iterator();
         while (it.hasNext()) {
             Metric metric = it.next();
+            if ((metric instanceof Info) && ignoreInfo) {
+                continue;
+            }
             if (metric instanceof GaugeWrapper) {
                 Gauge gauge = ((GaugeWrapper) metric).getOriginalOne();
                 if (gauge instanceof RollableTopGauge) {
