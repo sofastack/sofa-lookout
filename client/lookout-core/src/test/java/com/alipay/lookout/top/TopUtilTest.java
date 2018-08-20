@@ -38,7 +38,7 @@ public class TopUtilTest {
 
     @Test
     public void testDescTopGauge() throws NoSuchFieldException, IllegalAccessException,
-            InterruptedException {
+                                  InterruptedException {
 
         Registry registry = new DefaultRegistry();
 
@@ -68,12 +68,12 @@ public class TopUtilTest {
 
     @Test
     public void testAscTopGauge() throws NoSuchFieldException, IllegalAccessException,
-            InterruptedException {
+                                 InterruptedException {
 
         Registry registry = new DefaultRegistry();
 
         TopGauger topGauger = TopUtil.topGauger(registry, registry.createId("top3sql"), 2,
-                TopUtil.Order.ASC);
+            TopUtil.Order.ASC);
 
         topGauger.record(1000l, new BasicTag("sql1", "select1"));
         topGauger.record(2000l, new BasicTag("sql2", "select2"));
@@ -99,10 +99,10 @@ public class TopUtilTest {
         Assert.assertTrue(s.contains("select1"));
     }
 
-
     @Test
     public void testTopGaugeWithNoopId() {
-        TopGauger topGauger = TopUtil.topGauger(new DefaultRegistry(), NoopRegistry.INSTANCE.createId("xx"), 4);
+        TopGauger topGauger = TopUtil.topGauger(new DefaultRegistry(),
+            NoopRegistry.INSTANCE.createId("xx"), 4);
         Assert.assertTrue(topGauger.getClass().getName().contains("NoopTopGauger"));
     }
 

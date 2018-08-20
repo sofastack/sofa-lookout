@@ -18,7 +18,6 @@ package com.alipay.lookout.core.config;
 
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.common.Assert;
-
 import org.apache.commons.configuration2.MapConfiguration;
 
 import java.util.HashMap;
@@ -38,6 +37,7 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      LOOKOUT_REPORT_BATCH_SIZE               = "lookout.report.batch.size";
     public static final String                      LOOKOUT_REPORT_COMPRESSION_THRESHOLD    = "lookout.report.compression.threshhold";
     public static final String                      LOOKOUT_AUTOPOLL_INFO_METRIC_IGNORE     = "lookout.autopoll.info.ignore";
+    public static final String                      LOOKOUT_AUTOPOLL_OS_METRIC_IGNORE       = "lookout.autopoll.os.ignore";
     public static final String                      LOOKOUT_AGENT_SERVER_PORT               = "lookout.agent.server.port";
     public static final String                      LOOKOUT_ANT_EVENT_LOG_ENABLE            = "lookout.ant.event.log.enable";
     public static final String                      LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT = "lookout.prometheus.exporter.server.port";

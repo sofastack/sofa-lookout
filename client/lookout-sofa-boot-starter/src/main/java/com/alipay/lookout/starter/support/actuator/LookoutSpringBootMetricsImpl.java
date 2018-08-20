@@ -41,7 +41,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
 
     private final Registry                                  registry;
 
-    private final ConcurrentMap<String, SimpleLookoutGauge> gauges = new ConcurrentHashMap<String, SimpleLookoutGauge>();
+    private final ConcurrentMap<String, SimpleLookoutGauge> gauges                 = new ConcurrentHashMap<String, SimpleLookoutGauge>();
 
     public LookoutSpringBootMetricsImpl(Registry registry) {
         this.registry = registry;

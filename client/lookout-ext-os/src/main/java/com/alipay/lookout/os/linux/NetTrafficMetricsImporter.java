@@ -25,6 +25,7 @@ import com.alipay.lookout.os.CachedMetricsImporter;
 import com.alipay.lookout.os.utils.FileUtils;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,11 +93,14 @@ public class NetTrafficMetricsImporter extends CachedMetricsImporter {
         super(timeout, timeoutUnit);
         this.filePath = filePath;
         this.statByFace = new HashMap<String, Long[]>();
-        loadIfNessesary();
+
+        disable = !new File(filePath).exists();
+        if (!disable)
+            loadIfNessesary();
     }
 
     @Override
-    public void register(Registry registry) {
+    protected void doRegister(Registry registry) {
         for (final Map.Entry<String, Long[]> entry : statByFace.entrySet()) {
             final String face = entry.getKey();
             Id id = registry.createId("os.net.stat." + face);
@@ -134,7 +138,7 @@ public class NetTrafficMetricsImporter extends CachedMetricsImporter {
                 }
             }
         } catch (Exception e) {
-            logger.info("warning,can't parse text at /proc/net/dev", e.getMessage());
+            logger.debug("warning,can't parse text at /proc/net/dev", e.getMessage());
         }
     }
 }

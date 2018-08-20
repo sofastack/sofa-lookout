@@ -22,7 +22,6 @@ import com.alipay.lookout.api.info.Info;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
-import com.alipay.lookout.spi.DefaultMetricsImporterLocator;
 import com.alipay.lookout.spi.MetricsImporter;
 import com.alipay.lookout.spi.MetricsImporterLocator;
 import org.slf4j.Logger;
@@ -135,8 +134,7 @@ public class DropWizardMetricsRegistry extends MetricRegistry {
 
     @Override
     public void registerExtendedMetrics() {
-        MetricsImporterLocator locator = new DefaultMetricsImporterLocator();
-        for (MetricsImporter metricsImporter : locator.locate()) {
+        for (MetricsImporter metricsImporter : MetricsImporterLocator.locate()) {
             metricsImporter.register(this);
         }
     }

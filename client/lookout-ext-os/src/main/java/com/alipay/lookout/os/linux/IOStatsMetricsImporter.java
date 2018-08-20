@@ -26,13 +26,13 @@ import com.alipay.lookout.os.utils.FileUtils;
 import com.alipay.lookout.os.utils.NumFormatUtils;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * @author wuqin
  * @version $Id: IOStatsMetricsImporter.java, v 0.1 2017-03-18 下午6:23 wuqin Exp $$
  */
@@ -74,7 +74,6 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     *
      * @param filePath
      * @param upTimeFilePath
      * @param timeout
@@ -87,11 +86,13 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
         this.upTimeFilePath = upTimeFilePath;
         this.statsByDevice = new HashMap<String, Float[]>();
         this.lastDiskInfoMap = new HashMap<String, DiskInfo>();
-        loadIfNessesary();
+        disable = !new File(filePath).exists();
+        if (!disable)
+            loadIfNessesary();
     }
 
     @Override
-    public void register(Registry registry) {
+    protected void doRegister(Registry registry) {
         for (Map.Entry<String, Float[]> entry : statsByDevice.entrySet()) {
             final String device = entry.getKey();
             Id id = registry.createId("os.io.stats." + device);
@@ -144,7 +145,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     protected void loadValues() {
         float deltaTime = collectUpTime();
         if (deltaTime == 0.0f) {
-            logger.info("warning,calculate delta time failed!");
+            logger.debug("warning,calculate delta time failed!");
             return;
         }
 
@@ -162,7 +163,6 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     *
      * @return
      */
     private float collectUpTime() {
@@ -174,12 +174,11 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
             return deltaTime;
         } catch (Exception e) {
             logger.info("warning,can't parse line at /proc/uptime", e.getMessage());
-            return 0.0f;
         }
+        return 0.0f;
     }
 
     /**
-     *
      * @return
      */
     private Map<String, DiskInfo> collectDiskInfo() {
@@ -189,7 +188,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
             for (String line : lines) {
                 String[] stats = line.trim().split(SPLIT);
                 if (stats == null || stats.length != TOTAL_LENGTH) {
-                    logger.info("warning,can't parse text at /proc/diskstats, line: " + line);
+                    logger.debug("warning,can't parse text at /proc/diskstats, line: " + line);
                     continue;
                 }
                 if (Long.parseLong(stats[DiskStats.STATS.ordinal()]) == 0) {
