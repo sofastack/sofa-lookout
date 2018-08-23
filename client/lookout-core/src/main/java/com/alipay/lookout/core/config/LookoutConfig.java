@@ -40,6 +40,8 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      LOOKOUT_AUTOPOLL_OS_METRIC_IGNORE       = "lookout.autopoll.os.ignore";
     public static final String                      LOOKOUT_AGENT_SERVER_PORT               = "lookout.agent.server.port";
     public static final String                      LOOKOUT_ANT_EVENT_LOG_ENABLE            = "lookout.ant.event.log.enable";
+    public static final String                      LOOKOUT_EXPORTER_ACCESS_TOKEN           = "lookout.exporter.access.token";
+
     public static final String                      LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT = "lookout.prometheus.exporter.server.port";
     // default value
     public static final int                         DEFAULT_WEB_SERVER_PORT                 = 8083;

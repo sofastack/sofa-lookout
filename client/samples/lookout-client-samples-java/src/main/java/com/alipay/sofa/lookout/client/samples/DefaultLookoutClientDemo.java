@@ -21,6 +21,7 @@ import com.alipay.lookout.api.Id;
 import com.alipay.lookout.client.DefaultLookoutClient;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 
@@ -35,7 +36,12 @@ public class DefaultLookoutClientDemo {
         //构建一个全局的客户端实例
         final DefaultLookoutClient client = new DefaultLookoutClient("appName");
 
+        LookoutConfig metricConfig = new LookoutConfig();
+
+        //主动上报型
         LookoutRegistry lookoutRegistry = new LookoutRegistry(new LookoutConfig());
+        //被动采集型
+        ResettableStepRegistry stepRegistry = new ResettableStepRegistry(metricConfig);
 
         //set common tag example
         lookoutRegistry.setCommonTag("instant", "machine-a");
@@ -43,6 +49,7 @@ public class DefaultLookoutClientDemo {
         //本地观察metrics定时打印
         lookoutRegistry.addMetricObserver(new StdoutObserver());
         client.addRegistry(lookoutRegistry);
+        client.addRegistry(stepRegistry);
 
         //注册扩展的metrics，下面两种方式都可以
         //lookoutRegistry.registerExtendedMetrics();

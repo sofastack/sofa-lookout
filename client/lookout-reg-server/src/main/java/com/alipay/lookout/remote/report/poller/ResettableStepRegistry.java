@@ -16,9 +16,9 @@
  */
 package com.alipay.lookout.remote.report.poller;
 
-import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.step.StepRegistry;
@@ -40,6 +40,10 @@ public class ResettableStepRegistry extends StepRegistry implements ResettableSt
     private static final long         INIT_STEP_MILLS = 30000;
 
     private final Map<String, String> commonTags      = new ConcurrentHashMap<String, String>();
+
+    public ResettableStepRegistry(LookoutConfig config) {
+        this(Clock.SYSTEM, config);
+    }
 
     public ResettableStepRegistry(Clock clock, LookoutConfig config) {
         super(clock, config, INIT_STEP_MILLS);
