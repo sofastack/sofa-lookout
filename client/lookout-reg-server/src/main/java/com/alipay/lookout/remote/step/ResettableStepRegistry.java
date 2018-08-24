@@ -38,6 +38,10 @@ class ResettableStepRegistry extends StepRegistry implements ResettableStep, Com
 
     private final Map<String, String> commonTags = new ConcurrentHashMap<String, String>();
 
+    public ResettableStepRegistry(LookoutConfig config) {
+        this(Clock.SYSTEM, config);
+    }
+
     public ResettableStepRegistry(Clock clock, LookoutConfig config) {
         super(clock, config, INIT_STEP_MILLS);
     }

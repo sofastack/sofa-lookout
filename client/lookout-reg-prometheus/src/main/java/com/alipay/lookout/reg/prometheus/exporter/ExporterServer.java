@@ -16,7 +16,7 @@
  */
 package com.alipay.lookout.reg.prometheus.exporter;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.alipay.lookout.common.utils.CommonUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +37,8 @@ public class ExporterServer {
 
     public ExporterServer(int port) {
         final ExecutorService singleThreadPool = new ThreadPoolExecutor(1, 1, 0L,
-            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(100), getNamedThreadFactory(),
+            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(100),
+            CommonUtil.getNamedThreadFactory("prometheus-exporter-pool"),
             new ThreadPoolExecutor.AbortPolicy());
         try {
             httpServer = HttpServer.create(new InetSocketAddress(port), 2);
@@ -47,11 +47,6 @@ public class ExporterServer {
             throw new RuntimeException("prometheus exporter server create err! And port = " + port,
                 e);
         }
-    }
-
-    private static ThreadFactory getNamedThreadFactory() {
-        //使用guava包中工具类；
-        return new ThreadFactoryBuilder().setNameFormat("prometheus-exporter-pool-%d").build();
     }
 
     public void addMetricsQueryHandler(HttpHandler httpHandler) {

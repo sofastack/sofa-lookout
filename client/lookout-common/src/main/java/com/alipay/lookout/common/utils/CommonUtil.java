@@ -18,6 +18,9 @@ package com.alipay.lookout.common.utils;
 
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Tag;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import java.util.concurrent.ThreadFactory;
 
 /**
  * CommonUtil
@@ -41,5 +44,10 @@ public class CommonUtil {
             buf.append('.').append(t.key()).append('-').append(t.value());
         }
         return buf.toString();
+    }
+
+    public static ThreadFactory getNamedThreadFactory(String ThreadFactoryName) {
+        //使用guava包中工具类；
+        return new ThreadFactoryBuilder().setNameFormat(ThreadFactoryName + "-%d").build();
     }
 }
