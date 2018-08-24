@@ -16,16 +16,12 @@
  */
 package com.alipay.lookout.client;
 
-import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
-import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.poller.Listener;
 import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
 import com.alipay.lookout.remote.report.poller.PollerController;
-import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
-
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -44,36 +40,40 @@ final class PollerUtils {
     /**
      * 辅助方法, 通过HTTP暴露自身的metrics数据
      *
-     * @param config
      * @param client
      * @return
      * @throws Exception
      */
-    static MetricsHttpExporter exportHttp(LookoutConfig config, AbstractLookoutClient client)
-                                                                                             throws Exception {
-        ResettableStepRegistry resettableStepRegistry = new ResettableStepRegistry(Clock.SYSTEM,
-            config);
-
+    static MetricsHttpExporter exportHttp(AbstractLookoutClient client)
+            throws Exception {
         final List<LookoutRegistry> lookoutRegistryList = new ArrayList<LookoutRegistry>();
         for (Registry r : client.getInnerCompositeRegistry().getRegistries()) {
             if (r instanceof LookoutRegistry) {
                 lookoutRegistryList.add((LookoutRegistry) r);
             }
         }
-        PollerController controller = new PollerController(resettableStepRegistry);
+        if (lookoutRegistryList.isEmpty()) {
+            return null;
+        }
+        //TODO check only one lookoutRegistry
+        return exportHttp(lookoutRegistryList.get(0));
+    }
+
+
+    static MetricsHttpExporter exportHttp(final LookoutRegistry registry)
+            throws Exception {
+        //TODO check only one lookoutRegistry
+        PollerController controller = new PollerController(registry);
         controller.addListener(new Listener() {
             @Override
             public void onActive() {
-                for (LookoutRegistry r : lookoutRegistryList) {
-                    r.getMetricObserverComposite().setEnabled(false);
-                }
+                registry.getMetricObserverComposite().setEnabled(false);
+
             }
 
             @Override
             public void onIdle() {
-                for (LookoutRegistry r : lookoutRegistryList) {
-                    r.getMetricObserverComposite().setEnabled(false);
-                }
+                registry.getMetricObserverComposite().setEnabled(false);
             }
         });
         try {

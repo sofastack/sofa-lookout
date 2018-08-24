@@ -14,39 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.poller;
+package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.api.Clock;
-import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.ResettableStep;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
-import com.alipay.lookout.remote.step.StepRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 可调整 step 的 Registry
+ * 可调整 step 的 Registry reactive mode;
  *
  * @author xiangfeng.xzc
  * @date 2018/7/26
  */
-public class ResettableStepRegistry extends StepRegistry implements ResettableStep,
-                                                        CommonTagsAccessor {
+class ResettableStepRegistry extends StepRegistry implements ResettableStep, CommonTagsAccessor {
     /**
      * 默认的采样间隔时间
      */
-    private static final long         INIT_STEP_MILLS = 30000;
+    private static final long INIT_STEP_MILLS = 30000;
 
-    private final Map<String, String> commonTags      = new ConcurrentHashMap<String, String>();
+    private final Map<String, String> commonTags = new ConcurrentHashMap<String, String>();
 
     public ResettableStepRegistry(Clock clock, LookoutConfig config) {
         super(clock, config, INIT_STEP_MILLS);
     }
 
     public ResettableStepRegistry(Clock clock, LookoutConfig config, long initStep) {
-        super(clock, config, initStep);
+        super(clock, config, initStep < 0 ? INIT_STEP_MILLS : initStep);
     }
 
     @Override
@@ -71,17 +68,6 @@ public class ResettableStepRegistry extends StepRegistry implements ResettableSt
     @Override
     public void removeCommonTag(String name) {
         commonTags.remove(name);
-    }
-
-    /**
-     * ResettableStepRegistry 的metrics有相同的rate
-     *
-     * @param id
-     * @return
-     */
-    @Override
-    protected long getStepMillis(Id id) {
-        return fixedStepMillis;
     }
 
     @Override

@@ -51,7 +51,7 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     /**
      * 是否提供一个接口, 让外界拉取数据
      */
-    public static final String                      POLLER_EXPORTER_ENABLED                 = "lookout.poller.enabled";
+    //    public static final String                      POLLER_EXPORTER_ENABLED                 = "lookout.poller.enabled";
 
     /**
      * 多久没有请求拉取数据就进入idle状态

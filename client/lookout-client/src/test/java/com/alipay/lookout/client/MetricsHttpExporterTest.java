@@ -23,7 +23,7 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.poller.Listener;
 import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
 import com.alipay.lookout.remote.report.poller.PollerController;
-import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
+import com.alipay.lookout.remote.step.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import org.apache.http.client.methods.CloseableHttpResponse;

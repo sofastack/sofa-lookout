@@ -30,16 +30,13 @@ import com.alipay.lookout.remote.report.support.ReportDecider;
 import com.alipay.lookout.report.MetricObserver;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public final class LookoutRegistry extends StepRegistry implements CommonTagsAccessor {
+public final class LookoutRegistry extends ResettableStepRegistry implements CommonTagsAccessor {
 
     private SchedulerPoller               poller;
-    private final Map<String, String>     commonTags              = new ConcurrentHashMap<String, String>();
     private final MetricObserverComposite metricObserverComposite = new MetricObserverComposite();
 
     /**
@@ -56,10 +53,14 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
 
     public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer,
                            LookoutConfig config, AddressService addressService) {
-        super(clock, config);
+       this(clock,observer,config,addressService,-1l);
+    }
+
+    public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer, LookoutConfig config, AddressService addressService, long currentStep) {
+        super(clock, config,currentStep);
         if (observer == null) {
             observer = new HttpObserver(config, addressService == null ? getAddressService(config)
-                : addressService, this, new ReportDecider());
+                    : addressService, this, new ReportDecider());
         }
         addMetricObserver(observer);
         this.poller = new SchedulerPoller(this, config, metricObserverComposite);
@@ -88,28 +89,6 @@ public final class LookoutRegistry extends StepRegistry implements CommonTagsAcc
 
     public LookoutRegistry(MetricObserver<LookoutMeasurement> observer) {
         this(Clock.SYSTEM, observer, new LookoutConfig());
-    }
-
-    @Override
-    public String getCommonTagValue(String name) {
-        return commonTags.get(name);
-    }
-
-    @Override
-    public void setCommonTag(String name, String value) {
-        if (name != null && value != null) {
-            commonTags.put(name, value);
-        }
-    }
-
-    @Override
-    public void removeCommonTag(String name) {
-        commonTags.remove(name);
-    }
-
-    @Override
-    public Map<String, String> commonTags() {
-        return commonTags;
     }
 
     SchedulerPoller poller() {

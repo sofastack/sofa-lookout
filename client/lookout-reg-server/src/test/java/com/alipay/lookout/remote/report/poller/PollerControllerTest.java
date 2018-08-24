@@ -18,8 +18,8 @@ package com.alipay.lookout.remote.report.poller;
 
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.core.config.LookoutConfig;
+import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.google.common.collect.Sets;
-
 import org.junit.Test;
 
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class PollerControllerTest {
     @Test
     public void test() throws Exception {
         LookoutConfig config = new LookoutConfig();
-        ResettableStepRegistry r = new ResettableStepRegistry(Clock.SYSTEM, config, 1000L);
+        LookoutRegistry r = new LookoutRegistry(Clock.SYSTEM, null, config, null, 1000L);
 
         r.counter(r.createId("foo"));
 
@@ -64,7 +64,7 @@ public class PollerControllerTest {
 
             Thread.sleep(2000);
 
-            data = controller.getNextData(Collections.<Long> emptySet());
+            data = controller.getNextData(Collections.<Long>emptySet());
             assertThat(data).hasSize(3);
 
             success = extractCursors(data);
