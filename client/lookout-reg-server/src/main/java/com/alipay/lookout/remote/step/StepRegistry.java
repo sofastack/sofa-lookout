@@ -91,6 +91,7 @@ public class StepRegistry extends AbstractRegistry {
     @Override
     protected Metric newMixinMetric(Id id) {
         long stepSize = getStepMillis(id);
+        //mixin 的 step registry ，mode 不需要切换了,因为有了 stepClock;
         return new LookoutMixinMetric(id, new StepRegistry(clock, getLookoutConfig(), stepSize),
             stepClock(id));
     }

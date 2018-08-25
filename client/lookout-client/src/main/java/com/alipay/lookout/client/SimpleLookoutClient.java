@@ -77,21 +77,18 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             //add jvm and other metrics
             registry.registerExtendedMetrics();
             super.addRegistry(registry);
+            if (registry instanceof LookoutRegistry) {
+                try {
+                    PollerUtils.exportHttp((LookoutRegistry) registry);
+                } catch (Exception e) {
+                    logger.error("fail to start MetricsHttpExporter", e);
+                }
+            }
         }
-
-        exportPoller();
 
         logger.debug("set global registry to Lookout");
         // init global registry
         Lookout.setRegistry(getRegistry());
-    }
-
-    private void exportPoller() {
-        try {
-             PollerUtils.exportHttp(lookoutConfig, this);
-        } catch (Exception e) {
-            logger.error("fail to start MetricsHttpExporter", e);
-        }
     }
 
     /**

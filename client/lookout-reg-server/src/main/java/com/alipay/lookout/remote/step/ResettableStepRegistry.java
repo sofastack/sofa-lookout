@@ -34,9 +34,9 @@ class ResettableStepRegistry extends StepRegistry implements ResettableStep, Com
     /**
      * 默认的采样间隔时间
      */
-    private static final long INIT_STEP_MILLS = 30000;
+    private static final long         INIT_STEP_MILLS = 30000;
 
-    private final Map<String, String> commonTags = new ConcurrentHashMap<String, String>();
+    private final Map<String, String> commonTags      = new ConcurrentHashMap<String, String>();
 
     public ResettableStepRegistry(LookoutConfig config) {
         this(Clock.SYSTEM, config);

@@ -108,7 +108,7 @@ public class PollerController implements Closeable {
     /**
      * 多少时间没有请求就算是空闲
      */
-    private final int                     idleSeconds;
+    private int                           idleSeconds;
 
     public PollerController(LookoutRegistry registry) {
         this(registry, DEFAULT_SLOT_COUNT);
@@ -329,8 +329,8 @@ public class PollerController implements Closeable {
     }
 
     private void triggerIdle() {
-        registry.setProactive(false);
-
+        //fallback to proactive
+        registry.setProactive(true);
         // idle时不再poller 同时也清理掉cache
         this.metricCache.clear();
 
@@ -342,7 +342,8 @@ public class PollerController implements Closeable {
 
     private void triggerActive() {
         LOGGER.warn("PollerController is now active. proactive mode.");
-        registry.setProactive(true);
+        //reactive mode.
+        registry.setProactive(false);
         for (Listener listener : listeners) {
             listener.onActive();
         }

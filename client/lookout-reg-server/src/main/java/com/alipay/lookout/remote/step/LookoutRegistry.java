@@ -53,14 +53,15 @@ public final class LookoutRegistry extends ResettableStepRegistry implements Com
 
     public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer,
                            LookoutConfig config, AddressService addressService) {
-       this(clock,observer,config,addressService,-1l);
+        this(clock, observer, config, addressService, -1l);
     }
 
-    public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer, LookoutConfig config, AddressService addressService, long currentStep) {
-        super(clock, config,currentStep);
+    public LookoutRegistry(Clock clock, MetricObserver<LookoutMeasurement> observer,
+                           LookoutConfig config, AddressService addressService, long currentStep) {
+        super(clock, config, currentStep);
         if (observer == null) {
             observer = new HttpObserver(config, addressService == null ? getAddressService(config)
-                    : addressService, this, new ReportDecider());
+                : addressService, this, new ReportDecider());
         }
         addMetricObserver(observer);
         this.poller = new SchedulerPoller(this, config, metricObserverComposite);

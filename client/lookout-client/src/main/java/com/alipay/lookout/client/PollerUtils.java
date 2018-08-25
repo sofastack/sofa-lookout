@@ -44,8 +44,7 @@ final class PollerUtils {
      * @return
      * @throws Exception
      */
-    static MetricsHttpExporter exportHttp(AbstractLookoutClient client)
-            throws Exception {
+    static MetricsHttpExporter exportHttp(AbstractLookoutClient client) throws Exception {
         final List<LookoutRegistry> lookoutRegistryList = new ArrayList<LookoutRegistry>();
         for (Registry r : client.getInnerCompositeRegistry().getRegistries()) {
             if (r instanceof LookoutRegistry) {
@@ -59,9 +58,7 @@ final class PollerUtils {
         return exportHttp(lookoutRegistryList.get(0));
     }
 
-
-    static MetricsHttpExporter exportHttp(final LookoutRegistry registry)
-            throws Exception {
+    static MetricsHttpExporter exportHttp(final LookoutRegistry registry) throws Exception {
         //TODO check only one lookoutRegistry
         PollerController controller = new PollerController(registry);
         controller.addListener(new Listener() {
@@ -73,7 +70,7 @@ final class PollerUtils {
 
             @Override
             public void onIdle() {
-                registry.getMetricObserverComposite().setEnabled(false);
+                registry.getMetricObserverComposite().setEnabled(true);
             }
         });
         try {

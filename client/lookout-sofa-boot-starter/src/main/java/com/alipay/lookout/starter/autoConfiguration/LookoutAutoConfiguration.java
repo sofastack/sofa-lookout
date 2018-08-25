@@ -150,10 +150,6 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         logger.info("register extended metrics.");
         lookoutClient.registerExtendedMetrics();
 
-        if (lookoutConfig.getBoolean(LookoutConfig.POLLER_EXPORTER_ENABLED, true)) {
-            lookoutClient.registerExporter(lookoutConfig);
-        }
-
         return lookoutClient.getRegistry();
     }
 
