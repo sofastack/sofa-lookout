@@ -30,6 +30,7 @@ import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AUTOPOLL_OS_M
 
 /**
  * @author wuqin
+ * @author kevin.luy@alipay.com
  * @version $Id: CachedMetricsImporter.java, v 0.1 2017-03-18 下午4:40 wuqin Exp $$
  */
 public abstract class CachedMetricsImporter implements MetricsImporter {

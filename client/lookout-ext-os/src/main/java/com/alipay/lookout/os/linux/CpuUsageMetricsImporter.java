@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author wuqin
+ * @author kevin.luy@alipay.com
  * @version $Id: CpuUsageMetricsImporter.java, v 0.1 2017-03-18 下午5:19 wuqin Exp $$
  */
 public class CpuUsageMetricsImporter extends CachedMetricsImporter {
