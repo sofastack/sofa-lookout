@@ -20,6 +20,7 @@ import com.alipay.lookout.api.NoopRegistry;
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.client.DefaultLookoutClient;
+import com.alipay.lookout.client.LookoutClient;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.AddressService;
@@ -136,12 +137,23 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         return new SpringBootActuatorRegistryFactory();
     }
 
-    @Bean
-    public Registry registry(List<MetricsRegistryFactory> metricsRegistryFactoryList,
-                             LookoutConfig lookoutConfig) {
+    @Bean(destroyMethod = "close")
+    public LookoutClient lookoutClient(List<MetricsRegistryFactory> metricsRegistryFactoryList,
+                                       LookoutConfig lookoutConfig) {
+
         if (!lookoutConfig.getBoolean(LOOKOUT_ENABLE, true)) {
-            return NoopRegistry.INSTANCE;
+            return new LookoutClient() {
+                @Override
+                public <T extends Registry> T getRegistry() {
+                    return (T) NoopRegistry.INSTANCE;
+                }
+
+                @Override
+                public void close() throws Exception {
+                }
+            };
         }
+        // lookout enable
         DefaultLookoutClient lookoutClient = new DefaultLookoutClient(
             lookoutConfig.getString(APP_NAME));
         for (MetricsRegistryFactory metricsRegistryFactory : metricsRegistryFactoryList) {
@@ -149,8 +161,13 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         }
         logger.info("register extended metrics.");
         lookoutClient.registerExtendedMetrics();
+        return lookoutClient;
+    }
 
-        return lookoutClient.getRegistry();
+    @Bean
+    public Registry registry(List<MetricsRegistryFactory> metricsRegistryFactoryList,
+                             LookoutConfig lookoutConfig) {
+        return lookoutClient(metricsRegistryFactoryList, lookoutConfig).getRegistry();
     }
 
     protected LookoutConfig buildLookoutConfig(LookoutClientProperties lookoutClientProperties) {

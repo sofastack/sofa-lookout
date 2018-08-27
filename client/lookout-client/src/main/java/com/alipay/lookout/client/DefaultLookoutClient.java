@@ -46,7 +46,7 @@ public class DefaultLookoutClient extends AbstractLookoutClient {
         super.addRegistry(registry);
         if (registry instanceof LookoutRegistry) {
             try {
-                PollerUtils.exportHttp((LookoutRegistry) registry);
+                setMetricsHttpExporter(PollerUtils.exportHttp((LookoutRegistry) registry));
             } catch (Exception e) {
                 logger.error("fail to start MetricsHttpExporter", e);
             }

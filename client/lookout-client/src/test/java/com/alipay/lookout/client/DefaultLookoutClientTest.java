@@ -31,24 +31,27 @@ import org.junit.Test;
 public class DefaultLookoutClientTest {
 
     @Test(expected = IllegalStateException.class)
-    public void testDefaultLookoutClientWithoutRegistry() {
+    public void testDefaultLookoutClientWithoutRegistry() throws Exception {
         LookoutClient client1 = new DefaultLookoutClient("demo");
         LookoutClient client2 = new DefaultLookoutClient("demo");
         client1.getRegistry();
+        client1.close();
+        client2.close();
     }
 
     @Test
-    public void testDefaultLookoutClient_addRegsitry() {
+    public void testDefaultLookoutClient_addRegsitry() throws Exception {
         LookoutConfig lookoutConfig = new LookoutConfig();
         DefaultLookoutClient client = new DefaultLookoutClient("demo");
         LookoutRegistry lookoutRegistry = new LookoutRegistry(lookoutConfig);
         client.addRegistry(lookoutRegistry);
         client.addRegistry(new DefaultRegistry(lookoutConfig));
         Assert.assertEquals(2, ((CompositeRegistry) client.getRegistry()).getRegistries().size());
+        client.close();
     }
 
     @Test
-    public void testDefaultLookoutClient_addExtMetrics() {
+    public void testDefaultLookoutClient_addExtMetrics() throws Exception {
         LookoutConfig lookoutConfig = new LookoutConfig();
         DefaultLookoutClient client = new DefaultLookoutClient("demo");
         MetricRegistry r = new DefaultRegistry(lookoutConfig);
@@ -56,5 +59,6 @@ public class DefaultLookoutClientTest {
         client.registerExtendedMetrics();
         Id id = r.createId("jvm.gc");
         Assert.assertNotNull(client.getRegistry().get(id));
+        client.close();
     }
 }

@@ -52,6 +52,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
+        metricName = wrapName(LOOKOUT_COUNTER_PREFIX, metricName);
         Id id = this.registry.createId(metricName);
         Counter counter = this.registry.counter(id);
         counter.inc();
@@ -62,6 +63,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
+        metricName = wrapName(LOOKOUT_COUNTER_PREFIX, metricName);
         Id id = this.registry.createId(metricName);
         Counter counter = this.registry.counter(id);
         counter.dec();
@@ -72,6 +74,7 @@ public class LookoutSpringBootMetricsImpl implements CounterService, GaugeServic
         if (StringUtils.isBlank(metricName)) {
             return;
         }
+        metricName = wrapName(LOOKOUT_COUNTER_PREFIX, metricName);
         Id id = this.registry.createId(metricName);
         this.registry.removeMetric(id);
     }

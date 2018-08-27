@@ -31,4 +31,11 @@ public interface LookoutClient {
      */
     <T extends Registry> T getRegistry();
 
+    /**
+     * Closes this resource, relinquishing any underlying resources.
+     *
+     * @throws Exception if this resource cannot be closed
+     */
+    void close() throws Exception;
+
 }
