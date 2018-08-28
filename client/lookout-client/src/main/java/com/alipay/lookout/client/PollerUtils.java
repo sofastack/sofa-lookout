@@ -37,27 +37,6 @@ final class PollerUtils {
     private PollerUtils() {
     }
 
-    /**
-     * 辅助方法, 通过HTTP暴露自身的metrics数据
-     *
-     * @param client
-     * @return
-     * @throws Exception
-     */
-    static MetricsHttpExporter exportHttp(AbstractLookoutClient client) throws Exception {
-        final List<LookoutRegistry> lookoutRegistryList = new ArrayList<LookoutRegistry>();
-        for (Registry r : client.getInnerCompositeRegistry().getRegistries()) {
-            if (r instanceof LookoutRegistry) {
-                lookoutRegistryList.add((LookoutRegistry) r);
-            }
-        }
-        if (lookoutRegistryList.isEmpty()) {
-            return null;
-        }
-        //TODO check only one lookoutRegistry
-        return exportHttp(lookoutRegistryList.get(0));
-    }
-
     static MetricsHttpExporter exportHttp(final LookoutRegistry registry) throws Exception {
         //TODO check only one lookoutRegistry
         PollerController controller = new PollerController(registry);

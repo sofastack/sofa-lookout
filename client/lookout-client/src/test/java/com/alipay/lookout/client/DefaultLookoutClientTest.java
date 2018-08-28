@@ -32,11 +32,17 @@ public class DefaultLookoutClientTest {
 
     @Test(expected = IllegalStateException.class)
     public void testDefaultLookoutClientWithoutRegistry() throws Exception {
-        LookoutClient client1 = new DefaultLookoutClient("demo");
-        LookoutClient client2 = new DefaultLookoutClient("demo");
-        client1.getRegistry();
-        client1.close();
-        client2.close();
+        LookoutClient client1 = null;
+        LookoutClient client2 = null;
+        try {
+            client1 = new DefaultLookoutClient("demo");
+            client2 = new DefaultLookoutClient("demo");
+            client1.getRegistry();
+        } finally {
+            client1.close();
+            client2.close();
+        }
+
     }
 
     @Test
