@@ -46,11 +46,7 @@ final class LookoutMixinMetric implements MixinMetric, ResettableStep {
 
     @Override
     public void setStep(long step) {
-        for (Metric m : registry) {
-            if (m instanceof ResettableStep) {
-                ((ResettableStep) m).setStep(step);
-            }
-        }
+        registry.setStep(step);
     }
 
     @Override

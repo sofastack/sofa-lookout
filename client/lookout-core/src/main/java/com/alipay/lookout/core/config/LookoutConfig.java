@@ -18,7 +18,6 @@ package com.alipay.lookout.core.config;
 
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.common.Assert;
-
 import org.apache.commons.configuration2.MapConfiguration;
 
 import java.util.HashMap;
@@ -38,8 +37,11 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      LOOKOUT_REPORT_BATCH_SIZE               = "lookout.report.batch.size";
     public static final String                      LOOKOUT_REPORT_COMPRESSION_THRESHOLD    = "lookout.report.compression.threshhold";
     public static final String                      LOOKOUT_AUTOPOLL_INFO_METRIC_IGNORE     = "lookout.autopoll.info.ignore";
+    public static final String                      LOOKOUT_AUTOPOLL_OS_METRIC_IGNORE       = "lookout.autopoll.os.ignore";
     public static final String                      LOOKOUT_AGENT_SERVER_PORT               = "lookout.agent.server.port";
     public static final String                      LOOKOUT_ANT_EVENT_LOG_ENABLE            = "lookout.ant.event.log.enable";
+    public static final String                      LOOKOUT_EXPORTER_ACCESS_TOKEN           = "lookout.exporter.access.token";
+
     public static final String                      LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT = "lookout.prometheus.exporter.server.port";
     // default value
     public static final int                         DEFAULT_WEB_SERVER_PORT                 = 8083;
@@ -51,7 +53,7 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     /**
      * 是否提供一个接口, 让外界拉取数据
      */
-    public static final String                      POLLER_EXPORTER_ENABLED                 = "lookout.poller.enabled";
+    //    public static final String                      POLLER_EXPORTER_ENABLED                 = "lookout.poller.enabled";
 
     /**
      * 多久没有请求拉取数据就进入idle状态

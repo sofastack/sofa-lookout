@@ -26,6 +26,7 @@ import com.alipay.lookout.os.utils.FileUtils;
 import com.alipay.lookout.os.utils.NumFormatUtils;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
 /**
  *
  * @author wuqin
+ * @author kevin.luy@alipay.com
  * @version $Id: SystemLoadMetricsImporter.java, v 0.1 2017-03-18 下午4:59 wuqin Exp $$
  */
 public class SystemLoadMetricsImporter extends CachedMetricsImporter {
@@ -67,10 +69,11 @@ public class SystemLoadMetricsImporter extends CachedMetricsImporter {
         super(timeout, timeoutUnit);
         this.filePath = filePath;
         this.loadAvg = new float[LoadAvg.values().length];
+        disable = !new File(filePath).exists();
     }
 
     @Override
-    public void register(Registry registry) {
+    protected void doRegister(Registry registry) {
         Id id = registry.createId("os.systemload.average");
         MixinMetric mixin = registry.mixinMetric(id);
 

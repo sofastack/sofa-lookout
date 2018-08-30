@@ -17,29 +17,31 @@
 package com.alipay.lookout.remote.step;
 
 import com.alipay.lookout.api.Clock;
-import com.alipay.lookout.common.Assert;
+import com.alipay.lookout.api.Id;
 
 /**
+ * wall time 对齐
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public final class StepClock implements Clock {
+final class StepClock implements Clock {
 
-    private final Clock impl;
-    private final long  step;
+    private final StepRegistry stepRegistry;
+    private final Id           id;
 
-    StepClock(Clock impl, long step) {
-        Assert.checkArg(!(impl instanceof StepClock), "the clock arg can not be StepClock!");
-        this.impl = impl;
-        this.step = step;
+    StepClock(StepRegistry stepRegistry, Id id) {
+        this.stepRegistry = stepRegistry;
+        this.id = id;
     }
 
     @Override
     public long wallTime() {
-        return impl.wallTime() / step * step;
+        //support step refresh.
+        long step = stepRegistry.getStepMillis(id);
+        return stepRegistry.clock().wallTime() / step * step;
     }
 
     @Override
     public long monotonicTime() {
-        return impl.monotonicTime();
+        return stepRegistry.clock().monotonicTime();
     }
 }

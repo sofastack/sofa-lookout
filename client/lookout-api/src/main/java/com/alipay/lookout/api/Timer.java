@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public interface Timer extends Metric {
     /**
      * @param amount Duration of a single event
-     * @param unit
+     * @param unit time unit
      */
     void record(long amount, TimeUnit unit);
 

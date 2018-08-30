@@ -24,8 +24,8 @@ import com.alipay.lookout.common.Assert;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.utils.NetworkUtil;
 import com.alipay.lookout.core.CommonTagsAccessor;
+import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
 import com.google.common.base.Preconditions;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
@@ -35,9 +35,10 @@ import static com.alipay.lookout.common.LookoutConstants.INSTANCE_ID_NAME;
  * Created by kevin.luy@alipay.com on 2018/4/24.
  */
 abstract class AbstractLookoutClient implements LookoutClient {
-    Logger                    logger         = LookoutLoggerFactory.getLogger(this.getClass());
-    private final String      appName;
-    private CompositeRegistry globalRegistry = new CompositeRegistry(Clock.SYSTEM);
+    Logger                      logger         = LookoutLoggerFactory.getLogger(this.getClass());
+    private final String        appName;
+    private CompositeRegistry   globalRegistry = new CompositeRegistry(Clock.SYSTEM);
+    private MetricsHttpExporter metricsHttpExporter;
 
     /**
      * new an abstractLookoutClient
@@ -100,4 +101,19 @@ abstract class AbstractLookoutClient implements LookoutClient {
         commonTagsAccessor.setCommonTag("app", appName);
     }
 
+    @Override
+    public void close() throws Exception {
+        MetricsHttpExporter metricsHttpExporter = getMetricsHttpExporter();
+        if (metricsHttpExporter != null) {
+            metricsHttpExporter.close();
+        }
+    }
+
+    protected MetricsHttpExporter getMetricsHttpExporter() {
+        return metricsHttpExporter;
+    }
+
+    protected void setMetricsHttpExporter(MetricsHttpExporter metricsHttpExporter) {
+        this.metricsHttpExporter = metricsHttpExporter;
+    }
 }

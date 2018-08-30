@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *
  * @author wuqin
+ * @author kevin.luy@alipay.com
  * @version $Id: DiskUsageMetricsImporter.java, v 0.1 2017-03-18 下午5:30 wuqin Exp $$
  */
 public class DiskUsageMetricsImporter extends CachedMetricsImporter {
@@ -72,11 +73,14 @@ public class DiskUsageMetricsImporter extends CachedMetricsImporter {
         super(timeout, timeoutUnit);
         this.filePath = filePath;
         diskUsageByDevice = new HashMap<String, DiskUsage>();
-        loadIfNessesary();
+
+        disable = !new File(filePath).exists();
+        if (!disable)
+            loadIfNessesary();
     }
 
     @Override
-    public void register(Registry registry) {
+    protected void doRegister(Registry registry) {
         for (Map.Entry<String, DiskUsage> entry : diskUsageByDevice.entrySet()) {
             final String device = entry.getKey();
             Id id = registry.createId("os.disk.usage." + device);
@@ -150,7 +154,7 @@ public class DiskUsageMetricsImporter extends CachedMetricsImporter {
                 diskUsageByDevice.put(diskUsage.fsSpec, diskUsage);
             }
         } catch (Exception e) {
-            logger.info("warning,can't parse line at /proc/mounts", e.getMessage());
+            logger.debug("warning,can't parse line at /proc/mounts", e.getMessage());
         }
     }
 

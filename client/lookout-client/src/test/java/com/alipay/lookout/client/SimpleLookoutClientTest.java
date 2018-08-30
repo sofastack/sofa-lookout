@@ -48,7 +48,7 @@ public class SimpleLookoutClientTest {
      * 该实例只能全局单例，所以就统一在一个测试方法
      */
     @Test
-    public void testSimpleLookoutClient() {
+    public void testSimpleLookoutClient() throws Exception {
         LookoutRegistry lookoutRegistry = new LookoutRegistry(new LookoutConfig());
         SimpleLookoutClient client = new SimpleLookoutClient("demo", lookoutRegistry);
         //test addCommonTags
@@ -61,6 +61,7 @@ public class SimpleLookoutClientTest {
         //test get Registry
         Assert.assertSame(lookoutRegistry, ((CompositeRegistry) client.getRegistry())
             .getRegistries().iterator().next());
+        client.close();
     }
 
 }

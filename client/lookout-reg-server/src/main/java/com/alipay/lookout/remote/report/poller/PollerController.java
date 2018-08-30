@@ -18,44 +18,35 @@ package com.alipay.lookout.remote.report.poller;
 
 import com.alipay.lookout.api.Gauge;
 import com.alipay.lookout.api.Metric;
+import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.top.RollableTopGauge;
+import com.alipay.lookout.common.utils.CommonUtil;
 import com.alipay.lookout.core.GaugeWrapper;
 import com.alipay.lookout.core.InfoWrapper;
 import com.alipay.lookout.core.config.LookoutConfig;
+import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.step.LookoutRegistry;
+import com.alipay.lookout.remote.step.PollableInfoWrapper;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
-
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author xiangfeng.xzc
  * @date 2018/7/26
  */
 public class PollerController implements Closeable {
-    private static final Logger           LOGGER               = LoggerFactory
+    private static final Logger           LOGGER               = LookoutLoggerFactory
                                                                    .getLogger(PollerController.class);
 
     private static final int              DEFAULT_SLOT_COUNT   = 3;
 
-    private static final int              DEFAULT_IDLE_SECONDS = 3600;
+    private static final int              DEFAULT_IDLE_SECONDS = 1800;                                //30 min
     /**
      * 比较器 按照cursor倒序排序
      */
@@ -72,7 +63,7 @@ public class PollerController implements Closeable {
     /**
      * 注册中心
      */
-    private final ResettableStepRegistry  registry;
+    private final LookoutRegistry         registry;
 
     /**
      * 只有1个线程的调度器
@@ -117,21 +108,24 @@ public class PollerController implements Closeable {
     /**
      * 多少时间没有请求就算是空闲
      */
-    private final int                     idleSeconds;
+    private int                           idleSeconds;
 
-    public PollerController(ResettableStepRegistry registry) {
+    public PollerController(LookoutRegistry registry) {
         this(registry, DEFAULT_SLOT_COUNT);
     }
 
-    public PollerController(ResettableStepRegistry registry, int initSlotCount) {
+    public PollerController(LookoutRegistry registry, int initSlotCount) {
         this.registry = registry;
-        ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("PollerController %d")
-            .build();
-        scheduledExecutorService = new ScheduledThreadPoolExecutor(1, tf,
+        scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
+            CommonUtil.getNamedThreadFactory("poller-controller"),
             new ThreadPoolExecutor.AbortPolicy());
         idleSeconds = registry.getConfig().getInteger(LookoutConfig.POLLER_EXPORTER_IDLE_SECONDS,
             DEFAULT_IDLE_SECONDS);
-        update(registry.getFixedStepMillis(), initSlotCount);
+        update(registry.getCurrentStepMillis(), initSlotCount);
+    }
+
+    MetricConfig getMetricConfig() {
+        return registry.getConfig();
     }
 
     /**
@@ -284,6 +278,16 @@ public class PollerController implements Closeable {
                     it.remove();
                 }
             }
+            if (metric instanceof InfoWrapper) {
+                //ignore info
+                if (registry.getConfig().getBoolean(
+                    LookoutConfig.LOOKOUT_AUTOPOLL_INFO_METRIC_IGNORE, true)) {
+                    continue;
+                }
+                if (!((PollableInfoWrapper) metric).isAutoPolledAllowed(getStep())) {
+                    continue;
+                }
+            }
 
             MetricDto dto = new MetricDto();
             LookoutMeasurement lookoutMeasurement = LookoutMeasurement.from(metric, registry);
@@ -312,7 +316,7 @@ public class PollerController implements Closeable {
             oldFuture.cancel(true);
         }
 
-        // 5分钟后进入idle状态
+        // 空闲时间到了，进入idle状态
         this.idleFuture = scheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
@@ -325,18 +329,21 @@ public class PollerController implements Closeable {
     }
 
     private void triggerIdle() {
+        //fallback to proactive
+        registry.setProactive(true);
         // idle时不再poller 同时也清理掉cache
         this.metricCache.clear();
 
-        LOGGER.warn("PollerController is now idle");
+        LOGGER.warn("PollerController is now idle. reactive mode.");
         for (Listener listener : listeners) {
             listener.onIdle();
         }
     }
 
     private void triggerActive() {
-        LOGGER.warn("PollerController is now active");
-
+        LOGGER.warn("PollerController is now active. proactive mode.");
+        //reactive mode.
+        registry.setProactive(false);
         for (Listener listener : listeners) {
             listener.onActive();
         }
@@ -366,9 +373,5 @@ public class PollerController implements Closeable {
             this.scheduledExecutorService.shutdown();
             this.scheduledExecutorService = null;
         }
-    }
-
-    public ResettableStepRegistry getRegistry() {
-        return registry;
     }
 }

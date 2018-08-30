@@ -25,7 +25,6 @@ import com.alipay.lookout.core.AbstractRegistry;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
-import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -78,27 +77,18 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             //add jvm and other metrics
             registry.registerExtendedMetrics();
             super.addRegistry(registry);
+            if (registry instanceof LookoutRegistry) {
+                try {
+                    setMetricsHttpExporter(PollerUtils.exportHttp((LookoutRegistry) registry));
+                } catch (Exception e) {
+                    logger.error("fail to start MetricsHttpExporter", e);
+                }
+            }
         }
-
-        exportPoller();
 
         logger.debug("set global registry to Lookout");
         // init global registry
         Lookout.setRegistry(getRegistry());
-    }
-
-    private void exportPoller() {
-        if (!lookoutConfig.getBoolean(LookoutConfig.POLLER_EXPORTER_ENABLED, false)) {
-            return;
-        }
-        try {
-            ResettableStepRegistry resettableStepRegistry = PollerUtils
-                .exportHttp(lookoutConfig, this).getController().getRegistry();
-            resettableStepRegistry.registerExtendedMetrics();
-            super.addRegistry(resettableStepRegistry);
-        } catch (Exception e) {
-            logger.error("fail to start MetricsHttpExporter", e);
-        }
     }
 
     /**

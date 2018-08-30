@@ -26,8 +26,6 @@ public class DefaultMetricsImporterLocatorTest {
 
     @Test
     public void testLocateImporters() {
-        DefaultMetricsImporterLocator locator = new DefaultMetricsImporterLocator();
-        locator.locate();
-        Assert.assertEquals(0, locator.locate().size());
+        Assert.assertEquals(0, MetricsImporterLocator.locate().size());
     }
 }

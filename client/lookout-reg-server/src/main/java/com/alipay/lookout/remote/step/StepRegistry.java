@@ -16,31 +16,28 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.ResettableStep;
-import com.alipay.lookout.api.Clock;
-import com.alipay.lookout.api.Counter;
-import com.alipay.lookout.api.DistributionSummary;
-import com.alipay.lookout.api.Gauge;
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Metric;
-import com.alipay.lookout.api.Timer;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.api.info.Info;
 import com.alipay.lookout.common.utils.PriorityTagUtil;
 import com.alipay.lookout.core.AbstractRegistry;
 import com.alipay.lookout.core.GaugeWrapper;
 import com.alipay.lookout.core.common.NewMetricFunction;
 import com.alipay.lookout.core.config.LookoutConfig;
-
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.base.Preconditions;
 
 /**
+ * proactive mode; different fixed steps by different priorities.
+ * reactive mode; step is determined by collector;
+ * <p>
  * Created by kevin.luy@alipay.com on 2017/3/26.
  */
 public class StepRegistry extends AbstractRegistry {
-    protected final Clock   clock;                //未对齐时间
+    protected final Clock   clock;                   //未对齐时间
 
     //for LookoutMixinMetric
-    protected volatile long fixedStepMillis = -1L;
+    protected volatile long currentStepMillis = -1L;
+
+    private boolean         proactive         = true;
 
     public StepRegistry(Clock clock, LookoutConfig config) {
         this(clock, config, -1L);
@@ -51,12 +48,16 @@ public class StepRegistry extends AbstractRegistry {
      *
      * @param clock
      * @param config
-     * @param fixedStepMillis
+     * @param currentStepMillis
      */
-    public StepRegistry(Clock clock, LookoutConfig config, long fixedStepMillis) {
+    public StepRegistry(Clock clock, LookoutConfig config, long currentStepMillis) {
         super(clock, config);
         this.clock = clock;
-        this.fixedStepMillis = fixedStepMillis;
+        this.currentStepMillis = currentStepMillis;
+    }
+
+    public void setProactive(boolean proactive) {
+        this.proactive = proactive;
     }
 
     private LookoutConfig getLookoutConfig() {
@@ -74,10 +75,12 @@ public class StepRegistry extends AbstractRegistry {
     }
 
     protected long getStepMillis(Id id) {
-        if (fixedStepMillis > 0) {
-            return fixedStepMillis;
+        if (proactive) {
+            return getLookoutConfig().stepMillis(PriorityTagUtil.resolve(id.tags()));
         }
-        return getLookoutConfig().stepMillis(PriorityTagUtil.resolve(id.tags()));
+        //reactive mode
+        Preconditions.checkState(currentStepMillis > 0);
+        return currentStepMillis;
     }
 
     @Override
@@ -88,16 +91,17 @@ public class StepRegistry extends AbstractRegistry {
     @Override
     protected Metric newMixinMetric(Id id) {
         long stepSize = getStepMillis(id);
+        //mixin 的 step registry ，mode 不需要切换了,因为有了 stepClock;
         return new LookoutMixinMetric(id, new StepRegistry(clock, getLookoutConfig(), stepSize),
-            stepClock(stepSize));
+            stepClock(id));
     }
 
     @Override
     public <T extends Number> Gauge<T> gauge(Id id, final Gauge<T> gauge) {
         return (Gauge<T>) computeIfAbsent(id, new NewMetricFunction<Metric>() {
             @Override
-            public Metric apply(Id id) {
-                return new GaugeWrapper(id, gauge, stepClock(getStepMillis(id)));
+            public Metric apply(final Id id) {
+                return new GaugeWrapper(id, gauge, stepClock(id));
             }
 
             @Override
@@ -112,7 +116,7 @@ public class StepRegistry extends AbstractRegistry {
         return (Info<I>) computeIfAbsent(id, new NewMetricFunction<Metric>() {
             @Override
             public Metric apply(Id id) {
-                return new PollableInfoWrapper(id, info, stepClock(getStepMillis(id)));
+                return new PollableInfoWrapper(id, info, stepClock(id));
             }
 
             @Override
@@ -122,34 +126,27 @@ public class StepRegistry extends AbstractRegistry {
         });
     }
 
-    private static final ConcurrentHashMap<Long, StepClock> stepClockCache = new ConcurrentHashMap<Long, StepClock>();
-
     /**
      * 步长对齐时钟
      *
-     * @param stepMills
+     * @param id
      * @return
      */
-    private StepClock stepClock(long stepMills) {
-        StepClock stepClock = stepClockCache.get(stepMills);
-        if (stepClock == null) {
-            stepClock = new StepClock(clock, stepMills);
-            StepClock old = stepClockCache.putIfAbsent(stepMills, stepClock);
-            stepClock = old != null ? old : stepClock;//old first
-        }
-        return stepClock;
+    private StepClock stepClock(Id id) {
+        return new StepClock(this, id);
     }
 
     /**
-     * 重新设置step, 将会修改所有的metric
+     * reactive mode.
+     * 重新设置step, 修改所有的metric
      *
      * @param step
      */
     protected synchronized void setStep(long step) {
-        if (this.fixedStepMillis == step) {
+        if (this.currentStepMillis == step) {
             return;
         }
-        this.fixedStepMillis = step;
+        this.currentStepMillis = step;
         for (Metric m : this) {
             if (m instanceof ResettableStep) {
                 ((ResettableStep) m).setStep(step);
@@ -158,11 +155,12 @@ public class StepRegistry extends AbstractRegistry {
     }
 
     /**
-     * 获取采样间隔时间
+     * reactive mode.
+     * 获取当前使用的采样间隔时间
      *
      * @return
      */
-    public long getFixedStepMillis() {
-        return fixedStepMillis;
+    public long getCurrentStepMillis() {
+        return currentStepMillis;
     }
 }

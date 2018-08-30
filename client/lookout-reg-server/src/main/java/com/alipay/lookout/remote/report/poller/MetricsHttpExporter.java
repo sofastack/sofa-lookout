@@ -18,11 +18,11 @@ package com.alipay.lookout.remote.report.poller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.lookout.common.utils.CommonUtil;
 import com.google.common.collect.Sets;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
@@ -34,7 +34,13 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
+
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_EXPORTER_ACCESS_TOKEN;
 
 /**
  * @author xiangfeng.xzc
@@ -65,7 +71,13 @@ public class MetricsHttpExporter {
      * @throws IOException
      */
     public void start() throws IOException {
+        final ExecutorService singleThreadPool = new ThreadPoolExecutor(1, 1, 0L,
+            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(10),
+            CommonUtil.getNamedThreadFactory("client-exporter-pool"),
+            new ThreadPoolExecutor.CallerRunsPolicy());
+
         httpServer = HttpServer.create(new InetSocketAddress(port), backlog);
+        httpServer.setExecutor(singleThreadPool);
         httpServer.createContext("/get", getHandler);
         // 测试用接口 清理掉数据
         httpServer.createContext("/clear", clearHandler);
@@ -87,24 +99,36 @@ public class MetricsHttpExporter {
                                                public void handle(HttpExchange exchange)
                                                                                         throws IOException {
                                                    try {
+                                                       if (!isAccessAllowed(exchange)) {
+                                                           sendErrResponse(exchange, 403,
+                                                               "Forbidden");
+                                                           return;
+                                                       }
+
                                                        // 解析参数
                                                        Set<Long> success = Collections.emptySet();
                                                        long newStep = controller.getStep();
                                                        int newSlotCount = controller.getSlotCount();
 
-                                                       for (NameValuePair nvp : parseParams(exchange)) {
-                                                           String name = nvp.getName();
-                                                           String value = nvp.getValue();
-                                                           if ("step".equalsIgnoreCase(name)) {
-                                                               newStep = Long.parseLong(value);
-                                                           } else if ("slotCount"
-                                                               .equalsIgnoreCase(name)) {
-                                                               newSlotCount = Integer
-                                                                   .parseInt(value);
-                                                           } else if ("success"
-                                                               .equalsIgnoreCase(name)) {
-                                                               success = parseCursors(value);
+                                                       try {
+                                                           for (NameValuePair nvp : parseParams(exchange)) {
+                                                               String name = nvp.getName();
+                                                               String value = nvp.getValue();
+                                                               if ("step".equalsIgnoreCase(name)) {
+                                                                   newStep = Long.parseLong(value);
+                                                               } else if ("slotCount"
+                                                                   .equalsIgnoreCase(name)) {
+                                                                   newSlotCount = Integer
+                                                                       .parseInt(value);
+                                                               } else if ("success"
+                                                                   .equalsIgnoreCase(name)) {
+                                                                   success = parseCursors(value);
+                                                               }
                                                            }
+                                                       } catch (NumberFormatException nfe) {
+                                                           sendErrResponse(exchange, 400,
+                                                               nfe.getMessage());
+                                                           return;
                                                        }
 
                                                        Object data = controller
@@ -132,6 +156,11 @@ public class MetricsHttpExporter {
                                                public void handle(HttpExchange exchange)
                                                                                         throws IOException {
                                                    try {
+                                                       if (!isAccessAllowed(exchange)) {
+                                                           sendErrResponse(exchange, 403,
+                                                               "Forbidden");
+                                                           return;
+                                                       }
                                                        controller.clear();
                                                        exchange.sendResponseHeaders(204, -1);
                                                    } finally {
@@ -139,6 +168,27 @@ public class MetricsHttpExporter {
                                                    }
                                                }
                                            };
+
+    private boolean isAccessAllowed(HttpExchange exchange) {
+        if (controller.getMetricConfig().containsKey(LOOKOUT_EXPORTER_ACCESS_TOKEN)) {
+            //check access token
+            String requestToken = exchange.getRequestHeaders().getFirst("X-Lookout-Token");
+            if (!StringUtils.equals(requestToken,
+                controller.getMetricConfig().getString(LOOKOUT_EXPORTER_ACCESS_TOKEN))) {
+
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void sendErrResponse(HttpExchange exchange, int httpErrorStatus, String errorMsg)
+                                                                                                    throws IOException {
+        byte[] data = errorMsg.getBytes();
+        exchange.sendResponseHeaders(httpErrorStatus, data.length);
+        exchange.getResponseBody().write(data);
+        exchange.getResponseBody().close();
+    }
 
     private static void sendResponse(HttpExchange exchange, Object bodyEntity) throws IOException {
         exchange.getResponseHeaders().set("Content-Type", "application/json;charset=utf-8");

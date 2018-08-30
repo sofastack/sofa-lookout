@@ -20,7 +20,7 @@ package com.alipay.lookout.api;
  * 一个可以手动调整的Clock实现, 常用于单元测试
  *
  * @author xiangfeng.xzc
- * @date 2018/7/27
+ * 2018/7/27
  */
 public class ManualClock implements Clock {
     private volatile long wallTime;

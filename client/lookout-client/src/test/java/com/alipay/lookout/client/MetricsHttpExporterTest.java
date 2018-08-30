@@ -23,7 +23,6 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.poller.Listener;
 import com.alipay.lookout.remote.report.poller.MetricsHttpExporter;
 import com.alipay.lookout.remote.report.poller.PollerController;
-import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -71,18 +70,18 @@ public class MetricsHttpExporterTest {
     @Test
     public void test() throws IOException, InterruptedException {
         LookoutConfig config = new LookoutConfig();
-        final LookoutRegistry lookoutRegistry = new LookoutRegistry(config);
+        final LookoutRegistry lookoutRegistry = new LookoutRegistry(Clock.SYSTEM, null, config,
+            null, 1000L);
         // 通常只会有一个LookoutRegistry
         final Collection<LookoutRegistry> lookoutRegistries = new ArrayList<LookoutRegistry>(1);
         lookoutRegistries.add(lookoutRegistry);
 
-        ResettableStepRegistry ssr = new ResettableStepRegistry(Clock.SYSTEM, config, 1000L);
         // 使用者需要自行构建该 PollerController
         // 能不能将逻辑做到 client 里?
 
         // Registry registry = client.getRegistry();
 
-        PollerController pc = new PollerController(ssr);
+        PollerController pc = new PollerController(lookoutRegistry);
         bind(pc, lookoutRegistries);
 
         MetricsHttpExporter e = new MetricsHttpExporter(pc);
