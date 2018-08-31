@@ -81,9 +81,11 @@ public interface Registry extends Iterable<Metric> {
 
     /**
      * Register a info instance
-     * @param id metric id
+     * @param id id metric id
      * @param info an info instance
-     * @return
+     * @param <I> info data
+     * @param <Y> info type
+     * @return info info
      */
     <I, Y extends Info<I>> Info info(Id id, Y info);
 
@@ -127,7 +129,8 @@ public interface Registry extends Iterable<Metric> {
      * if reaching the max number,null will be returned too.
      *
      * @param id metric id
-     * @return Instance of the metric or null if there is no match.
+     * @param <X> metric type
+     * @return X Instance of the metric or null if there is no match.
      */
     <X extends Metric> X get(Id id);
 

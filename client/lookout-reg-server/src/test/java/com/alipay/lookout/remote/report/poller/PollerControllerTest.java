@@ -18,8 +18,10 @@ package com.alipay.lookout.remote.report.poller;
 
 import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.core.config.LookoutConfig;
+import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.google.common.collect.Sets;
-
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -34,14 +36,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @date 2018/7/30
  */
 public class PollerControllerTest {
-    @Test
-    public void test() throws Exception {
+    static PollerController controller;
+
+    @BeforeClass
+    public static void init() {
         LookoutConfig config = new LookoutConfig();
-        ResettableStepRegistry r = new ResettableStepRegistry(Clock.SYSTEM, config, 1000L);
+        LookoutRegistry r = new LookoutRegistry(Clock.SYSTEM, null, config, null, 1000L);
 
         r.counter(r.createId("foo"));
 
-        PollerController controller = new PollerController(r, 10);
+        controller = new PollerController(r, 10);
+
+    }
+
+    @Test
+    public void test() throws Exception {
 
         try {
             Set<Long> success = new HashSet<Long>();
@@ -75,6 +84,10 @@ public class PollerControllerTest {
             controller.close();
         }
 
+    }
+
+    public void testGetConfig() {
+        Assert.assertNotNull(controller.getMetricConfig());
     }
 
     private Set<Long> extractCursors(List<Slot> data) {

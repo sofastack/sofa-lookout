@@ -18,8 +18,7 @@ package com.alipay.lookout.client;
 
 import com.alipay.lookout.api.Lookout;
 import com.alipay.lookout.api.MetricRegistry;
-import com.alipay.lookout.core.config.LookoutConfig;
-import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
+import com.alipay.lookout.remote.step.LookoutRegistry;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/10/4.
@@ -45,6 +44,13 @@ public class DefaultLookoutClient extends AbstractLookoutClient {
             registry.registerExtendedMetrics();
         }
         super.addRegistry(registry);
+        if (registry instanceof LookoutRegistry) {
+            try {
+                setMetricsHttpExporter(PollerUtils.exportHttp((LookoutRegistry) registry));
+            } catch (Exception e) {
+                logger.error("fail to start MetricsHttpExporter", e);
+            }
+        }
     }
 
     /**
@@ -55,16 +61,5 @@ public class DefaultLookoutClient extends AbstractLookoutClient {
         isAutoRegisterExtendedMetrics = true;
         //对已有registry补偿登记
         super.registerExtendedMetrics();
-    }
-
-    public synchronized void registerExporter(LookoutConfig config) {
-        try {
-            ResettableStepRegistry resettableStepRegistry = PollerUtils.exportHttp(config, this)
-                .getController().getRegistry();
-            resettableStepRegistry.registerExtendedMetrics();
-            super.addRegistry(resettableStepRegistry);
-        } catch (Exception e) {
-            logger.error("fail to start MetricsHttpExporter", e);
-        }
     }
 }

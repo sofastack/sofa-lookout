@@ -70,7 +70,7 @@ public final class TopUtil {
 
     public static TopGauger topGauger(final Registry registry, final Id id, final int maxNumber,
                                       final Order order) {
-        if (registry instanceof NoopRegistry) {
+        if (registry instanceof NoopRegistry || (id == NoopRegistry.INSTANCE.createId(null))) {
             return NoopTopGauger.INSTANCE;
         }
         Id key = id.withTag(TOP_NUM_TAG_KEY, String.valueOf(maxNumber));

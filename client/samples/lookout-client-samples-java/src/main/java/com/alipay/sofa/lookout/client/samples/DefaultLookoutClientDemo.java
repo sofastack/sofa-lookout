@@ -35,7 +35,9 @@ public class DefaultLookoutClientDemo {
         //构建一个全局的客户端实例
         final DefaultLookoutClient client = new DefaultLookoutClient("appName");
 
+        //主动上报型
         LookoutRegistry lookoutRegistry = new LookoutRegistry(new LookoutConfig());
+        //被动采集型
 
         //set common tag example
         lookoutRegistry.setCommonTag("instant", "machine-a");

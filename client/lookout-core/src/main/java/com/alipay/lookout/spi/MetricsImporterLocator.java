@@ -16,17 +16,34 @@
  */
 package com.alipay.lookout.spi;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/2/16.
  */
-public interface MetricsImporterLocator {
+public final class MetricsImporterLocator {
+    private static List<MetricsImporter> metricsImporters = null;
+
+    private MetricsImporterLocator() {
+    }
 
     /**
-     * locates all metric importers
+     * locates all metric importers (and locate only once)
      *
      * @return
      */
-    Collection<MetricsImporter> locate();
+    public static synchronized Collection<MetricsImporter> locate() {
+        if (metricsImporters == null) {
+            metricsImporters = new ArrayList<MetricsImporter>(3);
+            ServiceLoader<MetricsImporter> mis = ServiceLoader.load(MetricsImporter.class);
+            for (MetricsImporter metricsImporter : mis) {
+                //TODO Class String name duplication check
+                metricsImporters.add(metricsImporter);
+            }
+        }
+        return metricsImporters;
+    }
 }

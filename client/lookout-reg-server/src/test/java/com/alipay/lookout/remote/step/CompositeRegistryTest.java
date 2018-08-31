@@ -29,7 +29,6 @@ import com.alipay.lookout.common.LookoutConstants;
 import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.SchedulerPoller;
-import com.alipay.lookout.remote.report.poller.ResettableStepRegistry;
 
 import org.junit.Assert;
 import org.junit.Before;

@@ -26,7 +26,6 @@ import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.core.common.NewMetricFunction;
 import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.event.MetricRegistryListener;
-import com.alipay.lookout.spi.DefaultMetricsImporterLocator;
 import com.alipay.lookout.spi.MetricsImporter;
 import com.alipay.lookout.spi.MetricsImporterLocator;
 import org.apache.commons.configuration2.MapConfiguration;
@@ -71,8 +70,7 @@ public abstract class AbstractRegistry extends MetricRegistry {
 
     @Override
     public void registerExtendedMetrics() {
-        MetricsImporterLocator locator = new DefaultMetricsImporterLocator();
-        for (MetricsImporter metricsImporter : locator.locate()) {
+        for (MetricsImporter metricsImporter : MetricsImporterLocator.locate()) {
             metricsImporter.register(this);
         }
 

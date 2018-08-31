@@ -26,13 +26,14 @@ import com.alipay.lookout.os.utils.FileUtils;
 import com.alipay.lookout.os.utils.NumFormatUtils;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author wuqin
+ * @author kevin.luy@alipay.com
  * @version $Id: CpuUsageMetricsImporter.java, v 0.1 2017-03-18 下午5:19 wuqin Exp $$
  */
 public class CpuUsageMetricsImporter extends CachedMetricsImporter {
@@ -69,7 +70,6 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     *
      * @param filePath
      * @param timeout
      * @param timeoutUnit
@@ -79,10 +79,11 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
         this.filePath = filePath;
         this.cpuUsage = new float[CpuUsage.values().length];
         this.lastCpuInfo = new CpuInfo();
+        disable = !new File(filePath).exists();
     }
 
     @Override
-    public void register(Registry registry) {
+    protected void doRegister(Registry registry) {
         Id id = registry.createId("os.cpu");
         MixinMetric mixin = registry.mixinMetric(id);
 
@@ -147,7 +148,7 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
     protected void loadValues() {
         CpuInfo currentCpuInfo = collectCpuInfo();
         if (currentCpuInfo == null) {
-            logger.info("warning,collect cpu info failed!");
+            logger.debug("warning,collect cpu info failed!");
             lastCpuInfo = new CpuInfo();
             return;
         }
@@ -178,7 +179,6 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     *
      * @return
      */
     private CpuInfo collectCpuInfo() {
@@ -224,7 +224,7 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
                 return cpuInfo;
             }
         } catch (Exception e) {
-            logger.info("waring,can't parse text at /proc/stat", e.getMessage());
+            logger.info("warning,can't parse text at /proc/stat", e.getMessage());
         }
 
         return null;
