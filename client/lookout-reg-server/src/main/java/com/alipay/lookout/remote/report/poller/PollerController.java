@@ -240,6 +240,7 @@ public class PollerController implements Closeable {
      * @param newSlotCount
      */
     public synchronized void update(long newStep, int newSlotCount) {
+        Preconditions.checkArgument(newStep >= 0, "step must greater than 0");
         setSlotCount(newSlotCount);
         setStep(newStep);
         registry.setStep(newStep);
