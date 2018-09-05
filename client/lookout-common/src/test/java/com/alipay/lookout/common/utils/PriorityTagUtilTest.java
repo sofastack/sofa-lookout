@@ -19,6 +19,7 @@ package com.alipay.lookout.common.utils;
 import com.alipay.lookout.api.BasicTag;
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.api.Tag;
+import com.alipay.lookout.common.LookoutConstants;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,6 +38,15 @@ public class PriorityTagUtilTest {
         List<Tag> tags = new ArrayList<Tag>();
         tags.add(new BasicTag("k1", "v1"));
         tags.add(new BasicTag(TAG_PRIORITY_KEY, PRIORITY.HIGH.toString()));
+        Assert.assertEquals(PRIORITY.HIGH, PriorityTagUtil.resolve(tags));
+    }
+
+
+    @Test
+    public void testResolveHigh2() {
+        List<Tag> tags = new ArrayList<Tag>();
+        tags.add(new BasicTag("k1", "v1"));
+        tags.add(LookoutConstants.HIGH_PRIORITY_TAG);
         Assert.assertEquals(PRIORITY.HIGH, PriorityTagUtil.resolve(tags));
     }
 
