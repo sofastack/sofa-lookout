@@ -41,7 +41,6 @@ public class PriorityTagUtilTest {
         Assert.assertEquals(PRIORITY.HIGH, PriorityTagUtil.resolve(tags));
     }
 
-
     @Test
     public void testResolveHigh2() {
         List<Tag> tags = new ArrayList<Tag>();

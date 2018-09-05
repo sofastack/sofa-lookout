@@ -34,7 +34,8 @@ public class LookoutClientProperties {
     private int     agentServerPort              = -1;
 
     private long    pollingInterval              = -1l;                                    //mills
-
+    private long    exporterIdle                 = -1l;                                    //second
+    private boolean exporterEnable               = false;
     private int     maxMetricsNum                = DEFAULT_MAX_METRICS_NUM;
 
     private int     reportBatchSize              = DEFAULT_REPORT_BATCH_SIZE;
@@ -125,5 +126,21 @@ public class LookoutClientProperties {
 
     public void setPrometheusExporterServerPort(int prometheusExporterServerPort) {
         this.prometheusExporterServerPort = prometheusExporterServerPort;
+    }
+
+    public long getExporterIdle() {
+        return exporterIdle;
+    }
+
+    public void setExporterIdle(long exporterIdle) {
+        this.exporterIdle = exporterIdle;
+    }
+
+    public boolean isExporterEnable() {
+        return exporterEnable;
+    }
+
+    public void setExporterEnable(boolean exporterEnable) {
+        this.exporterEnable = exporterEnable;
     }
 }

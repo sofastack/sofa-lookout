@@ -119,7 +119,7 @@ public class PollerController implements Closeable {
         scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
             CommonUtil.getNamedThreadFactory("poller-controller"),
             new ThreadPoolExecutor.AbortPolicy());
-        idleSeconds = registry.getConfig().getInteger(LookoutConfig.POLLER_EXPORTER_IDLE_SECONDS,
+        idleSeconds = registry.getConfig().getInteger(LookoutConfig.LOOKOUT_EXPORTER_IDLE_SECONDS,
             DEFAULT_IDLE_SECONDS);
         update(registry.getCurrentStepMillis(), initSlotCount);
     }

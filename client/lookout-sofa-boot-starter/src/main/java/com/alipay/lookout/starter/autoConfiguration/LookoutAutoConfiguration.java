@@ -27,6 +27,7 @@ import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 import com.alipay.lookout.starter.LookoutClientProperties;
+import com.alipay.lookout.starter.support.MetricConfigCustomizer;
 import com.alipay.lookout.starter.support.reg.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,8 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
 
     @Autowired(required = false)
     private List<MetricObserver<LookoutMeasurement>> metricObservers;
+    @Autowired(required = false)
+    private List<MetricConfigCustomizer>             metricConfigCustomizers;
     private BeanFactory                              beanFactory;
 
     @Override
@@ -77,6 +80,11 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         Assert.notNull(appName, "spring.application.name can not be null!");
         LookoutConfig config = buildLookoutConfig(lookoutClientProperties);
         config.setProperty(APP_NAME, appName);
+        if (metricConfigCustomizers != null) {
+            for (MetricConfigCustomizer configCustomizer : metricConfigCustomizers) {
+                configCustomizer.customize(config);
+            }
+        }
         return config;
     }
 
@@ -191,6 +199,12 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
             lookoutConfig.setStepInterval(PRIORITY.NORMAL,
                 lookoutClientProperties.getPollingInterval());
         }
+        if (lookoutClientProperties.getExporterIdle() > 0) {
+            lookoutConfig.setProperty(LOOKOUT_EXPORTER_IDLE_SECONDS,
+                lookoutClientProperties.getExporterIdle());
+        }
+        lookoutConfig.setProperty(LOOKOUT_EXPORTER_ENABLE,
+            lookoutClientProperties.isExporterEnable());
         return lookoutConfig;
     }
 }
