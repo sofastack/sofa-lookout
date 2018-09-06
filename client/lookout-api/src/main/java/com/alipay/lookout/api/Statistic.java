@@ -37,6 +37,11 @@ public enum Statistic {
      */
     totalAmount,
 
+    /**
+     * distribution of the amounts recorded
+     */
+    distribution,
+
     //    /**
     //     * The sum of the squares of the amounts recorded.
     //     */

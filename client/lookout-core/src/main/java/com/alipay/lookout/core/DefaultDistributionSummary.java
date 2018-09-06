@@ -25,10 +25,12 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 final class DefaultDistributionSummary implements DistributionSummary {
 
-    private final Clock      clock;
-    private final Id         id;
-    private final AtomicLong count;
-    private final AtomicLong totalAmount;
+    private final Clock        clock;
+    private final Id           id;
+    private final AtomicLong   count;
+    private final AtomicLong   totalAmount;
+    private       long[]       buckets;
+    private       AtomicLong[] cumulativeCounts;
 
     DefaultDistributionSummary(Clock clock, Id id) {
         this.clock = clock;
@@ -47,14 +49,37 @@ final class DefaultDistributionSummary implements DistributionSummary {
         if (amount >= 0) {
             totalAmount.addAndGet(amount);
             count.incrementAndGet();
+            if (buckets != null) {
+                recordBucket(amount);
+            }
         }
+    }
+
+    private void recordBucket(long amount) {
+        int i = 0;
+        for (; i < buckets.length; ++i) {
+            if (amount < buckets[i]) {
+                break;
+            }
+        }
+        if (cumulativeCounts[i] == null) {
+            cumulativeCounts[i] = new AtomicLong(0);
+        }
+        cumulativeCounts[i].incrementAndGet();
     }
 
     @Override
     public Indicator measure() {
         long now = clock.wallTime();
-        return new Indicator(now, id).addMeasurement(Statistic.count.name(), count.get())
-            .addMeasurement(Statistic.count.name(), totalAmount.get());
+        Indicator indicator = new Indicator(now, id).addMeasurement(Statistic.count.name(), count.get())
+                .addMeasurement(Statistic.totalAmount.name(), totalAmount.get());
+        for (int i = 0; i < cumulativeCounts.length; i++) {
+            if (cumulativeCounts[i] != null) {
+                String bucketTag = i < buckets.length ? String.valueOf(buckets[i - 1]) : INFINITY;
+                indicator.addMeasurement(bucketTag, cumulativeCounts[i].get());
+            }
+        }
+        return indicator;
     }
 
     @Override
@@ -66,4 +91,11 @@ final class DefaultDistributionSummary implements DistributionSummary {
     public long totalAmount() {
         return totalAmount.get();
     }
+
+    @Override
+    public void enableBuckets(long[] buckets) {
+        this.buckets = buckets;
+        this.cumulativeCounts = new AtomicLong[buckets.length + 1];
+    }
+
 }
