@@ -16,8 +16,7 @@
  */
 package com.alipay.lookout.core;
 
-import com.alipay.lookout.api.DistributionSummary;
-import com.alipay.lookout.api.ManualClock;
+import com.alipay.lookout.api.*;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,4 +56,27 @@ public class DefaultDistributionSummaryTest {
         Assert.assertEquals(t.totalAmount(), 0L);
     }
 
+    @Test
+    public void testRecordBuckets() {
+        DefaultRegistry registry = new DefaultRegistry();
+        Id id = registry.createId("test").withTag("a", "1");
+        DistributionSummary t = registry.newDistributionSummary(id);
+        long[] buckets = new long[] {1, 2, 4, 8};
+        t.enableBuckets(buckets);
+        for (int i = 0; i < 16; i++) {
+            t.record(i);
+        }
+        for (long bucket : buckets) {
+            checkBucket(registry, id, String.valueOf(bucket), bucket - bucket / 2);
+        }
+        checkBucket(registry, id, DistributionSummary.INFINITY, 8);
+    }
+
+    private void checkBucket(DefaultRegistry registry, Id id, String bucket, long value) {
+        Id bucketId = id.withTag(DistributionSummary.BUCKET_TAG_NAME, bucket);
+        Metric metric = registry.get(bucketId);
+        Assert.assertTrue(metric instanceof Counter);
+        Counter counter = (Counter) metric;
+        Assert.assertEquals(value, counter.count());
+    }
 }

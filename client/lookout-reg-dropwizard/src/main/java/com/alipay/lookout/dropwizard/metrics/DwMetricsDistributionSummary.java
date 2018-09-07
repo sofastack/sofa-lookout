@@ -16,10 +16,7 @@
  */
 package com.alipay.lookout.dropwizard.metrics;
 
-import com.alipay.lookout.api.Clock;
-import com.alipay.lookout.api.DistributionSummary;
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Indicator;
+import com.alipay.lookout.api.*;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Snapshot;
 
@@ -67,6 +64,11 @@ class DwMetricsDistributionSummary implements DistributionSummary, DwMetricWrapp
     @Override
     public long totalAmount() {
         return totalAmount.get();
+    }
+
+    @Override
+    public void enableBuckets(long[] buckets) {
+
     }
 
     @Override

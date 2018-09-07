@@ -50,4 +50,9 @@ enum NoopDistributionSummary implements DistributionSummary {
     public long totalAmount() {
         return 0L;
     }
+
+    @Override
+    public void enableBuckets(long[] buckets) {
+
+    }
 }

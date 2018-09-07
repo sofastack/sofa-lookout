@@ -16,13 +16,7 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.ResettableStep;
-import com.alipay.lookout.api.Clock;
-import com.alipay.lookout.api.DistributionSummary;
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Indicator;
-import com.alipay.lookout.api.Measurement;
-import com.alipay.lookout.api.Statistic;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.step.StepLong;
 import com.alipay.lookout.step.StepValue;
 
@@ -31,7 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutDistributionSummary implements DistributionSummary, ResettableStep {
+public class LookoutDistributionSummary extends BucketDistributionSummary implements DistributionSummary, ResettableStep {
 
     private final Id       id;
     private final StepLong count;
@@ -83,12 +77,13 @@ public class LookoutDistributionSummary implements DistributionSummary, Resettab
             count.getCurrent().incrementAndGet();
             total.getCurrent().addAndGet(amount);
             refreshMax(max.getCurrent(), amount);
+            recordBucket(id, amount);
         }
     }
 
     private void refreshMax(AtomicLong maxValue, long v) {
         for (long max = maxValue.get(); (v > max && !maxValue.compareAndSet(max, v)); max = maxValue
-            .get()) {
+                .get()) {
         }
     }
 
@@ -101,4 +96,5 @@ public class LookoutDistributionSummary implements DistributionSummary, Resettab
     public long totalAmount() {
         return total.poll();
     }
+
 }
