@@ -26,7 +26,7 @@ public interface DistributionSummary extends Metric {
 
     String BUCKET_TAG_NAME = "_bucket";
 
-    String INFINITY = "+Inf";
+    String INFINITY        = "+Inf";
 
     /**
      * Updates the statistics with the specified amount.

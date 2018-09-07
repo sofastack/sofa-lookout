@@ -23,7 +23,8 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Distribution summary implementation for the default registry.
  */
-final class DefaultDistributionSummary extends BucketDistributionSummary implements DistributionSummary {
+final class DefaultDistributionSummary extends BucketDistributionSummary implements
+                                                                        DistributionSummary {
 
     private final Clock      clock;
     private final Id         id;
@@ -54,8 +55,8 @@ final class DefaultDistributionSummary extends BucketDistributionSummary impleme
     @Override
     public Indicator measure() {
         long now = clock.wallTime();
-        Indicator indicator = new Indicator(now, id).addMeasurement(Statistic.count.name(), count.get())
-                .addMeasurement(Statistic.totalAmount.name(), totalAmount.get());
+        Indicator indicator = new Indicator(now, id).addMeasurement(Statistic.count.name(),
+            count.get()).addMeasurement(Statistic.totalAmount.name(), totalAmount.get());
         return indicator;
     }
 

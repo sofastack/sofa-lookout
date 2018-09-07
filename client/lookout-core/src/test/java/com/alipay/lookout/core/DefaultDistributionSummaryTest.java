@@ -61,15 +61,16 @@ public class DefaultDistributionSummaryTest {
         DefaultRegistry registry = new DefaultRegistry();
         Id id = registry.createId("test").withTag("a", "1");
         DistributionSummary t = registry.newDistributionSummary(id);
-        long[] buckets = new long[] {1, 2, 4, 8};
+        long[] buckets = new long[] { 1, 2, 4, 8 };
         t.enableBuckets(buckets);
         for (int i = 0; i < 16; i++) {
             t.record(i);
         }
+        Id bucketId = registry.createId("test.buckets").withTag("a", "1");
         for (long bucket : buckets) {
-            checkBucket(registry, id, String.valueOf(bucket), bucket - bucket / 2);
+            checkBucket(registry, bucketId, String.valueOf(bucket), bucket - bucket / 2);
         }
-        checkBucket(registry, id, DistributionSummary.INFINITY, 8);
+        checkBucket(registry, bucketId, DistributionSummary.INFINITY, 8);
     }
 
     private void checkBucket(DefaultRegistry registry, Id id, String bucket, long value) {

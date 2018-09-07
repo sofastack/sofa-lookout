@@ -25,7 +25,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutDistributionSummary extends BucketDistributionSummary implements DistributionSummary, ResettableStep {
+public class LookoutDistributionSummary extends BucketDistributionSummary implements
+                                                                         DistributionSummary,
+                                                                         ResettableStep {
 
     private final Id       id;
     private final StepLong count;
@@ -83,7 +85,7 @@ public class LookoutDistributionSummary extends BucketDistributionSummary implem
 
     private void refreshMax(AtomicLong maxValue, long v) {
         for (long max = maxValue.get(); (v > max && !maxValue.compareAndSet(max, v)); max = maxValue
-                .get()) {
+            .get()) {
         }
     }
 

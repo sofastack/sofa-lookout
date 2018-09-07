@@ -31,12 +31,12 @@ import com.google.common.base.Preconditions;
  * Created by kevin.luy@alipay.com on 2017/3/26.
  */
 public class StepRegistry extends AbstractRegistry {
-    protected final Clock clock;                   //未对齐时间
+    protected final Clock   clock;                   //未对齐时间
 
     //for LookoutMixinMetric
     protected volatile long currentStepMillis = -1L;
 
-    private boolean proactive = true;
+    private boolean         proactive         = true;
 
     public StepRegistry(Clock clock, LookoutConfig config) {
         this(clock, config, -1L);
@@ -70,7 +70,8 @@ public class StepRegistry extends AbstractRegistry {
 
     @Override
     protected DistributionSummary newDistributionSummary(Id id) {
-        LookoutDistributionSummary distributionSummary = new LookoutDistributionSummary(id, clock, getStepMillis(id));
+        LookoutDistributionSummary distributionSummary = new LookoutDistributionSummary(id, clock,
+            getStepMillis(id));
         distributionSummary.setRegistry(this);
         return distributionSummary;
     }
@@ -94,7 +95,7 @@ public class StepRegistry extends AbstractRegistry {
         long stepSize = getStepMillis(id);
         //mixin 的 step registry ，mode 不需要切换了,因为有了 stepClock;
         return new LookoutMixinMetric(id, new StepRegistry(clock, getLookoutConfig(), stepSize),
-                stepClock(id));
+            stepClock(id));
     }
 
     @Override
