@@ -17,14 +17,12 @@
 package com.alipay.lookout.starter.support;
 
 import com.alipay.lookout.core.config.LookoutConfig;
-import com.alipay.lookout.core.config.MetricConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;

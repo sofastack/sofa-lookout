@@ -80,7 +80,7 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             registry.registerExtendedMetrics();
             super.addRegistry(registry);
             if (registry instanceof LookoutRegistry) {
-                if (!config.getBoolean(LOOKOUT_EXPORTER_ENABLE, false)) {
+                if (!lookoutConfig.getBoolean(LOOKOUT_EXPORTER_ENABLE, false)) {
                     return;
                 }
                 try {
