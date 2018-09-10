@@ -7,7 +7,7 @@
 
 [English Document](./README_EN.md)
 
-访问 [WIKI](https://github.com/alipay/sofa-lookout/wiki) 查看完整的文档使用指南。
+访问 [WIKI](http://www.sofastack.tech/sofa-lookout/docs/Home) 查看完整的文档使用指南。
 
 SOFALookout 是一个利用多维度的 metrics 对目标系统进行度量和监控的项目。SOFALookout 的多维度 metrics 参考[Metrics2.0 标准](http://metrics20.org/)。SOFALookout 项目分为客户端部分与服务器端部分。
 
