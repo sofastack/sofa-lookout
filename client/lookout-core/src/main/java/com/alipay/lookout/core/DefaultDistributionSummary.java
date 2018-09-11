@@ -23,8 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Distribution summary implementation for the default registry.
  */
-final class DefaultDistributionSummary extends BucketDistributionSummary implements
-                                                                        DistributionSummary {
+final class DefaultDistributionSummary implements DistributionSummary {
 
     private final Clock      clock;
     private final Id         id;
@@ -48,7 +47,6 @@ final class DefaultDistributionSummary extends BucketDistributionSummary impleme
         if (amount >= 0) {
             totalAmount.addAndGet(amount);
             count.incrementAndGet();
-            recordBucket(id, amount);
         }
     }
 
@@ -68,6 +66,11 @@ final class DefaultDistributionSummary extends BucketDistributionSummary impleme
     @Override
     public long totalAmount() {
         return totalAmount.get();
+    }
+
+    @Override
+    public void enableBuckets(long[] buckets) {
+
     }
 
 }

@@ -60,26 +60,22 @@ public class DefaultDistributionSummaryTest {
     public void testRecordBuckets() {
         DefaultRegistry registry = new DefaultRegistry();
         Id id = registry.createId("test").withTag("a", "1");
-        DistributionSummary t = registry.newDistributionSummary(id);
-        long[] buckets = new long[] {1, 2, 4, 8};
+        DistributionSummary t = registry.distributionSummary(id);
+        long[] buckets = new long[] { 1, 2, 4, 8 };
         t.enableBuckets(buckets);
         for (int i = 1; i <= 16; i++) {
             t.record(i);
         }
-        String[] tags = new String[] {"0-1", "1-2", "2-4", "4-8", "8-"};
-        Id bucketId = registry.createId("test.buckets").withTag("a", "1");
-        for (int i = 0; i < buckets.length; i++) {
-            long bucket = buckets[i];
-            checkBucket(registry, bucketId, tags[i], bucket - bucket / 2);
+        long sum = 0;
+        for (Metric metric : registry) {
+            if (metric.id().name().endsWith(".buckets")) {
+                for (Object o : metric.measure().measurements()) {
+                    Measurement<Long> m = (Measurement<Long>) o;
+                    sum += m.value();
+                }
+            }
         }
-        checkBucket(registry, bucketId, tags[tags.length - 1], 8);
+        Assert.assertEquals(16, sum);
     }
 
-    private void checkBucket(DefaultRegistry registry, Id id, String bucket, long value) {
-        Id bucketId = id.withTag(DistributionSummary.BUCKET_TAG_NAME, bucket);
-        Metric metric = registry.get(bucketId);
-        Assert.assertTrue(metric instanceof Counter);
-        Counter counter = (Counter) metric;
-        Assert.assertEquals(value, counter.count());
-    }
 }

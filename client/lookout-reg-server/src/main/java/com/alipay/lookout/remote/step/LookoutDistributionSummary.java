@@ -79,7 +79,7 @@ public class LookoutDistributionSummary extends BucketDistributionSummary implem
             count.getCurrent().incrementAndGet();
             total.getCurrent().addAndGet(amount);
             refreshMax(max.getCurrent(), amount);
-            recordBucket(id, amount);
+            recordBucket(amount);
         }
     }
 

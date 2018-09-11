@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.api;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -24,20 +25,17 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class BucketDistributionSummary implements DistributionSummary {
 
-    private Registry registry;
+    private long[]       buckets;
 
-    private long[] buckets;
-
-    public void setRegistry(Registry registry) {
-        this.registry = registry;
-    }
+    private AtomicLong[] counts;
 
     @Override
     public void enableBuckets(long[] buckets) {
         this.buckets = buckets;
+        this.counts = new AtomicLong[buckets.length + 1];
     }
 
-    protected void recordBucket(Id id, long amount) {
+    protected void recordBucket(long amount) {
         if (buckets == null) {
             return;
         }
@@ -47,13 +45,10 @@ public abstract class BucketDistributionSummary implements DistributionSummary {
                 break;
             }
         }
-        String bucketTag = getBucketTag(i);
-        Id bucketId = registry.createId(id.name() + "." + Statistic.buckets, id.tags()).withTag(
-                BUCKET_TAG_NAME, bucketTag);
-        Counter counter = registry.counter(bucketId);
-        if (counter != null) {
-            counter.inc();
+        if (counts[i] == null) {
+            counts[i] = new AtomicLong();
         }
+        counts[i].incrementAndGet();
     }
 
     private String getBucketTag(int i) {
@@ -66,4 +61,67 @@ public abstract class BucketDistributionSummary implements DistributionSummary {
         return buckets[i - 1] + "-" + buckets[i];
     }
 
+    public Iterator<Metric> bucketMetricIterator() {
+        return new Iterator<Metric>() {
+
+            int            i = 0;
+
+            private Metric metric;
+
+            @Override
+            public boolean hasNext() {
+                if (metric == null) {
+                    while (i < counts.length) {
+                        if (counts[i] != null) {
+                            metric = new BucketMetric(i);
+                            i++;
+                            break;
+                        } else {
+                            i++;
+                        }
+                    }
+                }
+                return metric != null;
+            }
+
+            @Override
+            public Metric next() {
+                Metric m = metric;
+                metric = null;
+                return m;
+            }
+
+            @Override
+            public void remove() {
+
+            }
+        };
+    }
+
+    class BucketMetric implements Metric {
+
+        Id  id;
+
+        int i;
+
+        public BucketMetric(int i) {
+            this.i = i;
+            String bucketTag = getBucketTag(i);
+            id = BucketDistributionSummary.this.id().withTag(BUCKET_TAG_NAME, bucketTag);
+        }
+
+        @Override
+        public Id id() {
+            return id;
+        }
+
+        @Override
+        public Indicator measure() {
+            long now = Clock.SYSTEM.wallTime();
+            Indicator indicator = new Indicator(now, id).addMeasurement(Statistic.buckets.name(),
+                counts[i].getAndSet(0));
+            return indicator;
+        }
+
+    }
 }

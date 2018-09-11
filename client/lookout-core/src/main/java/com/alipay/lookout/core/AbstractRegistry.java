@@ -47,6 +47,7 @@ public abstract class AbstractRegistry extends MetricRegistry {
                                                                   .getLogger(getClass());
 
     private final ConcurrentHashMap<Id, Metric> metrics;
+
     private MetricConfig                        config;
 
     private final List<MetricRegistryListener>  listeners     = new CopyOnWriteArrayList<MetricRegistryListener>();
@@ -180,8 +181,7 @@ public abstract class AbstractRegistry extends MetricRegistry {
     }
 
     /**
-     * only support gauge or info now!
-     * for not singleton and temp life;
+     * only support gauge or info now! for not singleton and temp life;
      *
      * @param id
      */
@@ -386,8 +386,8 @@ public abstract class AbstractRegistry extends MetricRegistry {
     protected abstract Metric newMixinMetric(Id id);
 
     /**
-     * Adds a {@link MetricRegistryListener} to a collection of listeners that will be notified on
-     * metric creation.  Listeners will be notified in the order in which they are added.
+     * Adds a {@link MetricRegistryListener} to a collection of listeners that will be notified on metric creation.  Listeners will be
+     * notified in the order in which they are added.
      *
      * @param listener the listener that will be notified
      */

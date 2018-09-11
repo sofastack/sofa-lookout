@@ -66,4 +66,10 @@ public final class Indicator<T> {
     public Collection<Measurement<T>> measurements() {
         return measurements;
     }
+
+    @Override
+    public String toString() {
+        return "Indicator{" + "timestamp=" + timestamp + ", id=" + id + ", measurements="
+               + measurements + '}';
+    }
 }

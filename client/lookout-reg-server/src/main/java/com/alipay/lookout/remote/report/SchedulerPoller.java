@@ -16,10 +16,7 @@
  */
 package com.alipay.lookout.remote.report;
 
-import com.alipay.lookout.api.Gauge;
-import com.alipay.lookout.api.Metric;
-import com.alipay.lookout.api.MetricRegistry;
-import com.alipay.lookout.api.PRIORITY;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.common.Assert;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
@@ -225,10 +222,50 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     }
 
     private Iterator<Metric> getMetricsIterator(PRIORITY priority) {
+        Iterator<Metric> iterator;
         if (priority == null) {
-            return registry().iterator();
+            iterator = registry().iterator();
+        } else {
+            iterator = priorityMetricsCache.getMetricByPriority(priority).iterator();
         }
-        return priorityMetricsCache.getMetricByPriority(priority).iterator();
+        return new MetricIterator(iterator);
+    }
+
+    class MetricIterator implements Iterator<Metric> {
+
+        private final Iterator<Metric> iterator;
+
+        private Iterator<Metric>       bucketCounterIterator;
+
+        public MetricIterator(Iterator<Metric> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (bucketCounterIterator != null && bucketCounterIterator.hasNext()) {
+                return true;
+            }
+            return iterator.hasNext();
+        }
+
+        @Override
+        public Metric next() {
+            if (bucketCounterIterator != null && bucketCounterIterator.hasNext()) {
+                return bucketCounterIterator.next();
+            }
+            Metric metric = iterator.next();
+            if (metric instanceof BucketDistributionSummary) {
+                BucketDistributionSummary summary = (BucketDistributionSummary) metric;
+                bucketCounterIterator = summary.bucketMetricIterator();
+            }
+            return metric;
+        }
+
+        @Override
+        public void remove() {
+
+        }
     }
 
 }

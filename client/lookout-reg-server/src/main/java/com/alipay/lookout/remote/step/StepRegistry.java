@@ -72,7 +72,6 @@ public class StepRegistry extends AbstractRegistry {
     protected DistributionSummary newDistributionSummary(Id id) {
         LookoutDistributionSummary distributionSummary = new LookoutDistributionSummary(id, clock,
             getStepMillis(id));
-        distributionSummary.setRegistry(this);
         return distributionSummary;
     }
 
