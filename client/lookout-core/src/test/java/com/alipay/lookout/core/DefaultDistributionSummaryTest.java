@@ -62,7 +62,7 @@ public class DefaultDistributionSummaryTest {
         Id id = registry.createId("test").withTag("a", "1");
         DistributionSummary t = registry.distributionSummary(id);
         long[] buckets = new long[] { 1, 2, 4, 8 };
-        t.enableBuckets(buckets);
+        t.buckets(buckets);
         for (int i = 1; i <= 16; i++) {
             t.record(i);
         }

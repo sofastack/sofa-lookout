@@ -52,7 +52,7 @@ enum NoopDistributionSummary implements DistributionSummary {
     }
 
     @Override
-    public void enableBuckets(long[] buckets) {
+    public void buckets(long[] buckets) {
 
     }
 }

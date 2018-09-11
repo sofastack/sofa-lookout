@@ -67,7 +67,7 @@ class DwMetricsDistributionSummary implements DistributionSummary, DwMetricWrapp
     }
 
     @Override
-    public void enableBuckets(long[] buckets) {
+    public void buckets(long[] buckets) {
 
     }
 

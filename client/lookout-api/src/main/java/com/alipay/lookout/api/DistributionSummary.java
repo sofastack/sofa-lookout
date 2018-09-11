@@ -22,7 +22,7 @@ package com.alipay.lookout.api;
  * hitting and http server.
  * Created by kevin.luy@alipay.com on 2017/2/14.
  */
-public interface DistributionSummary extends Metric {
+public interface DistributionSummary extends BucketCounter {
 
     String BUCKET_TAG_NAME = "_bucket";
 
@@ -47,7 +47,5 @@ public interface DistributionSummary extends Metric {
      * @return total
      */
     long totalAmount();
-
-    void enableBuckets(long[] buckets);
 
 }

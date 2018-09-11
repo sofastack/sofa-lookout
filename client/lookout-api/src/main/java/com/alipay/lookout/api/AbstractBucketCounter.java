@@ -23,14 +23,15 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author zhangzhuo
  * @version $Id: BucketDistributionSummary.java, v 0.1 2018年09月07日 上午11:47 zhangzhuo Exp $
  */
-public abstract class BucketDistributionSummary implements DistributionSummary {
+public abstract class AbstractBucketCounter implements Metric {
 
-    private long[]       buckets;
+    private static final String BUCKET_TAG_NAME = "_bucket";
 
-    private AtomicLong[] counts;
+    private long[]              buckets;
 
-    @Override
-    public void enableBuckets(long[] buckets) {
+    private AtomicLong[]        counts;
+
+    public void buckets(long[] buckets) {
         this.buckets = buckets;
         this.counts = new AtomicLong[buckets.length + 1];
     }
@@ -107,7 +108,7 @@ public abstract class BucketDistributionSummary implements DistributionSummary {
         public BucketMetric(int i) {
             this.i = i;
             String bucketTag = getBucketTag(i);
-            id = BucketDistributionSummary.this.id().withTag(BUCKET_TAG_NAME, bucketTag);
+            id = AbstractBucketCounter.this.id().withTag(BUCKET_TAG_NAME, bucketTag);
         }
 
         @Override

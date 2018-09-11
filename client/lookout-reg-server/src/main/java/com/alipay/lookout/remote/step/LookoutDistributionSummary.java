@@ -25,9 +25,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutDistributionSummary extends BucketDistributionSummary implements
-                                                                         DistributionSummary,
-                                                                         ResettableStep {
+public class LookoutDistributionSummary extends AbstractBucketCounter implements
+                                                                     DistributionSummary,
+                                                                     ResettableStep {
 
     private final Id       id;
     private final StepLong count;

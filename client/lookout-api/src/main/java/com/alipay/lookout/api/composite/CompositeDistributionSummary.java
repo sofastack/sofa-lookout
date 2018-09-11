@@ -19,7 +19,6 @@ package com.alipay.lookout.api.composite;
 import com.alipay.lookout.api.DistributionSummary;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Registry;
-import com.alipay.lookout.api.Timer;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -53,9 +52,9 @@ class CompositeDistributionSummary extends CompositeMetric implements Distributi
     }
 
     @Override
-    public void enableBuckets(long[] buckets) {
+    public void buckets(long[] buckets) {
         for (Registry r : registries) {
-            getMetric(r).enableBuckets(buckets);
+            getMetric(r).buckets(buckets);
         }
     }
 

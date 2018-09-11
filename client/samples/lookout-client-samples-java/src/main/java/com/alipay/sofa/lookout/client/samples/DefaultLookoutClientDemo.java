@@ -16,10 +16,7 @@
  */
 package com.alipay.sofa.lookout.client.samples;
 
-import com.alipay.lookout.api.Counter;
-import com.alipay.lookout.api.DistributionSummary;
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Registry;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.client.DefaultLookoutClient;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
@@ -29,6 +26,7 @@ import com.alipay.lookout.report.MetricObserver;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by kevin.luy@alipay.com on 2018/4/23.
@@ -70,13 +68,13 @@ public class DefaultLookoutClientDemo {
 
     private static void testDistributionSummary(Registry registry) {
         Id id = registry.createId("rpc_latency_distribution").withTag("service", "orderService");
-        final DistributionSummary summary = registry.distributionSummary(id);
-        summary.enableBuckets(new long[] {10, 100, 1000, 10000});
+        final Timer timer = registry.timer(id);
+        timer.buckets(new long[] {10, 100, 1000, 10000});
         new Thread(new Runnable() {
             public void run() {
                 final Random random = new Random();
                 for (int i = 0; i < 10000; i++) {
-                    summary.record(random.nextInt(200));
+                    timer.record(random.nextInt(200),TimeUnit.MILLISECONDS);
                     try {
                         Thread.sleep(1);
                     } catch (InterruptedException e) {
@@ -89,7 +87,7 @@ public class DefaultLookoutClientDemo {
             public void run() {
                 final Random random = new Random();
                 for (int i = 0; i < 1000; i++) {
-                    summary.record(random.nextInt(2000));
+                    timer.record(random.nextInt(2000),TimeUnit.MILLISECONDS);
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
@@ -102,7 +100,7 @@ public class DefaultLookoutClientDemo {
             public void run() {
                 final Random random = new Random();
                 for (int i = 0; i < 100; i++) {
-                    summary.record(random.nextInt(20000));
+                    timer.record(random.nextInt(20000),TimeUnit.MILLISECONDS);
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {

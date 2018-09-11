@@ -255,9 +255,9 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
                 return bucketCounterIterator.next();
             }
             Metric metric = iterator.next();
-            if (metric instanceof BucketDistributionSummary) {
-                BucketDistributionSummary summary = (BucketDistributionSummary) metric;
-                bucketCounterIterator = summary.bucketMetricIterator();
+            if (metric instanceof AbstractBucketCounter) {
+                AbstractBucketCounter bucketCounter = (AbstractBucketCounter) metric;
+                bucketCounterIterator = bucketCounter.bucketMetricIterator();
             }
             return metric;
         }
