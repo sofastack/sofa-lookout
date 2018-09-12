@@ -50,7 +50,7 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT = "lookout.prometheus.exporter.server.port";
     // default value
     public static final int                         DEFAULT_WEB_SERVER_PORT                 = 8083;
-    public static final int                         DEFAULT_HTTP_EXPORTER_PORT                 = 19399;
+    public static final int                         DEFAULT_HTTP_EXPORTER_PORT              = 19399;
     public static final int                         DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT = 9494;
     public static final String                      APP_NAME                                = "app.name";
     public static int                               DEFAULT_REPORT_BATCH_SIZE               = 1700;
