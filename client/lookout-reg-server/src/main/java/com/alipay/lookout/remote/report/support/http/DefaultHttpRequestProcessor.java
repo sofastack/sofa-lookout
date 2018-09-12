@@ -21,7 +21,6 @@ import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.utils.NetworkUtil;
 import com.alipay.lookout.remote.report.support.ReportDecider;
-
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
@@ -30,8 +29,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
@@ -147,12 +147,11 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
             return httpClientCache;
         }
         if (httpClientInitialized.compareAndSet(false, true)) {
-            PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
-            connManager.setDefaultMaxPerRoute(3);
-            connManager.setMaxTotal(20);
+            BasicHttpClientConnectionManager connManager = new BasicHttpClientConnectionManager();
             connManager.closeIdleConnections(60, TimeUnit.SECONDS);
             httpClientCache = HttpClientBuilder.create().setConnectionManager(connManager)
-                .disableAutomaticRetries().setUserAgent(CLIENT_VERSION).build();
+                .setRetryHandler(new DefaultHttpRequestRetryHandler(1, false))
+                .setUserAgent(CLIENT_VERSION).build();
             return httpClientCache;
         }
         return null; //发生并发初始化情况;
