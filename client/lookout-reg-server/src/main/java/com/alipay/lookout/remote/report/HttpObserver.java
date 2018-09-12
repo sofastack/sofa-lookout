@@ -161,7 +161,8 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             if (!enableReportAlreadyLogged) {
                 enableReportAlreadyLogged = true;
                 Address agentAddress = addressService.getAgentServerHost();
-                logger.info(">>: enable {} report! agent:{}",lookoutConfig.getString(LookoutConfig.APP_NAME), agentAddress);
+                logger.info(">>: enable {} report! agent:{}",
+                    lookoutConfig.getString(LookoutConfig.APP_NAME), agentAddress);
             }
         } else {
             if (enableReportAlreadyLogged) {
