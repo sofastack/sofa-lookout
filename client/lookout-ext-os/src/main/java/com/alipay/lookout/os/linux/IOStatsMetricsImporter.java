@@ -96,7 +96,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     protected void doRegister(Registry registry) {
         for (Map.Entry<String, Float[]> entry : statsByDevice.entrySet()) {
             final String device = entry.getKey();
-            Id id = registry.createId("os.io.stats." + device);
+            Id id = registry.createId("os.io.stats");
             id = id.withTag("device", device);
             MixinMetric mixin = registry.mixinMetric(id);
 
