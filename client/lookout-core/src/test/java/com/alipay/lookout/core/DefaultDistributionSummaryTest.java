@@ -21,6 +21,8 @@ import com.alipay.lookout.api.*;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Iterator;
+
 public class DefaultDistributionSummaryTest {
 
     private final ManualClock clock = new ManualClock();
@@ -59,20 +61,31 @@ public class DefaultDistributionSummaryTest {
     @Test
     public void testRecordBuckets() {
         DefaultRegistry registry = new DefaultRegistry();
-        Id id = registry.createId("test").withTag("a", "1");
-        DistributionSummary t = registry.distributionSummary(id);
-        long[] buckets = new long[] { 1, 2, 4, 8 };
-        t.buckets(buckets);
+        final Id id = registry.createId("test").withTag("a", "1");
+        AbstractBucketCounter counter = new AbstractBucketCounter() {
+            @Override
+            public Id id() {
+                return id;
+            }
+
+            @Override
+            public Indicator measure() {
+                return null;
+            }
+        };
+        long[] buckets = new long[] {1, 2, 4, 8};
+        counter.buckets(buckets);
         for (int i = 1; i <= 16; i++) {
-            t.record(i);
+            counter.recordBucket(i);
         }
         long sum = 0;
-        for (Metric metric : registry) {
-            if (metric.id().name().endsWith(".buckets")) {
-                for (Object o : metric.measure().measurements()) {
-                    Measurement<Long> m = (Measurement<Long>) o;
-                    sum += m.value();
-                }
+        Iterator<Metric> iterator = counter.bucketMetricIterator();
+        while (iterator.hasNext()) {
+            Metric metric = iterator.next();
+            for (Object o : metric.measure().measurements()) {
+                Measurement<Long> m = (Measurement<Long>) o;
+                Assert.assertEquals("buckets", m.name());
+                sum += m.value();
             }
         }
         Assert.assertEquals(16, sum);

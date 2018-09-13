@@ -36,7 +36,7 @@ public abstract class AbstractBucketCounter implements Metric {
         this.counts = new AtomicLong[buckets.length + 1];
     }
 
-    protected void recordBucket(long amount) {
+    public void recordBucket(long amount) {
         if (buckets == null) {
             return;
         }
