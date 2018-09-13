@@ -73,7 +73,7 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
     private volatile long              silentTime                   = -1;
     private AtomicReference<Address>   addressHolder                = new AtomicReference<Address>();
     private volatile long              addressLastModifiedTime      = -1;
-    private long                       expiredTime                  = 65000;                                           //65s
+    private long                       expiredTime                  = 65000;                                          //65s
 
     private AddressService             addressService;
     private final Map<String, String>  commonMetadata               = new HashMap<String, String>();
