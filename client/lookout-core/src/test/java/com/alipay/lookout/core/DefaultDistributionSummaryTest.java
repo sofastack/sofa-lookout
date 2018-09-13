@@ -73,15 +73,13 @@ public class DefaultDistributionSummaryTest {
                 return null;
             }
         };
-        long[] buckets = new long[] {1, 2, 4, 8};
+        long[] buckets = new long[] { 1, 2, 4, 8 };
         counter.buckets(buckets);
         for (int i = 1; i <= 16; i++) {
             counter.recordBucket(i);
         }
         long sum = 0;
-        Iterator<Metric> iterator = counter.bucketMetricIterator();
-        while (iterator.hasNext()) {
-            Metric metric = iterator.next();
+        for (Metric metric : counter) {
             for (Object o : metric.measure().measurements()) {
                 Measurement<Long> m = (Measurement<Long>) o;
                 Assert.assertEquals("buckets", m.name());

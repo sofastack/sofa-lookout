@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author zhangzhuo
  * @version $Id: BucketDistributionSummary.java, v 0.1 2018年09月07日 上午11:47 zhangzhuo Exp $
  */
-public abstract class AbstractBucketCounter implements Metric {
+public abstract class AbstractBucketCounter implements Metric, Iterable<Metric> {
 
     private static final String BUCKET_TAG_NAME = "_bucket";
 
@@ -62,7 +62,7 @@ public abstract class AbstractBucketCounter implements Metric {
         return buckets[i - 1] + "-" + buckets[i];
     }
 
-    public Iterator<Metric> bucketMetricIterator() {
+    public Iterator<Metric> iterator() {
         return new Iterator<Metric>() {
 
             int            i = 0;
