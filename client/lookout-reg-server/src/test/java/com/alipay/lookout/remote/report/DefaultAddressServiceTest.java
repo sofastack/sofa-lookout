@@ -59,4 +59,15 @@ public class DefaultAddressServiceTest {
         Assert.assertTrue(address.ip().startsWith("127.0.0"));
     }
 
+    @Test
+    public void testSetAddressListFromVip() {
+        AddressService addressService = new DefaultAddressService();
+        Assert.assertFalse(addressService.isAgentServerExisted());
+        addressService.setAgentServerVip("127.0.0.1, 127.0.0.2");
+        Assert.assertTrue(addressService.isAgentServerExisted());
+        Address address = addressService.getAgentServerHost();
+        System.out.println(address);
+        Assert.assertTrue(address.ip().startsWith("127.0.0"));
+    }
+
 }
