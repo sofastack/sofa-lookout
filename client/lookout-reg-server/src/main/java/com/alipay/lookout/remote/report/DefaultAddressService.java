@@ -18,6 +18,9 @@ package com.alipay.lookout.remote.report;
 
 import com.google.common.base.Strings;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 默认静态地址服务
  * with vip and test model url
@@ -27,6 +30,7 @@ public class DefaultAddressService implements AddressService {
 
     private Address agentServerVip;
     private Address agentTestUrl;
+    private List<Address> addressList;
 
     public DefaultAddressService() {
     }
@@ -51,15 +55,31 @@ public class DefaultAddressService implements AddressService {
         }
     }
 
+    public void setAddressList(List<String> addresses) {
+        if (addresses == null || addresses.isEmpty()) {
+            return;
+        }
+        List<Address> addressList = new ArrayList<Address>();
+        for (String addressStr : addresses) {
+            addressList.add(new Address(addressStr));
+        }
+        this.addressList = addressList;
+    }
+
     @Override
     public boolean isAgentServerExisted() {
-        return agentTestUrl != null || agentServerVip != null;
+        return agentTestUrl != null || (addressList != null && !addressList.isEmpty()) || agentServerVip != null;
     }
 
     @Override
     public Address getAgentServerHost() {
         if (agentTestUrl != null) {
             return agentTestUrl;
+        }
+        List<Address> addrList = addressList;
+        if (addrList != null && !addrList.isEmpty()) {
+            int randomNodeIdx = randomThreadLocal.get().nextInt(addrList.size());
+            return addrList.get(randomNodeIdx);
         }
         return agentServerVip;
     }

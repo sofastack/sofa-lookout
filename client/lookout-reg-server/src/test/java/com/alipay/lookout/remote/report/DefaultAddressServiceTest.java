@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.remote.report;
 
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,6 +45,18 @@ public class DefaultAddressServiceTest {
         Assert.assertTrue(addressService.isAgentServerExisted());
         Address address = addressService.getAgentServerHost();
         Assert.assertNotNull(address);
+    }
+
+
+    @Test
+    public void testSetAddressList() {
+        AddressService addressService = new DefaultAddressService();
+        Assert.assertFalse(addressService.isAgentServerExisted());
+        ((DefaultAddressService) addressService).setAddressList(Lists.newArrayList("127.0.0.1", "127.0.0.2"));
+        Assert.assertTrue(addressService.isAgentServerExisted());
+        Address address = addressService.getAgentServerHost();
+        System.out.println(address);
+        Assert.assertTrue(address.ip().startsWith("127.0.0"));
     }
 
 }

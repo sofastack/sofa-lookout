@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout;
 
+import com.alipay.lookout.remote.report.Address;
 import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -31,12 +32,28 @@ public class MockHttpRequestProcessor implements HttpRequestProcessor {
     public Object request;
 
     @Override
-    public void sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException {
-        this.request = httpPost;
+    public boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata)
+                                                                                   throws IOException {
+        return false;
     }
 
     @Override
-    public void sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException {
+    public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException {
+        return false;
+    }
 
+    @Override
+    public void addCommonHeader(String headerName, String headerValue) {
+
+    }
+
+    @Override
+    public boolean stillSilent() {
+        return false;
+    }
+
+    @Override
+    public Address getAvailableAddress() {
+        return new Address("localhost", 8080);
     }
 }

@@ -35,8 +35,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.MetricsDropwizardAutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -57,7 +55,6 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
 @AutoConfigureOrder(-100)
 @Configuration
 @EnableConfigurationProperties(LookoutClientProperties.class)
-@AutoConfigureBefore({ MetricsDropwizardAutoConfiguration.class })
 public class LookoutAutoConfiguration implements BeanFactoryAware {
     private static final Logger                      logger = LoggerFactory
                                                                 .getLogger(LookoutAutoConfiguration.class);

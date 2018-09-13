@@ -30,7 +30,6 @@ public class LookoutClientProperties {
     private boolean enable                       = true;
 
     private String  agentHostAddress;
-
     private int     agentServerPort              = -1;
 
     private long    pollingInterval              = -1l;                                    //mills

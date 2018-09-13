@@ -21,13 +21,10 @@ import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
-import com.alipay.lookout.remote.report.support.ReportDecider;
 import com.alipay.lookout.remote.report.support.http.DefaultHttpRequestProcessor;
 import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
 import com.alipay.lookout.report.MetricObserver;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpGet;
@@ -43,21 +40,9 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
-import static com.alipay.lookout.core.config.LookoutConfig.DEFAULT_REPORT_BATCH_SIZE;
-import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AGENT_HOST_ADDRESS;
-import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AGENT_SERVER_PORT;
-import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AGENT_TEST_URL;
-import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_AUTOPOLL_ENABLE;
-import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_REPORT_BATCH_SIZE;
-import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_REPORT_COMPRESSION_THRESHOLD;
+import static com.alipay.lookout.core.config.LookoutConfig.*;
 
 /**
  * 将数据push到lookout-gateway
@@ -75,15 +60,9 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
 
     private static final char          MSG_SPLITOR                = '\t';
     private final AddressService       addressService;
-
-    AtomicInteger                      warningTimes               = new AtomicInteger(0);
-
     private final LookoutConfig        lookoutConfig;
 
     private final HttpRequestProcessor httpRequestProcessor;
-    private final ReportDecider        reportDecider;
-
-    private final Map<String, String>  commonMetadata             = new HashMap<String, String>();
 
     private int                        innerAgentPort             = -1;
 
@@ -94,20 +73,17 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     private Registry                   reg;
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService) {
-        this(lookoutConfig, addrService, null, new ReportDecider());
+        this(lookoutConfig, addrService, null);
+    }
+
+    public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry) {
+        this(lookoutConfig, addrService, registry, new DefaultHttpRequestProcessor(addrService));
     }
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry,
-                        ReportDecider reportDecider) {
-        this(lookoutConfig, addrService, registry, reportDecider, new DefaultHttpRequestProcessor(
-            reportDecider));
-    }
-
-    public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry,
-                        ReportDecider reportDecider, HttpRequestProcessor requestProcessor) {
+                        HttpRequestProcessor requestProcessor) {
         Preconditions.checkNotNull(requestProcessor, "HttpRequestProcessor is required!");
         this.lookoutConfig = lookoutConfig;
-        this.reportDecider = reportDecider;
         this.httpRequestProcessor = requestProcessor;
         addressService = addrService;
         addressService.setAgentServerVip(lookoutConfig.getString(LOOKOUT_AGENT_HOST_ADDRESS));
@@ -115,10 +91,10 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             System.getProperty(LOOKOUT_AGENT_TEST_URL)));
         //inner port
         innerAgentPort = lookoutConfig.getInt(LOOKOUT_AGENT_SERVER_PORT, -1);
-
         //add common metadatas
         if (lookoutConfig.containsKey(LookoutConfig.APP_NAME)) {
-            commonMetadata.put(APP_HEADER_NAME, lookoutConfig.getString(LookoutConfig.APP_NAME));
+            httpRequestProcessor.addCommonHeader(APP_HEADER_NAME,
+                lookoutConfig.getString(LookoutConfig.APP_NAME));
         }
         this.reg = registry;
     }
@@ -134,19 +110,13 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
      */
     @Override
     public boolean isEnable() {
-        if (!reportDecider.isPassed()) {
-            if (reportDecider.stillSilent()) {
-                logger.debug("observer is disable temporarily cause by agent silent order.");
-                return false;
-            }
-            // ask agent ?
-            Address agentAddress = addressService.getAgentServerHost();
-            if (!isAgentAddressEmpty(agentAddress)) {
-                sendHttpDataSilently(
-                    new HttpGet(String.format(AGENT_URL_PATTERN, agentAddress.ip(),
-                        agentAddress.port())), commonMetadata);
-                return false;//下次再重新询问是否passed
-            }
+        if (httpRequestProcessor.stillSilent()) {
+            logger.debug("observer is disable temporarily cause by agent silent command.");
+            return false;
+        }
+        Address address = httpRequestProcessor.getAvailableAddress();
+        if (address == null) {
+            return false;//下次再重新询问是否passed
         }
 
         boolean enable = addressService.isAgentServerExisted()
@@ -160,9 +130,8 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             //enable alread logged ? skip this condition.
             if (!enableReportAlreadyLogged) {
                 enableReportAlreadyLogged = true;
-                Address agentAddress = addressService.getAgentServerHost();
                 logger.info(">>: enable {} report! agent:{}",
-                    lookoutConfig.getString(LookoutConfig.APP_NAME), agentAddress);
+                    lookoutConfig.getString(LookoutConfig.APP_NAME), address);
             }
         } else {
             if (enableReportAlreadyLogged) {
@@ -185,17 +154,17 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         if (measures.isEmpty()) {
             return;
         }
-        metadata.putAll(commonMetadata);
-        logger.debug(">> metrics:\n{}\n", measures.toString());
+        Address address = httpRequestProcessor.getAvailableAddress();
+        if (address == null) {
+            logger.debug("## no gateway address found, drop metrics:\n{}\n", measures.toString());
+            return;
+        }
+        logger.debug(">> send metrics to {}:\n{}\n", address, measures.toString());
         List<List<LookoutMeasurement>> batches = getBatches(measures,
             lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
         for (List<LookoutMeasurement> batch : batches) {
-            reportBatch(batch, metadata);
+            reportBatch(batch, metadata, address);
         }
-    }
-
-    private boolean isAgentAddressEmpty(Address agentAddress) {
-        return agentAddress == null || Strings.isNullOrEmpty(agentAddress.ip());
     }
 
     /**
@@ -217,28 +186,13 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         return batches;
     }
 
-    private void reportBatch(List<LookoutMeasurement> measures, Map<String, String> metadata) {
-        Address agentAddress = addressService.getAgentServerHost();
-        if (isAgentAddressEmpty(agentAddress)) {
-            //防止日志过多
-            if (warningTimes.get() < 5) {
-                logger
-                    .warn(">>WARNING: lookout report fail! cause by :agent-host-address is required!");
-                warningTimes.incrementAndGet();
-            }
-            return;//空地址，就不报告了.
-        }
-        //如果有汇报地址
-        if (warningTimes.get() > 0) {
-            warningTimes.getAndSet(0);
-            logger.info("agent-host-address is found again!");
-        }
-
+    private void reportBatch(List<LookoutMeasurement> measures, Map<String, String> metadata,
+                             Address address) {
         String text = buildReportText(measures);
         if (measures.size() < lookoutConfig.getInt(LOOKOUT_REPORT_COMPRESSION_THRESHOLD, 100)) {
-            report2Agent(agentAddress, text, metadata);
+            report2Agent(address, text, metadata);
         } else {
-            reportSnappy2Agent(agentAddress, text, metadata);
+            reportSnappy2Agent(address, text, metadata);
         }
         //  Response response = httpClient.newCall(request).execute();
         //  String date = response.header("Date");
@@ -298,7 +252,6 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
                 logger.info(">>WARNING: unSupport http request Type:{}", httpRequest);
             }
         } catch (Throwable e) {
-            reportDecider.markUnpassed();
             if (e instanceof UnknownHostException || e instanceof ConnectException) {
                 addressService.clearAddressCache();
                 logger.info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest.toString(),

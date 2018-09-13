@@ -21,12 +21,7 @@ import com.alipay.lookout.common.utils.ClassUtil;
 import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
-import com.alipay.lookout.remote.report.AddressService;
-import com.alipay.lookout.remote.report.DefaultAddressService;
-import com.alipay.lookout.remote.report.HttpObserver;
-import com.alipay.lookout.remote.report.MetricObserverMeasurementsFilter;
-import com.alipay.lookout.remote.report.SchedulerPoller;
-import com.alipay.lookout.remote.report.support.ReportDecider;
+import com.alipay.lookout.remote.report.*;
 import com.alipay.lookout.report.MetricObserver;
 
 import java.util.Collection;
@@ -61,7 +56,7 @@ public final class LookoutRegistry extends ResettableStepRegistry implements Com
         super(clock, config, currentStep);
         if (observer == null) {
             observer = new HttpObserver(config, addressService == null ? getAddressService(config)
-                : addressService, this, new ReportDecider());
+                : addressService, this);
         }
         addMetricObserver(observer);
         this.poller = new SchedulerPoller(this, config, metricObserverComposite);
