@@ -50,21 +50,21 @@ import java.util.Map;
  * Created by kevin.luy@alipay.com on 2017/2/7.
  */
 public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
-    private final Logger               logger               = LookoutLoggerFactory
-                                                                .getLogger(SchedulerPoller.class);
-    private ScheduledService           scheduler;
+    private final Logger logger = LookoutLoggerFactory
+            .getLogger(SchedulerPoller.class);
+    private ScheduledService scheduler;
 
     //====>config
-    private final boolean              enabled              = true;
-    private MetricObserver             metricObserver;
-    private final LookoutConfig        config;
-    private final int                  numThreads           = 3;
+    private final boolean enabled = true;
+    private MetricObserver metricObserver;
+    private final LookoutConfig config;
+    private final int numThreads = 3;
 
-    private CompositeRegistry          compositeRegistry;
-    private ReScheduleSupport          reScheduleSupport;
+    private CompositeRegistry compositeRegistry;
+    private ReScheduleSupport reScheduleSupport;
     private final PriorityMetricsCache priorityMetricsCache = new PriorityMetricsCache();
 
-    public static final String         PRIORITY_NAME        = "pri";
+    public static final String PRIORITY_NAME = "pri";
 
     public SchedulerPoller(MetricRegistry observerableRegistry, LookoutConfig config,
                            MetricObserver observer) {
@@ -141,7 +141,7 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
             scheduler.shutdown();
             scheduler = null;
             logger
-                .info("stopped collecting metrics every {}ms", config.stepMillis(PRIORITY.NORMAL));
+                    .info("stopped collecting metrics every {}ms", config.stepMillis(PRIORITY.NORMAL));
         } else {
             logger.warn("registry stopped, but was never started");
         }
@@ -174,12 +174,8 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
             Map<String, String> metadata = Maps.newHashMap();
             metadata.put(PRIORITY_NAME, priority.name());
             List<LookoutMeasurement> measurements = getMeasurements(priority, metricFilter);
-            try {
-                observer.update(measurements, metadata);
-            } finally {
-                logger.debug("send {} metrics to remote server. metrics:\n{}", measurements.size(),
-                    measurements.toString());
-            }
+            logger.debug("collect {} metrics", measurements.size());
+            observer.update(measurements, metadata);
         }
     }
 
@@ -202,7 +198,7 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
                     continue;
                 }
                 if (!((PollableInfoWrapper) metric).isAutoPolledAllowed(config
-                    .stepMillis(PRIORITY.NORMAL))) {
+                        .stepMillis(PRIORITY.NORMAL))) {
                     continue;
                 }
             }
@@ -217,9 +213,9 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
             }
             //deal with a metric
             lookoutMeasurements.add(LookoutMeasurement
-                .from(metric,
-                    (registry() instanceof CommonTagsAccessor) ? (CommonTagsAccessor) registry()
-                        : null));
+                    .from(metric,
+                            (registry() instanceof CommonTagsAccessor) ? (CommonTagsAccessor) registry()
+                                    : null));
         }
         return lookoutMeasurements;
     }

@@ -29,7 +29,7 @@ import java.util.List;
  * Created by kevin.luy@alipay.com on 2017/5/31.
  */
 public class DefaultAddressService implements AddressService {
-    private Address agentTestUrl;
+    private Address       agentTestUrl;
     private List<Address> addressList;
 
     public DefaultAddressService() {

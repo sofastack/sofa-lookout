@@ -73,7 +73,7 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
     private volatile long              silentTime                   = -1;
     private AtomicReference<Address>   addressHolder                = new AtomicReference<Address>();
     private volatile long              addressLastModifiedTime      = -1;
-    private long                       expiredTime                  = 120000;                                         //2min
+    private long                       expiredTime                  = 65000;                                           //65s
 
     private AddressService             addressService;
     private final Map<String, String>  commonMetadata               = new HashMap<String, String>();
@@ -126,7 +126,7 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
                 addressHolder.compareAndSet(oldOne, newOne);
             }
             addressLastModifiedTime = System.currentTimeMillis();
-            logger.debug("change gateway address ,from {} to {} .",oldOne,newOne);
+            logger.debug("change gateway address ,from {} to {} .", oldOne, newOne);
 
             return;
         } catch (Throwable e) {
@@ -164,7 +164,7 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
                         handleErrorResponse(response, httpGet);
                         return false;
                     } else {//success
-                        logger.debug(">> check lookout gateway ok.{}", httpGet.toString());
+                        logger.debug("check lookout gateway ok.{}", httpGet.toString());
                     }
                 } finally {
                     EntityUtils.consumeQuietly(response.getEntity());
@@ -197,7 +197,7 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
                                 .inc();
                             return false;
                         } else {//success
-                            logger.debug(">> report to lookout gateway ok.{}", httpPost.toString());
+                            logger.debug("<< report to lookout gateway ok.{}", httpPost.toString());
                         }
                     } finally {
                         EntityUtils.consumeQuietly(response.getEntity());

@@ -24,11 +24,11 @@ import java.util.Random;
  */
 public interface AddressService {
     ThreadLocal<Random> randomThreadLocal = new ThreadLocal<Random>() {
-        @Override
-        protected Random initialValue() {
-            return new Random();
-        }
-    };
+                                              @Override
+                                              protected Random initialValue() {
+                                                  return new Random();
+                                              }
+                                          };
 
     /**
      * set a agentTestUrl,优先与动态发现的地址
