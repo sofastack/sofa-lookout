@@ -58,35 +58,4 @@ public class DefaultDistributionSummaryTest {
         Assert.assertEquals(t.totalAmount(), 0L);
     }
 
-    @Test
-    public void testRecordBuckets() {
-        DefaultRegistry registry = new DefaultRegistry();
-        final Id id = registry.createId("test").withTag("a", "1");
-        AbstractBucketCounter counter = new AbstractBucketCounter() {
-            @Override
-            public Id id() {
-                return id;
-            }
-
-            @Override
-            public Indicator measure() {
-                return null;
-            }
-        };
-        long[] buckets = new long[] { 1, 2, 4, 8 };
-        counter.buckets(buckets);
-        for (int i = 1; i <= 16; i++) {
-            counter.recordBucket(i);
-        }
-        long sum = 0;
-        for (Metric metric : counter) {
-            for (Object o : metric.measure().measurements()) {
-                Measurement<Long> m = (Measurement<Long>) o;
-                Assert.assertEquals("buckets", m.name());
-                sum += m.value();
-            }
-        }
-        Assert.assertEquals(16, sum);
-    }
-
 }

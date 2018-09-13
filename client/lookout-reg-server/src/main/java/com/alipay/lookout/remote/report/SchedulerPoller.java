@@ -28,6 +28,7 @@ import com.alipay.lookout.core.InfoWrapper;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.jdk8.Function;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.step.LookoutBucketCounter;
 import com.alipay.lookout.remote.step.PollableInfoWrapper;
 import com.alipay.lookout.report.AbstractPoller;
 import com.alipay.lookout.report.MetricObserver;
@@ -255,8 +256,8 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
                 return bucketCounterIterator.next();
             }
             Metric metric = iterator.next();
-            if (metric instanceof AbstractBucketCounter) {
-                AbstractBucketCounter bucketCounter = (AbstractBucketCounter) metric;
+            if (metric instanceof LookoutBucketCounter) {
+                LookoutBucketCounter bucketCounter = (LookoutBucketCounter) metric;
                 bucketCounterIterator = bucketCounter.iterator();
             }
             return metric;

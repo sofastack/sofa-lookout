@@ -25,9 +25,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutDistributionSummary extends AbstractBucketCounter implements
-                                                                     DistributionSummary,
-                                                                     ResettableStep {
+public class LookoutDistributionSummary extends LookoutBucketCounter implements
+                                                                    DistributionSummary,
+                                                                    ResettableStep {
 
     private final Id       id;
     private final StepLong count;
@@ -35,6 +35,7 @@ public class LookoutDistributionSummary extends AbstractBucketCounter implements
     private final StepLong max;
 
     LookoutDistributionSummary(Id id, Clock clock, long step) {
+        super(clock, step);
         this.id = id;
         this.count = new StepLong(0L, clock, step);
         this.total = new StepLong(0L, clock, step);
@@ -68,6 +69,7 @@ public class LookoutDistributionSummary extends AbstractBucketCounter implements
 
     @Override
     public void setStep(long step) {
+        super.setStep(step);
         count.setStep(step);
         total.setStep(step);
         max.setStep(step);

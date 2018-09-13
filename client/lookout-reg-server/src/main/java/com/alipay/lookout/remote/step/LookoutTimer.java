@@ -26,15 +26,15 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-class LookoutTimer extends AbstractBucketCounter implements Timer, ResettableStep {
+class LookoutTimer extends LookoutBucketCounter implements Timer, ResettableStep {
 
     private final Id       id;
-    private final Clock    clock;
     private final StepLong count;
     private final StepLong total;
     private final StepLong max;
 
     LookoutTimer(Id id, Clock clock, long step) {
+        super(clock, step);
         this.id = id;
         this.clock = clock;
         this.count = new StepLong(0L, clock, step);
@@ -44,6 +44,7 @@ class LookoutTimer extends AbstractBucketCounter implements Timer, ResettableSte
 
     @Override
     public void setStep(long step) {
+        super.setStep(step);
         count.setStep(step);
         total.setStep(step);
         max.setStep(step);

@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.api;
+package com.alipay.lookout.remote.step;
+
+import com.alipay.lookout.api.*;
 
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,13 +25,31 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author zhangzhuo
  * @version $Id: BucketDistributionSummary.java, v 0.1 2018年09月07日 上午11:47 zhangzhuo Exp $
  */
-public abstract class AbstractBucketCounter implements Metric, Iterable<Metric> {
+public abstract class LookoutBucketCounter implements Metric, Iterable<Metric> {
 
-    private static final String BUCKET_TAG_NAME = "_bucket";
+    private static final String   BUCKET_TAG_NAME = "_bucket";
 
-    private long[]              buckets;
+    protected Clock               clock;
 
-    private AtomicLong[]        counts;
+    private long                  step;
+
+    private long[]                buckets;
+
+    private volatile AtomicLong[] counts;
+
+    private volatile AtomicLong[] prevCounts;
+
+    private final AtomicLong      lastInitPos;
+
+    public LookoutBucketCounter(Clock clock, long step) {
+        this.clock = clock;
+        this.step = step;
+        lastInitPos = new AtomicLong(clock.wallTime() / step);
+    }
+
+    public void setStep(long step) {
+        this.step = step;
+    }
 
     public void buckets(long[] buckets) {
         this.buckets = buckets;
@@ -62,7 +82,25 @@ public abstract class AbstractBucketCounter implements Metric, Iterable<Metric> 
         return buckets[i - 1] + "-" + buckets[i];
     }
 
+    private void roll() {
+        final long stepTime = clock.wallTime() / step;
+        final long lastInit = lastInitPos.get();
+        // 如果正好到达下一个步长区间，则并发竞争成功的线程做实际更新；
+        if (lastInit < stepTime && lastInitPos.compareAndSet(lastInit, stepTime)) {
+            // 每次取出当前值，并设置初始值重新开始新一轮计数；
+            if (lastInit == stepTime - 1) {
+                prevCounts = counts;
+            } else {
+                prevCounts = null;
+            }
+            counts = new AtomicLong[buckets.length + 1];
+        }
+    }
+
     public Iterator<Metric> iterator() {
+
+        roll();
+
         return new Iterator<Metric>() {
 
             int            i = 0;
@@ -71,9 +109,12 @@ public abstract class AbstractBucketCounter implements Metric, Iterable<Metric> 
 
             @Override
             public boolean hasNext() {
+                if (prevCounts == null) {
+                    return false;
+                }
                 if (metric == null) {
-                    while (i < counts.length) {
-                        if (counts[i] != null) {
+                    while (i < prevCounts.length) {
+                        if (prevCounts[i] != null) {
                             metric = new BucketMetric(i);
                             i++;
                             break;
@@ -94,21 +135,20 @@ public abstract class AbstractBucketCounter implements Metric, Iterable<Metric> 
 
             @Override
             public void remove() {
-
             }
         };
     }
 
     class BucketMetric implements Metric {
 
-        Id  id;
+        Id   id;
 
-        int i;
+        long count;
 
         public BucketMetric(int i) {
-            this.i = i;
             String bucketTag = getBucketTag(i);
-            id = AbstractBucketCounter.this.id().withTag(BUCKET_TAG_NAME, bucketTag);
+            id = LookoutBucketCounter.this.id().withTag(BUCKET_TAG_NAME, bucketTag);
+            this.count = prevCounts[i].get();
         }
 
         @Override
@@ -120,7 +160,7 @@ public abstract class AbstractBucketCounter implements Metric, Iterable<Metric> 
         public Indicator measure() {
             long now = Clock.SYSTEM.wallTime();
             Indicator indicator = new Indicator(now, id).addMeasurement(Statistic.buckets.name(),
-                counts[i].getAndSet(0));
+                count);
             return indicator;
         }
 
