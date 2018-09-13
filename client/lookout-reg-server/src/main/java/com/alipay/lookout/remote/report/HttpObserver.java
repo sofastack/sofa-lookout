@@ -48,28 +48,28 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
  * Created by kevin.luy@alipay.com on 2017/2/7.
  */
 public class HttpObserver implements MetricObserver<LookoutMeasurement> {
-    private static final Logger logger = LookoutLoggerFactory
-            .getLogger(HttpObserver.class);
-    static final String APP_HEADER_NAME = "app";
-    public static final String UTF_8 = "utf-8";
-    static final String AGENT_URL_PATTERN = "http://%s:%d/datas";
-    public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
-    public static final String SNAPPY = "snappy";
-    static final String TEXT_MEDIATYPE = "text/plain";
+    private static final Logger        logger                     = LookoutLoggerFactory
+                                                                      .getLogger(HttpObserver.class);
+    static final String                APP_HEADER_NAME            = "app";
+    public static final String         UTF_8                      = "utf-8";
+    static final String                AGENT_URL_PATTERN          = "http://%s:%d/datas";
+    public static final String         APPLICATION_OCTET_STREAM   = "application/octet-stream";
+    public static final String         SNAPPY                     = "snappy";
+    static final String                TEXT_MEDIATYPE             = "text/plain";
 
-    private static final char MSG_SPLITOR = '\t';
-    private final AddressService addressService;
-    private final LookoutConfig lookoutConfig;
+    private static final char          MSG_SPLITOR                = '\t';
+    private final AddressService       addressService;
+    private final LookoutConfig        lookoutConfig;
 
     private final HttpRequestProcessor httpRequestProcessor;
 
-    private int innerAgentPort = -1;
+    private int                        innerAgentPort             = -1;
 
     //anti log repeatly, mark it
-    private volatile boolean enableReportAlreadyLogged = false;
-    private volatile boolean disableReportAlreadyLogged = false;
+    private volatile boolean           enableReportAlreadyLogged  = false;
+    private volatile boolean           disableReportAlreadyLogged = false;
 
-    private Registry reg;
+    private Registry                   reg;
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService) {
         this(lookoutConfig, addrService, null);
@@ -87,13 +87,13 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         addressService = addrService;
         addressService.setAgentServerVip(lookoutConfig.getString(LOOKOUT_AGENT_HOST_ADDRESS));
         addressService.setAgentTestUrl(lookoutConfig.getString(LOOKOUT_AGENT_TEST_URL,
-                System.getProperty(LOOKOUT_AGENT_TEST_URL)));
+            System.getProperty(LOOKOUT_AGENT_TEST_URL)));
         //inner port
         innerAgentPort = lookoutConfig.getInt(LOOKOUT_AGENT_SERVER_PORT, -1);
         //add common metadatas
         if (lookoutConfig.containsKey(LookoutConfig.APP_NAME)) {
             httpRequestProcessor.addCommonHeader(APP_HEADER_NAME,
-                    lookoutConfig.getString(LookoutConfig.APP_NAME));
+                lookoutConfig.getString(LookoutConfig.APP_NAME));
         }
         this.reg = registry;
     }
@@ -119,7 +119,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         }
 
         boolean enable = addressService.isAgentServerExisted()
-                && lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true);
+                         && lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true);
 
         if (enable) {
             if (disableReportAlreadyLogged) {
@@ -130,7 +130,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             if (!enableReportAlreadyLogged) {
                 enableReportAlreadyLogged = true;
                 logger.info(">>: enable {} report! agent:{}",
-                        lookoutConfig.getString(LookoutConfig.APP_NAME), address);
+                    lookoutConfig.getString(LookoutConfig.APP_NAME), address);
             }
         } else {
             if (enableReportAlreadyLogged) {
@@ -139,9 +139,9 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             if (!disableReportAlreadyLogged) {
                 disableReportAlreadyLogged = true;
                 logger.info(
-                        ">>WARNING: disable report! agent existed:{},lookout.autopoll.enable:{}",
-                        addressService.isAgentServerExisted(),
-                        lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true));
+                    ">>WARNING: disable report! agent existed:{},lookout.autopoll.enable:{}",
+                    addressService.isAgentServerExisted(),
+                    lookoutConfig.getBoolean(LOOKOUT_AUTOPOLL_ENABLE, true));
             }
         }
 
@@ -160,7 +160,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         }
         logger.debug(">> send metrics to {}:\n{}\n", address, measures.toString());
         List<List<LookoutMeasurement>> batches = getBatches(measures,
-                lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
+            lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
         for (List<LookoutMeasurement> batch : batches) {
             reportBatch(batch, metadata, address);
         }
@@ -240,15 +240,15 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         try {
             if (httpRequest instanceof HttpPost) {
                 registry().counter(
-                        registry().createId("lookout.client.report.count").withTag("mtd", "post"))
-                        .inc();
+                    registry().createId("lookout.client.report.count").withTag("mtd", "post"))
+                    .inc();
                 httpRequestProcessor.sendPostRequest((HttpPost) httpRequest, metadata);
             }
-//            else if (httpRequest instanceof HttpGet) {
-//                registry().counter(
-//                    registry().createId("lookout.client.report.count").withTag("mtd", "get")).inc();
-//                httpRequestProcessor.sendGetRequest((HttpGet) httpRequest, metadata);
-//            }
+            //            else if (httpRequest instanceof HttpGet) {
+            //                registry().counter(
+            //                    registry().createId("lookout.client.report.count").withTag("mtd", "get")).inc();
+            //                httpRequestProcessor.sendGetRequest((HttpGet) httpRequest, metadata);
+            //            }
             else {
                 logger.info(">>WARNING: unSupport http request Type:{}", httpRequest);
             }
@@ -256,21 +256,21 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             if (e instanceof UnknownHostException || e instanceof ConnectException) {
                 addressService.clearAddressCache();
                 logger.info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest.toString(),
-                        e.getMessage());
+                    e.getMessage());
             } else if (e instanceof SocketTimeoutException) {
                 registry().counter(
-                        registry().createId("lookout.client.report.fail.count").withTag("err",
-                                "socket_timeout")).inc();
+                    registry().createId("lookout.client.report.fail.count").withTag("err",
+                        "socket_timeout")).inc();
             } else {
                 registry().counter(registry().createId("lookout.client.report.fail.count")).inc();
             }
             logger.info(">>WARNING: lookout agent:{} fail!cause:{}", httpRequest.toString(),
-                    e.getMessage());
+                e.getMessage());
         }
     }
 
     String buildRealAgentServerURL(Address agentAddress) {
         return String.format(AGENT_URL_PATTERN, agentAddress.ip(),
-                innerAgentPort > 0 ? innerAgentPort : agentAddress.port());
+            innerAgentPort > 0 ? innerAgentPort : agentAddress.port());
     }
 }
