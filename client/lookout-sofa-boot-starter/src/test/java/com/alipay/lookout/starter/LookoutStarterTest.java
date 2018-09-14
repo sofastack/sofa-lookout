@@ -57,7 +57,7 @@ public class LookoutStarterTest {
     private CounterService counterService;
 
     @After
-    public  void close() throws IOException {
+    public void close() throws IOException {
         CompositeRegistry reg = (CompositeRegistry) registry;
         for (Registry r : reg.getRegistries()) {
             if (r instanceof PrometheusRegistry) {

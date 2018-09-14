@@ -48,11 +48,11 @@ public class MetricConfigCustomizerTest {
     @Autowired
     LookoutConfig lookoutConfig;
     @Autowired
-    Registry reg;
+    Registry      reg;
 
     @After
     public void close() throws IOException {
-        for (Registry r : ((CompositeRegistry)reg).getRegistries()) {
+        for (Registry r : ((CompositeRegistry) reg).getRegistries()) {
             if (r instanceof PrometheusRegistry) {
                 ((PrometheusRegistry) r).close();
             }
