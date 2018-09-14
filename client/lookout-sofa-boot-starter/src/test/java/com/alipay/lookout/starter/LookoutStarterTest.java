@@ -18,14 +18,13 @@ package com.alipay.lookout.starter;
 
 import com.alipay.lookout.api.Gauge;
 import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Lookout;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.api.composite.MixinMetric;
 import com.alipay.lookout.dropwizard.metrics.DropWizardMetricsRegistry;
 import com.alipay.lookout.reg.prometheus.PrometheusRegistry;
 import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,9 +56,9 @@ public class LookoutStarterTest {
     @Autowired
     private CounterService counterService;
 
-    @AfterClass
-    public static void close() throws IOException {
-        CompositeRegistry reg = (CompositeRegistry) Lookout.registry();
+    @After
+    public  void close() throws IOException {
+        CompositeRegistry reg = (CompositeRegistry) registry;
         for (Registry r : reg.getRegistries()) {
             if (r instanceof PrometheusRegistry) {
                 ((PrometheusRegistry) r).close();

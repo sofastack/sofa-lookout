@@ -16,12 +16,11 @@
  */
 package com.alipay.lookout.starter.support;
 
-import com.alipay.lookout.api.Lookout;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.reg.prometheus.PrometheusRegistry;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,15 +47,18 @@ public class MetricConfigCustomizerTest {
 
     @Autowired
     LookoutConfig lookoutConfig;
-    @AfterClass
-    public static void close() throws IOException {
-        CompositeRegistry reg = (CompositeRegistry) Lookout.registry();
-        for (Registry r : reg.getRegistries()) {
+    @Autowired
+    Registry reg;
+
+    @After
+    public void close() throws IOException {
+        for (Registry r : ((CompositeRegistry)reg).getRegistries()) {
             if (r instanceof PrometheusRegistry) {
                 ((PrometheusRegistry) r).close();
             }
         }
     }
+
     @Test
     public void testMetricConfigCustomizer() {
         Assert.assertEquals("testbb", lookoutConfig.getString("testaa"));
