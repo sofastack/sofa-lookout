@@ -33,7 +33,8 @@ public class DefaultAddressServiceTest {
         addressService.setAgentTestUrl("100.12.1.12");
         Assert.assertTrue(addressService.isAgentServerExisted());
         Address address = addressService.getAgentServerHost();
-        Assert.assertNotNull(address);
+
+        Assert.assertEquals(address, ((DefaultAddressService) addressService).getAgentTestUrl());
 
     }
 
@@ -68,6 +69,7 @@ public class DefaultAddressServiceTest {
         Address address = addressService.getAgentServerHost();
         System.out.println(address);
         Assert.assertTrue(address.ip().startsWith("127.0.0"));
+        Assert.assertEquals(2, ((DefaultAddressService) addressService).getAddressList().size());
     }
 
 }

@@ -60,4 +60,5 @@ public class HttpRequestProcessorTest {
         Mockito.when(statusLine.getStatusCode()).thenReturn(status);
         return response;
     }
+
 }

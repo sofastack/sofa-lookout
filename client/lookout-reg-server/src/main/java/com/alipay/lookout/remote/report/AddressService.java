@@ -53,6 +53,7 @@ public interface AddressService {
      */
     Address getAgentServerHost();
 
+    @Deprecated
     void clearAddressCache();
 
 }

@@ -104,7 +104,7 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
     @Override
     public boolean sendPostRequest(final HttpPost httpPost, Map<String, String> metadata)
                                                                                          throws IOException {
-        if (PRIORITY.LOW.name().equalsIgnoreCase(metadata.get(PRIORITY_NAME))
+        if (metadata != null && PRIORITY.LOW.name().equalsIgnoreCase(metadata.get(PRIORITY_NAME))
             && clearIdleConnectionsTask != null) {
             clearIdleConnectionsTask.run();
         }

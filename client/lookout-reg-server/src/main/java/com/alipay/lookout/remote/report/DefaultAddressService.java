@@ -39,7 +39,6 @@ public class DefaultAddressService implements AddressService {
     }
 
     //  cache,for a connection keep alive & reuse;
-
     public void clearAddressCache() {
     }
 
@@ -71,6 +70,14 @@ public class DefaultAddressService implements AddressService {
             addressList.add(new Address(addressStr.trim()));
         }
         this.addressList = addressList;
+    }
+
+    protected Address getAgentTestUrl() {
+        return agentTestUrl;
+    }
+
+    protected List<Address> getAddressList() {
+        return addressList;
     }
 
     @Override
