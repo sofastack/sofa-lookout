@@ -374,5 +374,6 @@ public class PollerController implements Closeable {
             this.scheduledExecutorService.shutdown();
             this.scheduledExecutorService = null;
         }
+        registry.destroy();
     }
 }

@@ -89,6 +89,7 @@ public class MetricsHttpExporter {
             httpServer.stop(5);
             httpServer = null;
         }
+        getController().close();
     }
 
     /**
