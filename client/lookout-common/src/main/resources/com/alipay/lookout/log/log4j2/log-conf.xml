@@ -35,17 +35,6 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="ANTEVENTCONTEXT-APPENDER" fileName="${LOOKOUT_LOG_PATH}/lookout/ant-biz-stat.log" append="true"
-                     filePattern="${LOOKOUT_LOG_PATH}/lookout/ant-biz-stat-%d{yyyy-MM-dd}.log">
-            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout charset="${LOOKOUT_FILE_ENCODING}">
-                <pattern>%d %-5p %-32t - %m%n</pattern>
-            </PatternLayout>
-            <Policies>
-                <!-- 按天分日志文件:重要的是 filePattern 配置到按照天 -->
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-            </Policies>
-        </RollingFile>
 
     </appenders>
 
@@ -54,10 +43,5 @@
             <appender-ref ref="ROOT-APPENDER"/>
             <appender-ref ref="ERROR-APPENDER"/>
         </root>
-
-        <logger name="ANTEVENTCONTEXT-LOG" value="INFO" additivity="false">
-            <appender-ref ref="ANTEVENTCONTEXT-APPENDER"/>
-            <appender-ref ref="ERROR-APPENDER" />
-        </logger>
     </loggers>
 </configuration>

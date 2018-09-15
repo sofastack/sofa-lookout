@@ -29,16 +29,16 @@ import java.util.concurrent.atomic.AtomicReference;
  * Created by kevin.luy@alipay.com on 2018/9/14.
  */
 public abstract class ReportDecider implements HttpRequestProcessor {
-    private static final Logger      logger                  = LookoutLoggerFactory
-                                                                 .getLogger(ReportDecider.class);
+    private static final Logger logger = LookoutLoggerFactory
+            .getLogger(ReportDecider.class);
 
     //静默期，一般是得到agent特殊提示，从当前到silentTime这段时间不要再尝试汇报了.
-    private volatile long            silentTime              = -1;
-    private AtomicReference<Address> addressHolder           = new AtomicReference<Address>();
-    private volatile long            addressLastModifiedTime = -1;
-    private long                     expiredTime             = 65000;                            //65s
+    private volatile long silentTime = -1;
+    private AtomicReference<Address> addressHolder = new AtomicReference<Address>();
+    private volatile long addressLastModifiedTime = -1;
+    private long expiredTime = 65000;                            //65s
 
-    private AddressService           addressService;
+    private AddressService addressService;
 
     public ReportDecider(AddressService addressService) {
         this.addressService = addressService;
@@ -84,7 +84,7 @@ public abstract class ReportDecider implements HttpRequestProcessor {
         //check new address
         try {
             boolean ok = sendGetRequest(
-                new HttpGet(String.format("http://%s:%d/datas", newOne.ip(), newOne.port())), null);
+                    new HttpGet(String.format("http://%s:%d/datas", newOne.ip(), newOne.port())), null);
             if (!ok) {
                 return;
             }
@@ -99,7 +99,7 @@ public abstract class ReportDecider implements HttpRequestProcessor {
 
             return;
         } catch (Throwable e) {
-            logger.debug("check gateway address {} fail :{}!", newOne.ip(), e.getMessage());
+            logger.debug("check gateway address {} fail:{}. old address:{}!", newOne.ip(), e.getMessage(), oldOne.ip());
         }
 
     }
