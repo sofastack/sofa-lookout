@@ -48,11 +48,6 @@ public class MockHttpRequestProcessor implements HttpRequestProcessor {
     }
 
     @Override
-    public boolean stillSilent() {
-        return false;
-    }
-
-    @Override
     public Address getAvailableAddress() {
         return new Address("localhost", 8080);
     }

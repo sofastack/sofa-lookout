@@ -76,4 +76,14 @@ public class HttpObserverTest {
         observer.update(measures, new HashMap<String, String>());
         Assert.assertNotNull(requestProcessor);
     }
+
+    @Test
+    public void testReportSnappy() {
+        LookoutConfig config = new LookoutConfig();
+        AddressService addressService = new DefaultAddressService();
+        addressService.setAgentTestUrl("127.0.0.1");
+        Registry registry = new DefaultRegistry();
+        HttpObserver observer = new HttpObserver(config, addressService, registry,
+            new MockHttpRequestProcessor());
+    }
 }

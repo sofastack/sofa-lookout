@@ -23,6 +23,7 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.support.http.DefaultHttpRequestProcessor;
 import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
+import com.alipay.lookout.remote.report.support.http.ReportDecider;
 import com.alipay.lookout.report.MetricObserver;
 import com.google.common.base.Preconditions;
 import org.apache.http.HttpHeaders;
@@ -109,10 +110,13 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
      */
     @Override
     public boolean isEnable() {
-        if (httpRequestProcessor.stillSilent()) {
-            logger.debug("observer is disable temporarily cause by agent silent command.");
-            return false;
+        if (httpRequestProcessor instanceof ReportDecider) {
+            if (((ReportDecider) httpRequestProcessor).stillSilent()) {
+                logger.debug("observer is disable temporarily cause by agent silent command.");
+                return false;
+            }
         }
+
         Address address = httpRequestProcessor.getAvailableAddress();
         if (address == null) {
             return false;//下次再重新询问是否passed
@@ -236,7 +240,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         sendHttpDataSilently(httpPost, metadata);
     }
 
-    private void sendHttpDataSilently(HttpRequest httpRequest, Map<String, String> metadata) {
+    void sendHttpDataSilently(HttpRequest httpRequest, Map<String, String> metadata) {
         try {
             if (httpRequest instanceof HttpPost) {
                 registry().counter(

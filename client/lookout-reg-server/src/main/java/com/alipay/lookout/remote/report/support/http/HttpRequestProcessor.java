@@ -30,11 +30,9 @@ public interface HttpRequestProcessor {
 
     void addCommonHeader(String headerName, String headerValue);
 
-    boolean stillSilent();
-
-    Address getAvailableAddress();
-
     boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException;
 
     boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException;
+
+    Address getAvailableAddress();
 }

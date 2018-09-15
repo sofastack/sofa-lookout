@@ -21,7 +21,6 @@ import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.utils.NetworkUtil;
-import com.alipay.lookout.remote.report.Address;
 import com.alipay.lookout.remote.report.AddressService;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -42,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.alipay.lookout.common.LookoutConstants.LOW_PRIORITY_TAG;
 import static com.alipay.lookout.remote.report.SchedulerPoller.PRIORITY_NAME;
@@ -51,7 +49,7 @@ import static com.alipay.lookout.remote.report.SchedulerPoller.PRIORITY_NAME;
  * 将数据推送到 lookout-gateway 上
  * Created by kevin.luy@alipay.com on 2017/4/13.
  */
-public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
+public final class DefaultHttpRequestProcessor extends ReportDecider {
     private static final Logger        logger                       = LookoutLoggerFactory
                                                                         .getLogger(DefaultHttpRequestProcessor.class);
 
@@ -69,86 +67,15 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
 
     private static final AtomicBoolean httpClientInitialized        = new AtomicBoolean(false);
 
-    //静默期，一般是得到agent特殊提示，从当前到silentTime这段时间不要再尝试汇报了.
-    private volatile long              silentTime                   = -1;
-    private AtomicReference<Address>   addressHolder                = new AtomicReference<Address>();
-    private volatile long              addressLastModifiedTime      = -1;
-    private long                       expiredTime                  = 65000;                                          //65s
-
-    private AddressService             addressService;
     private final Map<String, String>  commonMetadata               = new HashMap<String, String>();
 
     public DefaultHttpRequestProcessor(AddressService addressService) {
-        this.addressService = addressService;
-        this.addressLastModifiedTime = System.currentTimeMillis() - expiredTime;
+        super(addressService);
     }
 
     @Override
     public void addCommonHeader(String headerName, String headerValue) {
         commonMetadata.put(headerName, headerValue);
-    }
-
-    public boolean stillSilent() {
-        return silentTime > 0 && System.currentTimeMillis() < silentTime;
-    }
-
-    void changeSilentTime(int wait, TimeUnit timeUnit) {
-        if (wait > 0) {
-            long waitTime = timeUnit.toMillis(wait) + System.currentTimeMillis();
-            if (waitTime > silentTime) {
-                //do change
-                silentTime = waitTime;
-            }
-        }
-    }
-
-    /**
-     * post error or timeout.(容忍临时并发刷新)
-     */
-    void refreshAddressCache() {
-        //get a new one
-        Address oldOne = addressHolder.get();
-        Address newOne = addressService.getAgentServerHost();
-        if (newOne == null) {
-            return;
-        }
-        //check new address
-        try {
-            boolean ok = sendGetRequest(
-                new HttpGet(String.format("http://%s:%d/datas", newOne.ip(), newOne.port())), null);
-            if (!ok) {
-                return;
-            }
-            // address is checked!
-            if (oldOne == null) {
-                addressHolder.set(newOne);
-            } else if (!newOne.ip().equals(oldOne.ip())) {
-                addressHolder.compareAndSet(oldOne, newOne);
-            }
-            addressLastModifiedTime = System.currentTimeMillis();
-            logger.debug("change gateway address ,from {} to {} .", oldOne, newOne);
-
-            return;
-        } catch (Throwable e) {
-            logger.debug("check gateway address {} fail :{}!", newOne.ip(), e.getMessage());
-        }
-
-    }
-
-    private boolean isAddressExpired() {
-        return addressLastModifiedTime + expiredTime < System.currentTimeMillis();
-    }
-
-    /**
-     * 保证一定时间(2min)内，只使用同一个 gateway 地址连接上报（优化连接使用）
-     *
-     * @return
-     */
-    public synchronized Address getAvailableAddress() {
-        if (isAddressExpired()) {
-            refreshAddressCache();
-        }
-        return addressHolder.get();
     }
 
     @Override
@@ -265,6 +192,11 @@ public final class DefaultHttpRequestProcessor implements HttpRequestProcessor {
         changeSilentTime(wait, TimeUnit.MINUTES);
     }
 
+    /**
+     * lazy init singleton.
+     *
+     * @return CloseableHttpClient http client
+     */
     static CloseableHttpClient getHttpClent() {
         if (httpClientCache != null) {
             return httpClientCache;
