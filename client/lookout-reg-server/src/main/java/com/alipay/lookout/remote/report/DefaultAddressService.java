@@ -16,7 +16,12 @@
  */
 package com.alipay.lookout.remote.report;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 默认静态地址服务
@@ -24,9 +29,8 @@ import com.google.common.base.Strings;
  * Created by kevin.luy@alipay.com on 2017/5/31.
  */
 public class DefaultAddressService implements AddressService {
-
-    private Address agentServerVip;
-    private Address agentTestUrl;
+    private Address       agentTestUrl;
+    private List<Address> addressList;
 
     public DefaultAddressService() {
     }
@@ -35,7 +39,6 @@ public class DefaultAddressService implements AddressService {
     }
 
     //  cache,for a connection keep alive & reuse;
-
     public void clearAddressCache() {
     }
 
@@ -46,14 +49,40 @@ public class DefaultAddressService implements AddressService {
     }
 
     public void setAgentServerVip(String agentServerVip) {
-        if (!Strings.isNullOrEmpty(agentServerVip)) {
-            this.agentServerVip = new Address(agentServerVip);
+        if (Strings.isNullOrEmpty(agentServerVip)) {
+            return;
         }
+        //multi addresses
+        if (agentServerVip.contains(",")) {
+            List<String> agentServers = Splitter.on(',').splitToList(agentServerVip);
+            setAddressList(agentServers);
+            return;
+        }
+        this.addressList = Lists.newArrayList(new Address(agentServerVip));
+    }
+
+    public void setAddressList(List<String> addresses) {
+        if (addresses == null || addresses.isEmpty()) {
+            return;
+        }
+        List<Address> addressList = new ArrayList<Address>();
+        for (String addressStr : addresses) {
+            addressList.add(new Address(addressStr.trim()));
+        }
+        this.addressList = addressList;
+    }
+
+    protected Address getAgentTestUrl() {
+        return agentTestUrl;
+    }
+
+    protected List<Address> getAddressList() {
+        return addressList;
     }
 
     @Override
     public boolean isAgentServerExisted() {
-        return agentTestUrl != null || agentServerVip != null;
+        return agentTestUrl != null || (addressList != null && !addressList.isEmpty());
     }
 
     @Override
@@ -61,6 +90,14 @@ public class DefaultAddressService implements AddressService {
         if (agentTestUrl != null) {
             return agentTestUrl;
         }
-        return agentServerVip;
+        List<Address> addrList = addressList;
+        if (addrList == null) {
+            return null;
+        }
+        if (addrList.size() == 1) {
+            return addrList.get(0);
+        }
+        int randomNodeIdx = randomThreadLocal.get().nextInt(addrList.size());
+        return addrList.get(randomNodeIdx);
     }
 }

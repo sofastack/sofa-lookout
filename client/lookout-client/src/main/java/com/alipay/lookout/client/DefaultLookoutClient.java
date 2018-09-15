@@ -18,7 +18,10 @@ package com.alipay.lookout.client;
 
 import com.alipay.lookout.api.Lookout;
 import com.alipay.lookout.api.MetricRegistry;
+import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.step.LookoutRegistry;
+
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_EXPORTER_ENABLE;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/10/4.
@@ -44,7 +47,12 @@ public class DefaultLookoutClient extends AbstractLookoutClient {
             registry.registerExtendedMetrics();
         }
         super.addRegistry(registry);
+
         if (registry instanceof LookoutRegistry) {
+            MetricConfig config = ((LookoutRegistry) registry).getConfig();
+            if (!config.getBoolean(LOOKOUT_EXPORTER_ENABLE, false)) {
+                return;
+            }
             try {
                 setMetricsHttpExporter(PollerUtils.exportHttp((LookoutRegistry) registry));
             } catch (Exception e) {

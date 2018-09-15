@@ -22,7 +22,9 @@ import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.api.composite.MixinMetric;
 import com.alipay.lookout.dropwizard.metrics.DropWizardMetricsRegistry;
+import com.alipay.lookout.reg.prometheus.PrometheusRegistry;
 import com.alipay.lookout.starter.support.actuator.LookoutSpringBootMetricsImpl;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +37,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,6 +55,16 @@ public class LookoutStarterTest {
 
     @Autowired
     private CounterService counterService;
+
+    @After
+    public void close() throws IOException {
+        CompositeRegistry reg = (CompositeRegistry) registry;
+        for (Registry r : reg.getRegistries()) {
+            if (r instanceof PrometheusRegistry) {
+                ((PrometheusRegistry) r).close();
+            }
+        }
+    }
 
     @Test
     public void testDropwizardMetrics() {
@@ -85,7 +98,7 @@ public class LookoutStarterTest {
     }
 
     /**
-     *  默认如果classpath 中有 dropwizard ,则优先生效桥接到dropwizard
+     * 默认如果classpath 中有 dropwizard ,则优先生效桥接到dropwizard
      */
     @Test
     public void testLookoutCounterService() {

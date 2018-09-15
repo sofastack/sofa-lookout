@@ -91,7 +91,7 @@ abstract class AbstractLookoutClient implements LookoutClient {
         if (StringUtils.isNotEmpty(zone)) {
             commonTagsAccessor.setCommonTag("zone", zone);
         }
-        //Ant cloud middleware instanceId
+        //instanceId
         String instanceId = System.getProperty(INSTANCE_ID_NAME);
         if (StringUtils.isNotEmpty(instanceId)) {
             commonTagsAccessor.setCommonTag("instance_id", instanceId);

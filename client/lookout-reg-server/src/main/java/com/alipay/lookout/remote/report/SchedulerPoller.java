@@ -174,12 +174,8 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
             Map<String, String> metadata = Maps.newHashMap();
             metadata.put(PRIORITY_NAME, priority.name());
             List<LookoutMeasurement> measurements = getMeasurements(priority, metricFilter);
-            try {
-                observer.update(measurements, metadata);
-            } finally {
-                logger.debug("send {} metrics to remote server. metrics:\n{}", measurements.size(),
-                    measurements.toString());
-            }
+            logger.debug("collect {} metrics", measurements.size());
+            observer.update(measurements, metadata);
         }
     }
 

@@ -24,7 +24,6 @@ import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.report.DefaultAddressService;
 import com.alipay.lookout.remote.report.HttpObserver;
-import com.alipay.lookout.remote.report.support.ReportDecider;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,10 +41,9 @@ public class HttpObserverTest {
     public void testIsEnable() {
         LookoutConfig config = new LookoutConfig();
         AddressService addressService = new DefaultAddressService();
-        ReportDecider reportDecider = new ReportDecider();
         Registry registry = new DefaultRegistry();
 
-        HttpObserver observer = new HttpObserver(config, addressService, registry, reportDecider);
+        HttpObserver observer = new HttpObserver(config, addressService, registry);
         Assert.assertFalse(observer.isEnable());
     }
 
@@ -54,12 +52,10 @@ public class HttpObserverTest {
         LookoutConfig config = new LookoutConfig();
         AddressService addressService = new DefaultAddressService();
         addressService.setAgentTestUrl("127.0.0.1");
-
-        ReportDecider reportDecider = new ReportDecider();
-        reportDecider.markPassed();
         Registry registry = new DefaultRegistry();
 
-        HttpObserver observer = new HttpObserver(config, addressService, registry, reportDecider);
+        HttpObserver observer = new HttpObserver(config, addressService, registry,
+            new MockHttpRequestProcessor());
         Assert.assertTrue(observer.isEnable());
     }
 
@@ -68,13 +64,9 @@ public class HttpObserverTest {
         LookoutConfig config = new LookoutConfig();
         AddressService addressService = new DefaultAddressService();
         addressService.setAgentTestUrl("127.0.0.1");
-
-        ReportDecider reportDecider = new ReportDecider();
-        reportDecider.markPassed();
         Registry registry = new DefaultRegistry();
         MockHttpRequestProcessor requestProcessor = new MockHttpRequestProcessor();
-        HttpObserver observer = new HttpObserver(config, addressService, registry, reportDecider,
-            requestProcessor);
+        HttpObserver observer = new HttpObserver(config, addressService, registry, requestProcessor);
 
         List<LookoutMeasurement> measures = new ArrayList<LookoutMeasurement>();
         LookoutMeasurement measurement = new LookoutMeasurement(new Date(),
@@ -83,5 +75,15 @@ public class HttpObserverTest {
 
         observer.update(measures, new HashMap<String, String>());
         Assert.assertNotNull(requestProcessor);
+    }
+
+    @Test
+    public void testReportSnappy() {
+        LookoutConfig config = new LookoutConfig();
+        AddressService addressService = new DefaultAddressService();
+        addressService.setAgentTestUrl("127.0.0.1");
+        Registry registry = new DefaultRegistry();
+        HttpObserver observer = new HttpObserver(config, addressService, registry,
+            new MockHttpRequestProcessor());
     }
 }
