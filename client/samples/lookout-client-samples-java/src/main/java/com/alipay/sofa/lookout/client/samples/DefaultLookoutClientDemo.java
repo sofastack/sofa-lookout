@@ -35,18 +35,17 @@ public class DefaultLookoutClientDemo {
         //构建一个全局的客户端实例
         final DefaultLookoutClient client = new DefaultLookoutClient("appName");
 
-        //主动上报型
-        LookoutRegistry lookoutRegistry = new LookoutRegistry(new LookoutConfig());
-        //被动采集型
+        LookoutConfig lookoutConfig=new LookoutConfig();
 
+        //主动上报型
+        //向远程 Agent(gateway）server上报metrics,必须的设置;
+        //lookoutConfig.setProperty(LookoutConfig.LOOKOUT_AGENT_HOST_ADDRESS,"10.101.92.239");
+        LookoutRegistry lookoutRegistry = new LookoutRegistry(lookoutConfig);
         //set common tag example
         lookoutRegistry.setCommonTag("instant", "machine-a");
 
-        //本地观察metrics定时打印
+        //本地观察metrics定时打印(optional)
         lookoutRegistry.addMetricObserver(new StdoutObserver());
-        //或者向远程 Agent(gateway）server上报metrics
-        //lookoutRegistry.getConfig().setProperty(LookoutConfig.LOOKOUT_AGENT_HOST_ADDRESS,"127.0.0.2");
-
 
         //可以 add 多个不同类型的 Registry 实例
         client.addRegistry(lookoutRegistry);

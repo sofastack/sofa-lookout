@@ -66,10 +66,6 @@ public class HttpObserverTest {
     }
 
     class TestHttpRequestProcessor implements HttpRequestProcessor {
-        @Override
-        public void addCommonHeader(String headerName, String headerValue) {
-
-        }
 
         @Override
         public Address getAvailableAddress() {
