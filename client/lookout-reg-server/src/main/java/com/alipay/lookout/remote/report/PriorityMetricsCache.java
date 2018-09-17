@@ -20,9 +20,11 @@ import com.alipay.lookout.api.Metric;
 import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.common.utils.PriorityTagUtil;
 import com.alipay.lookout.core.InfoWrapper;
+import com.alipay.lookout.core.MetricIterator;
 import com.alipay.lookout.event.MetricRegistryListener;
 import com.google.common.collect.Sets;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -45,6 +47,10 @@ public class PriorityMetricsCache implements MetricRegistryListener {
             default:
                 return null;
         }
+    }
+
+    public Iterator<Metric> getMetricIteratorByPriority(PRIORITY priority) {
+        return new MetricIterator(getMetricByPriority(priority).iterator());
     }
 
     public Set<Metric> getHighMetircs() {

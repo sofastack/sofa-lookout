@@ -53,9 +53,8 @@ final class DefaultDistributionSummary implements DistributionSummary {
     @Override
     public Indicator measure() {
         long now = clock.wallTime();
-        Indicator indicator = new Indicator(now, id).addMeasurement(Statistic.count.name(),
-            count.get()).addMeasurement(Statistic.totalAmount.name(), totalAmount.get());
-        return indicator;
+        return new Indicator(now, id).addMeasurement(Statistic.count.name(), count.get())
+            .addMeasurement(Statistic.totalAmount.name(), totalAmount.get());
     }
 
     @Override

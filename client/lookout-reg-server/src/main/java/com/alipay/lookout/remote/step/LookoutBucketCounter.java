@@ -17,6 +17,7 @@
 package com.alipay.lookout.remote.step;
 
 import com.alipay.lookout.api.*;
+import com.alipay.lookout.core.MetricIterable;
 
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
@@ -25,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author zhangzhuo
  * @version $Id: BucketDistributionSummary.java, v 0.1 2018年09月07日 上午11:47 zhangzhuo Exp $
  */
-public abstract class LookoutBucketCounter implements Metric, Iterable<Metric> {
+public abstract class LookoutBucketCounter implements Metric, MetricIterable {
 
     private static final String   BUCKET_TAG_NAME = "_bucket";
 
@@ -39,7 +40,7 @@ public abstract class LookoutBucketCounter implements Metric, Iterable<Metric> {
 
     private volatile AtomicLong[] prevCounts;
 
-    private final AtomicLong      lastInitPos;
+    private AtomicLong            lastInitPos;
 
     public LookoutBucketCounter(Clock clock, long step) {
         this.clock = clock;
@@ -49,6 +50,7 @@ public abstract class LookoutBucketCounter implements Metric, Iterable<Metric> {
 
     public void setStep(long step) {
         this.step = step;
+        this.lastInitPos.set(clock.wallTime() / step);
     }
 
     public void buckets(long[] buckets) {
@@ -158,8 +160,8 @@ public abstract class LookoutBucketCounter implements Metric, Iterable<Metric> {
 
         @Override
         public Indicator measure() {
-            long now = Clock.SYSTEM.wallTime();
-            Indicator indicator = new Indicator(now, id).addMeasurement(Statistic.buckets.name(),
+            long time = lastInitPos.get() * step;
+            Indicator indicator = new Indicator(time, id).addMeasurement(Statistic.buckets.name(),
                 count);
             return indicator;
         }

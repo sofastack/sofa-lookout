@@ -14,25 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.support.http;
+package com.alipay.lookout.starter.support;
 
-import com.alipay.lookout.remote.report.Address;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-
-import java.io.IOException;
-import java.util.Map;
+import com.alipay.lookout.core.config.MetricConfig;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Created by kevin.luy@alipay.com on 2018/6/5.
+ * Created by kevin.luy@alipay.com on 2018/9/5.
  */
-public interface HttpRequestProcessor {
+@Configuration
+public class MetricConfigCustomizerConfig {
 
-    void addCommonHeader(String headerName, String headerValue);
-
-    boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException;
-
-    boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException;
-
-    Address getAvailableAddress();
+    @Bean
+    public MetricConfigCustomizer metricConfigCustomizer() {
+        return new MetricConfigCustomizer() {
+            @Override
+            public void customize(MetricConfig metricConfig) {
+                metricConfig.addProperty("testaa", "testbb");
+            }
+        };
+    }
 }

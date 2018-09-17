@@ -16,10 +16,12 @@
  */
 package com.alipay.lookout.remote.report.support;
 
+import com.alipay.lookout.remote.report.DefaultAddressService;
 import com.alipay.lookout.remote.report.support.http.DefaultHttpRequestProcessor;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -30,15 +32,17 @@ import static com.alipay.lookout.remote.report.support.http.DefaultHttpRequestPr
  * Created by kevin.luy@alipay.com on 2017/4/13.
  */
 public class HttpRequestProcessorTest {
-    final ReportDecider               reportDecider        = new ReportDecider();
     final DefaultHttpRequestProcessor httpRequestProcessor = new DefaultHttpRequestProcessor(
-                                                               reportDecider);
+                                                               new DefaultAddressService());
 
     @Test
     public void testHandleErrorResponse401() {
-        Assert.assertFalse(reportDecider.stillSilent());
-        httpRequestProcessor.handleErrorResponse(mockHttpResponse(401));
-        Assert.assertTrue(reportDecider.stillSilent());
+        Assert.assertFalse(httpRequestProcessor.stillSilent());
+        HttpRequestBase rb = Mockito.mock(HttpRequestBase.class);
+        Mockito.when(rb.toString()).thenReturn("");
+
+        httpRequestProcessor.handleErrorResponse(mockHttpResponse(401), rb);
+        Assert.assertTrue(httpRequestProcessor.stillSilent());
     }
 
     private HttpResponse mockHttpResponse(int status) {
@@ -56,4 +60,5 @@ public class HttpRequestProcessorTest {
         Mockito.when(statusLine.getStatusCode()).thenReturn(status);
         return response;
     }
+
 }

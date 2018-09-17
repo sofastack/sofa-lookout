@@ -77,11 +77,10 @@ public class NetTrafficMetricsImporter extends CachedMetricsImporter {
 
     private static final Pattern  NET_PATTERN       = Pattern.compile(STR_PATTERN);
 
-    private static final String[] FIELDS            = { "net.in.bytes", "net.in.packets",
-            "net.in.errs", "net.in.dropped", "net.in.fifo.errs", "net.in.frame.errs",
-            "net.in.compressed", "net.in.multicast", "net.out.bytes", "net.out.packets",
-            "net.out.errs", "net.out.dropped", "net.out.fifo.errs", "net.out.collisions",
-            "net.out.carrier.errs", "net.out.compressed" };
+    private static final String[] FIELDS            = { "in.bytes", "in.packets", "in.errs",
+            "in.dropped", "in.fifo.errs", "in.frame.errs", "in.compressed", "in.multicast",
+            "out.bytes", "out.packets", "out.errs", "out.dropped", "out.fifo.errs",
+            "out.collisions", "out.carrier.errs", "out.compressed" };
 
     private String                filePath;
     private Map<String, Long[]>   statByFace;
@@ -104,7 +103,7 @@ public class NetTrafficMetricsImporter extends CachedMetricsImporter {
     protected void doRegister(Registry registry) {
         for (final Map.Entry<String, Long[]> entry : statByFace.entrySet()) {
             final String face = entry.getKey();
-            Id id = registry.createId("os.net.stat." + face);
+            Id id = registry.createId("os.net.stats").withTag("intfc", face);
             MixinMetric mixin = registry.mixinMetric(id);
 
             for (int i = 0; i < entry.getValue().length; i++) {

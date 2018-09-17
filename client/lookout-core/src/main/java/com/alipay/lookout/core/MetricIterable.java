@@ -14,25 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.remote.report.support.http;
+package com.alipay.lookout.core;
 
-import com.alipay.lookout.remote.report.Address;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-
-import java.io.IOException;
-import java.util.Map;
+import com.alipay.lookout.api.Metric;
 
 /**
- * Created by kevin.luy@alipay.com on 2018/6/5.
+ * @author zhangzhuo
+ * @version $Id: MetricIterable.java, v 0.1 2018年09月17日 下午2:33 zhangzhuo Exp $
  */
-public interface HttpRequestProcessor {
-
-    void addCommonHeader(String headerName, String headerValue);
-
-    boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException;
-
-    boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException;
-
-    Address getAvailableAddress();
+public interface MetricIterable extends Iterable<Metric> {
 }

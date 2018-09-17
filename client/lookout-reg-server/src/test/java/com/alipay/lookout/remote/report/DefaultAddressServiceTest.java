@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.remote.report;
 
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,7 +33,8 @@ public class DefaultAddressServiceTest {
         addressService.setAgentTestUrl("100.12.1.12");
         Assert.assertTrue(addressService.isAgentServerExisted());
         Address address = addressService.getAgentServerHost();
-        Assert.assertNotNull(address);
+
+        Assert.assertEquals(address, ((DefaultAddressService) addressService).getAgentTestUrl());
 
     }
 
@@ -44,6 +46,30 @@ public class DefaultAddressServiceTest {
         Assert.assertTrue(addressService.isAgentServerExisted());
         Address address = addressService.getAgentServerHost();
         Assert.assertNotNull(address);
+    }
+
+    @Test
+    public void testSetAddressList() {
+        AddressService addressService = new DefaultAddressService();
+        Assert.assertFalse(addressService.isAgentServerExisted());
+        ((DefaultAddressService) addressService).setAddressList(Lists.newArrayList("127.0.0.1",
+            "127.0.0.2"));
+        Assert.assertTrue(addressService.isAgentServerExisted());
+        Address address = addressService.getAgentServerHost();
+        System.out.println(address);
+        Assert.assertTrue(address.ip().startsWith("127.0.0"));
+    }
+
+    @Test
+    public void testSetAddressListFromVip() {
+        AddressService addressService = new DefaultAddressService();
+        Assert.assertFalse(addressService.isAgentServerExisted());
+        addressService.setAgentServerVip("127.0.0.1, 127.0.0.2");
+        Assert.assertTrue(addressService.isAgentServerExisted());
+        Address address = addressService.getAgentServerHost();
+        System.out.println(address);
+        Assert.assertTrue(address.ip().startsWith("127.0.0"));
+        Assert.assertEquals(2, ((DefaultAddressService) addressService).getAddressList().size());
     }
 
 }

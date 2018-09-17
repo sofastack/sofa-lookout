@@ -353,7 +353,7 @@ public abstract class AbstractRegistry extends MetricRegistry {
 
     @Override
     public final Iterator<Metric> iterator() {
-        return metrics.values().iterator();
+        return new MetricIterator(metrics.values().iterator());
     }
 
     @Override

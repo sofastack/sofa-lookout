@@ -21,10 +21,7 @@ import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.common.Assert;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.top.RollableTopGauge;
-import com.alipay.lookout.core.AbstractRegistry;
-import com.alipay.lookout.core.CommonTagsAccessor;
-import com.alipay.lookout.core.GaugeWrapper;
-import com.alipay.lookout.core.InfoWrapper;
+import com.alipay.lookout.core.*;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.jdk8.Function;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
@@ -172,12 +169,8 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
             Map<String, String> metadata = Maps.newHashMap();
             metadata.put(PRIORITY_NAME, priority.name());
             List<LookoutMeasurement> measurements = getMeasurements(priority, metricFilter);
-            try {
-                observer.update(measurements, metadata);
-            } finally {
-                logger.debug("send {} metrics to remote server. metrics:\n{}", measurements.size(),
-                    measurements.toString());
-            }
+            logger.debug("collect {} metrics", measurements.size());
+            observer.update(measurements, metadata);
         }
     }
 
@@ -223,49 +216,10 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     }
 
     private Iterator<Metric> getMetricsIterator(PRIORITY priority) {
-        Iterator<Metric> iterator;
         if (priority == null) {
-            iterator = registry().iterator();
+            return registry().iterator();
         } else {
-            iterator = priorityMetricsCache.getMetricByPriority(priority).iterator();
-        }
-        return new MetricIterator(iterator);
-    }
-
-    class MetricIterator implements Iterator<Metric> {
-
-        private final Iterator<Metric> iterator;
-
-        private Iterator<Metric>       bucketCounterIterator;
-
-        public MetricIterator(Iterator<Metric> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (bucketCounterIterator != null && bucketCounterIterator.hasNext()) {
-                return true;
-            }
-            return iterator.hasNext();
-        }
-
-        @Override
-        public Metric next() {
-            if (bucketCounterIterator != null && bucketCounterIterator.hasNext()) {
-                return bucketCounterIterator.next();
-            }
-            Metric metric = iterator.next();
-            if (metric instanceof LookoutBucketCounter) {
-                LookoutBucketCounter bucketCounter = (LookoutBucketCounter) metric;
-                bucketCounterIterator = bucketCounter.iterator();
-            }
-            return metric;
-        }
-
-        @Override
-        public void remove() {
-            iterator.remove();
+            return priorityMetricsCache.getMetricIteratorByPriority(priority);
         }
     }
 

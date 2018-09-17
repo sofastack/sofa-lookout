@@ -27,6 +27,7 @@ import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.step.LookoutRegistry;
 import com.alipay.lookout.report.MetricObserver;
 import com.alipay.lookout.starter.LookoutClientProperties;
+import com.alipay.lookout.starter.support.MetricConfigCustomizer;
 import com.alipay.lookout.starter.support.reg.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.MetricsDropwizardAutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -56,13 +55,14 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
 @AutoConfigureOrder(-100)
 @Configuration
 @EnableConfigurationProperties(LookoutClientProperties.class)
-@AutoConfigureBefore({ MetricsDropwizardAutoConfiguration.class })
 public class LookoutAutoConfiguration implements BeanFactoryAware {
     private static final Logger                      logger = LoggerFactory
                                                                 .getLogger(LookoutAutoConfiguration.class);
 
     @Autowired(required = false)
     private List<MetricObserver<LookoutMeasurement>> metricObservers;
+    @Autowired(required = false)
+    private List<MetricConfigCustomizer>             metricConfigCustomizers;
     private BeanFactory                              beanFactory;
 
     @Override
@@ -77,6 +77,11 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         Assert.notNull(appName, "spring.application.name can not be null!");
         LookoutConfig config = buildLookoutConfig(lookoutClientProperties);
         config.setProperty(APP_NAME, appName);
+        if (metricConfigCustomizers != null) {
+            for (MetricConfigCustomizer configCustomizer : metricConfigCustomizers) {
+                configCustomizer.customize(config);
+            }
+        }
         return config;
     }
 
@@ -191,6 +196,12 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
             lookoutConfig.setStepInterval(PRIORITY.NORMAL,
                 lookoutClientProperties.getPollingInterval());
         }
+        if (lookoutClientProperties.getExporterIdle() > 0) {
+            lookoutConfig.setProperty(LOOKOUT_EXPORTER_IDLE_SECONDS,
+                lookoutClientProperties.getExporterIdle());
+        }
+        lookoutConfig.setProperty(LOOKOUT_EXPORTER_ENABLE,
+            lookoutClientProperties.isExporterEnable());
         return lookoutConfig;
     }
 }

@@ -40,6 +40,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
+import static com.alipay.lookout.core.config.LookoutConfig.DEFAULT_HTTP_EXPORTER_PORT;
 import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_EXPORTER_ACCESS_TOKEN;
 
 /**
@@ -49,14 +50,13 @@ import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_EXPORTER_ACCE
 public class MetricsHttpExporter {
     private static final Charset   UTF8            = Charset.forName("UTF-8");
     private static final int       DEFAULT_BACKLOG = 2;
-    private static final int       DEFAULT_PORT    = 19399;
     private final PollerController controller;
     private final int              port;
     private final int              backlog;
     private HttpServer             httpServer;
 
     public MetricsHttpExporter(PollerController controller) {
-        this(controller, DEFAULT_PORT, DEFAULT_BACKLOG);
+        this(controller, DEFAULT_HTTP_EXPORTER_PORT, DEFAULT_BACKLOG);
     }
 
     public MetricsHttpExporter(PollerController controller, int port, int backlog) {
@@ -89,6 +89,7 @@ public class MetricsHttpExporter {
             httpServer.stop(5);
             httpServer = null;
         }
+        getController().close();
     }
 
     /**
