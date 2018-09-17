@@ -44,6 +44,11 @@ public class DefaultLookoutClientDemo {
 
         //本地观察metrics定时打印
         lookoutRegistry.addMetricObserver(new StdoutObserver());
+        //或者向远程 Agent(gateway）server上报metrics
+        //lookoutRegistry.getConfig().setProperty(LookoutConfig.LOOKOUT_AGENT_HOST_ADDRESS,"127.0.0.2");
+
+
+        //可以 add 多个不同类型的 Registry 实例
         client.addRegistry(lookoutRegistry);
 
         //注册扩展的metrics，下面两种方式都可以
