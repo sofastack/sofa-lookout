@@ -52,4 +52,8 @@ public abstract class AbstractTimer implements Timer {
             record(clock.monotonicTime() - st, TimeUnit.NANOSECONDS);
         }
     }
+
+    @Override
+    public void buckets(long[] buckets) {
+    }
 }

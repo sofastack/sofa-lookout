@@ -78,6 +78,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry) {
         this(lookoutConfig, addrService, registry, new DefaultHttpRequestProcessor(addrService,
             lookoutConfig));
+
     }
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry,

@@ -14,55 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.api;
+package com.alipay.lookout.core;
+
+import com.alipay.lookout.api.Metric;
 
 /**
- * Measurement type Created by kevin.luy@alipay.com on 2017/2/14.
+ * @author zhangzhuo
+ * @version $Id: MetricIterable.java, v 0.1 2018年09月17日 下午2:33 zhangzhuo Exp $
  */
-public enum Statistic {
-    rate,
-    /**
-     * Rate per second for calls to record.
-     */
-    count,
-
-    /**
-     * The maximum amount recorded.
-     */
-    max,
-
-    /**
-     * The sum of the amounts recorded.
-     */
-    totalAmount,
-
-    /**
-     * buckets of the amounts recorded
-     */
-    buckets,
-
-    //    /**
-    //     * The sum of the squares of the amounts recorded.
-    //     */
-    //    totalOfSquares,
-
-    /**
-     * elapse time per execution
-     */
-    elapPerExec,
-
-    /**
-     * The sum of the times recorded.
-     */
-    totalTime,
-
-    /**
-     * Duration of a running task.
-     */
-    duration,
-
-    /**
-     * info. not only numerical value;
-     */
-    info
+public interface MetricIterable extends Iterable<Metric> {
 }

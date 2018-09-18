@@ -66,4 +66,10 @@ final class DefaultDistributionSummary implements DistributionSummary {
     public long totalAmount() {
         return totalAmount.get();
     }
+
+    @Override
+    public void buckets(long[] buckets) {
+
+    }
+
 }

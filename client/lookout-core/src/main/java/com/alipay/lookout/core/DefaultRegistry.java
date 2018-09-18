@@ -48,7 +48,8 @@ public class DefaultRegistry extends AbstractRegistry {
 
     @Override
     protected DistributionSummary newDistributionSummary(Id id) {
-        return new DefaultDistributionSummary(clock(), id);
+        DefaultDistributionSummary distributionSummary = new DefaultDistributionSummary(clock(), id);
+        return distributionSummary;
     }
 
     @Override

@@ -17,52 +17,16 @@
 package com.alipay.lookout.api;
 
 /**
- * Measurement type Created by kevin.luy@alipay.com on 2017/2/14.
+ *
+ * @author zhangzhuo
+ * @version $Id: BucketCounter.java, v 0.1 2018年09月11日 下午1:37 zhangzhuo Exp $
  */
-public enum Statistic {
-    rate,
-    /**
-     * Rate per second for calls to record.
-     */
-    count,
+public interface BucketCounter extends Metric {
 
     /**
-     * The maximum amount recorded.
+     * enable recording bucket counts
+     * @param buckets
      */
-    max,
+    void buckets(long[] buckets);
 
-    /**
-     * The sum of the amounts recorded.
-     */
-    totalAmount,
-
-    /**
-     * buckets of the amounts recorded
-     */
-    buckets,
-
-    //    /**
-    //     * The sum of the squares of the amounts recorded.
-    //     */
-    //    totalOfSquares,
-
-    /**
-     * elapse time per execution
-     */
-    elapPerExec,
-
-    /**
-     * The sum of the times recorded.
-     */
-    totalTime,
-
-    /**
-     * Duration of a running task.
-     */
-    duration,
-
-    /**
-     * info. not only numerical value;
-     */
-    info
 }

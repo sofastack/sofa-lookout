@@ -16,8 +16,7 @@
  */
 package com.alipay.sofa.lookout.client.samples;
 
-import com.alipay.lookout.api.Counter;
-import com.alipay.lookout.api.Id;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.client.DefaultLookoutClient;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
@@ -26,6 +25,8 @@ import com.alipay.lookout.report.MetricObserver;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by kevin.luy@alipay.com on 2018/4/23.
@@ -54,11 +55,14 @@ public class DefaultLookoutClientDemo {
         //lookoutRegistry.registerExtendedMetrics();
         client.registerExtendedMetrics();
 
+        Registry registry = client.getRegistry();
+
         //具体使用示例
-        Id id = client.getRegistry().createId("http_requests_total");
-        Counter counter = client.getRegistry().counter(id);
+        Id id = registry.createId("http_requests_total");
+        Counter counter = registry.counter(id);
         counter.inc();
 
+        testDistributionSummary(registry);
         try {
             Thread.sleep(60000);
         } catch (InterruptedException e) {
@@ -66,6 +70,50 @@ public class DefaultLookoutClientDemo {
         }
     }
 
+    private static void testDistributionSummary(Registry registry) {
+        Id id = registry.createId("rpc_latency_distribution").withTag("service", "orderService");
+        final Timer timer = registry.timer(id);
+        timer.buckets(new long[] {10, 100, 1000, 10000});
+        new Thread(new Runnable() {
+            public void run() {
+                final Random random = new Random();
+                for (int i = 0; i < 10000; i++) {
+                    timer.record(random.nextInt(200),TimeUnit.MILLISECONDS);
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+        new Thread(new Runnable() {
+            public void run() {
+                final Random random = new Random();
+                for (int i = 0; i < 1000; i++) {
+                    timer.record(random.nextInt(2000),TimeUnit.MILLISECONDS);
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+        new Thread(new Runnable() {
+            public void run() {
+                final Random random = new Random();
+                for (int i = 0; i < 100; i++) {
+                    timer.record(random.nextInt(20000),TimeUnit.MILLISECONDS);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
 
     static class StdoutObserver implements MetricObserver<LookoutMeasurement> {
 
@@ -77,8 +125,12 @@ public class DefaultLookoutClientDemo {
         }
 
         public void update(List<LookoutMeasurement> measures, Map<String, String> metadata) {
-            if (!measures.isEmpty())
-                System.out.println("==> " + measures.toString());
+            if (!measures.isEmpty()) {
+                System.out.println("------------------------------------------");
+                for (LookoutMeasurement measurement : measures) {
+                    System.out.println(measurement);
+                }
+            }
         }
     }
 }

@@ -16,11 +16,12 @@
  */
 package com.alipay.lookout.core;
 
-import com.alipay.lookout.api.DistributionSummary;
-import com.alipay.lookout.api.ManualClock;
+import com.alipay.lookout.api.*;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Iterator;
 
 public class DefaultDistributionSummaryTest {
 

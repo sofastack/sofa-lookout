@@ -112,6 +112,7 @@ public abstract class ReportDecider implements HttpRequestProcessor {
         } catch (Throwable e) {
             logger.debug("check gateway address {} fail:{}. old address:{}!", newOne.ip(),
                 e.getMessage(), oldOne == null ? "" : oldOne.ip());
+
         }
 
     }
