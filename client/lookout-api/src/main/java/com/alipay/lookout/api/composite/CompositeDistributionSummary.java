@@ -52,6 +52,13 @@ class CompositeDistributionSummary extends CompositeMetric implements Distributi
     }
 
     @Override
+    public void buckets(long[] buckets) {
+        for (Registry r : registries) {
+            getMetric(r).buckets(buckets);
+        }
+    }
+
+    @Override
     protected DistributionSummary getMetric(Registry registry) {
         return registry.distributionSummary(id);
     }
