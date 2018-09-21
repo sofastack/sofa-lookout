@@ -28,8 +28,6 @@ import java.util.Map;
  */
 public interface HttpRequestProcessor {
 
-    void addCommonHeader(String headerName, String headerValue);
-
     boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException;
 
     boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException;

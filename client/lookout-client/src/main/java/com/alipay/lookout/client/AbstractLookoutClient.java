@@ -50,6 +50,10 @@ abstract class AbstractLookoutClient implements LookoutClient {
         Assert.checkArg(StringUtils.isNotEmpty(appName), "appName is required!");
     }
 
+    protected String getAppName() {
+        return appName;
+    }
+
     protected void addRegistry(MetricRegistry registry) {
         Preconditions.checkArgument(!(registry instanceof CompositeRegistry),
             "The registry can not be compositeRegistry!");

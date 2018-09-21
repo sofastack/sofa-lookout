@@ -43,11 +43,6 @@ public class MockHttpRequestProcessor implements HttpRequestProcessor {
     }
 
     @Override
-    public void addCommonHeader(String headerName, String headerValue) {
-
-    }
-
-    @Override
     public Address getAvailableAddress() {
         return new Address("localhost", 8080);
     }

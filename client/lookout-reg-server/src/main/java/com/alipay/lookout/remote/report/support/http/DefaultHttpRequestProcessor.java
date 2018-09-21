@@ -21,7 +21,10 @@ import com.alipay.lookout.api.PRIORITY;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.utils.NetworkUtil;
+import com.alipay.lookout.core.config.LookoutConfig;
+import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.report.AddressService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
@@ -37,7 +40,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,6 +59,8 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
     public static final String         LOOKOUT_REPORT_FAIL_COUNT_ID = "lookout.report.fail";
     public static final String         WAIT_MINUTES                 = "Wait-Minutes";
     static final String                CLIENT_VERSION               = "LOOKOUT-CLIENT-V1";
+    static final String                APP_HEADER_NAME              = "app";
+
     private final String               clientIp                     = NetworkUtil.getLocalAddress()
                                                                         .getHostAddress();
 
@@ -67,15 +71,8 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
 
     private static final AtomicBoolean httpClientInitialized        = new AtomicBoolean(false);
 
-    private final Map<String, String>  commonMetadata               = new HashMap<String, String>();
-
-    public DefaultHttpRequestProcessor(AddressService addressService) {
-        super(addressService);
-    }
-
-    @Override
-    public void addCommonHeader(String headerName, String headerValue) {
-        commonMetadata.put(headerName, headerValue);
+    public DefaultHttpRequestProcessor(AddressService addressService, MetricConfig metricConfig) {
+        super(addressService, metricConfig);
     }
 
     @Override
@@ -140,14 +137,17 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
 
     }
 
-    private void addCommonHeaders(HttpRequestBase httpPost, Map<String, String> metadata) {
-        httpPost.setHeader(CLIENT_IP_HEADER_NAME, clientIp);
-        if (metadata == null) {
-            metadata = new HashMap<String, String>();
+    private void addCommonHeaders(HttpRequestBase httpMtd, Map<String, String> metadata) {
+        httpMtd.setHeader(CLIENT_IP_HEADER_NAME, clientIp);
+        String app = getMetricConfig().getString(LookoutConfig.APP_NAME);
+        if (StringUtils.isNotEmpty(app)) {
+            httpMtd.setHeader(APP_HEADER_NAME, app);
         }
-        metadata.putAll(commonMetadata);
+        if (metadata == null) {
+            return;
+        }
         for (Map.Entry<String, String> entry : metadata.entrySet()) {
-            httpPost.setHeader(entry.getKey(), entry.getValue());
+            httpMtd.setHeader(entry.getKey(), entry.getValue());
         }
     }
 

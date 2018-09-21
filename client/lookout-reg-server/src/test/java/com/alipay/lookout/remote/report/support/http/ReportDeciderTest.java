@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.remote.report.support.http;
 
+import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.report.DefaultAddressService;
 import org.apache.http.client.methods.HttpGet;
@@ -51,12 +52,7 @@ public class ReportDeciderTest {
     class ReportDecider2 extends ReportDecider {
 
         public ReportDecider2(AddressService addressService) {
-            super(addressService);
-        }
-
-        @Override
-        public void addCommonHeader(String headerName, String headerValue) {
-
+            super(addressService, new LookoutConfig());
         }
 
         @Override

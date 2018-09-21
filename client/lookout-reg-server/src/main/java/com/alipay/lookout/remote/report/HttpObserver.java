@@ -51,7 +51,6 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
 public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     private static final Logger        logger                     = LookoutLoggerFactory
                                                                       .getLogger(HttpObserver.class);
-    static final String                APP_HEADER_NAME            = "app";
     public static final String         UTF_8                      = "utf-8";
     static final String                AGENT_URL_PATTERN          = "http://%s:%d/datas";
     public static final String         APPLICATION_OCTET_STREAM   = "application/octet-stream";
@@ -77,7 +76,9 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     }
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry) {
-        this(lookoutConfig, addrService, registry, new DefaultHttpRequestProcessor(addrService));
+        this(lookoutConfig, addrService, registry, new DefaultHttpRequestProcessor(addrService,
+            lookoutConfig));
+
     }
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService, Registry registry,
@@ -91,11 +92,6 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             System.getProperty(LOOKOUT_AGENT_TEST_URL)));
         //inner port
         innerAgentPort = lookoutConfig.getInt(LOOKOUT_AGENT_SERVER_PORT, -1);
-        //add common metadatas
-        if (lookoutConfig.containsKey(LookoutConfig.APP_NAME)) {
-            httpRequestProcessor.addCommonHeader(APP_HEADER_NAME,
-                lookoutConfig.getString(LookoutConfig.APP_NAME));
-        }
         this.reg = registry;
     }
 
