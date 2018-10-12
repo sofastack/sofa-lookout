@@ -46,7 +46,7 @@ public class PrometheusRegistryTest {
     @Test
     public void testPromReg() throws IOException {
         String result = sendHttpRequest(new URL("http://localhost:9494/metrics"));
-        Assert.assertTrue(result.contains("lookout.reg_max.size"));
+        Assert.assertTrue(result.contains("lookout_reg_max_size"));
     }
 
     @Test
