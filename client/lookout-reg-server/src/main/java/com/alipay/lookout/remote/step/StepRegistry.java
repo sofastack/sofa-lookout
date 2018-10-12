@@ -45,9 +45,9 @@ public class StepRegistry extends AbstractRegistry {
     /**
      * for LookoutMixinMetric
      *
-     * @param clock
-     * @param config
-     * @param currentStepMillis
+     * @param clock clock
+     * @param config config
+     * @param currentStepMillis currentStepMillis
      */
     public StepRegistry(Clock clock, LookoutConfig config, long currentStepMillis) {
         super(clock, config);
@@ -140,7 +140,7 @@ public class StepRegistry extends AbstractRegistry {
     /**
      * reactive mode. 重新设置step, 修改所有的metric
      *
-     * @param step
+     * @param step step
      */
     protected synchronized void setStep(long step) {
         if (this.currentStepMillis == step) {
@@ -157,7 +157,7 @@ public class StepRegistry extends AbstractRegistry {
     /**
      * reactive mode. 获取当前使用的采样间隔时间
      *
-     * @return
+     * @return the interval of sampling
      */
     public long getCurrentStepMillis() {
         return currentStepMillis;
