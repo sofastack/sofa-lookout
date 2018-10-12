@@ -17,8 +17,8 @@
 package com.alipay.lookout.reg.prometheus;
 
 import com.alipay.lookout.core.config.LookoutConfig;
-import org.junit.After;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,10 +30,13 @@ import static com.alipay.lookout.reg.prometheus.ExporterServerTest.sendHttpReque
  * Created by kevin.luy@alipay.com on 2018/5/11.
  */
 public class PrometheusRegistryTest {
-    private PrometheusRegistry r;
+    private static PrometheusRegistry r;
 
     public PrometheusRegistryTest() {
-        System.out.println("Hello, world!");
+    }
+
+    @BeforeClass
+    public static void init() {
         LookoutConfig lookoutConfig = new LookoutConfig();
         lookoutConfig.setProperty(LookoutConfig.APP_NAME, "appNameTest");
         r = new PrometheusRegistry(lookoutConfig);
@@ -43,7 +46,7 @@ public class PrometheusRegistryTest {
     @Test
     public void testPromReg() throws IOException {
         String result = sendHttpRequest(new URL("http://localhost:9494/metrics"));
-        Assert.assertTrue(result.contains("lookout_reg_max_size"));
+        Assert.assertTrue(result.contains("lookout.reg_max.size"));
     }
 
     @Test
