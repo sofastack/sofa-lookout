@@ -25,7 +25,7 @@ import java.util.Set;
 
 /**
  * @author xiangfeng.xzc
- * @date 2018/7/12
+ * @since 2018/7/12
  */
 public class MetricCache {
     private final long  rate;
@@ -48,9 +48,9 @@ public class MetricCache {
     /**
      * 如果存在原始的cache, 那么尽量保留原始origin里的数据
      *
-     * @param origin
-     * @param rate
-     * @param slotCount
+     * @param origin    origin
+     * @param rate      rate
+     * @param slotCount slotCount
      */
     public MetricCache(MetricCache origin, long rate, int slotCount) {
         Preconditions.checkNotNull(origin);
@@ -97,7 +97,7 @@ public class MetricCache {
     /**
      * 找出一个可用的位置, 第一个available=true 或者 所有slot里, cursor最小的那个
      *
-     * @return
+     * @return available slot
      */
     private int findAvailableSlot() {
         int oldestSlotIndex = -1;
