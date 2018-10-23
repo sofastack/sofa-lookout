@@ -101,6 +101,10 @@ public abstract class LookoutBucketCounter implements Metric, MetricIterable {
 
     public Iterator<Metric> iterator() {
 
+        if (buckets == null) {
+            return null;
+        }
+
         roll();
 
         return new Iterator<Metric>() {
@@ -144,7 +148,6 @@ public abstract class LookoutBucketCounter implements Metric, MetricIterable {
     class BucketMetric implements Metric {
 
         Id   id;
-
         long count;
 
         public BucketMetric(int i) {
