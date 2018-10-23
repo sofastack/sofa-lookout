@@ -28,19 +28,19 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class LookoutBucketCounter implements Metric, MetricIterable {
 
-    private static final String   BUCKET_TAG_NAME = "_bucket";
+    private static final String BUCKET_TAG_NAME = "_bucket";
 
-    protected Clock               clock;
+    protected Clock clock;
 
-    private long                  step;
+    private long step;
 
-    private long[]                buckets;
+    private long[] buckets;
 
     private volatile AtomicLong[] counts;
 
     private volatile AtomicLong[] prevCounts;
 
-    private AtomicLong            lastInitPos;
+    private AtomicLong lastInitPos;
 
     public LookoutBucketCounter(Clock clock, long step) {
         this.clock = clock;
@@ -101,11 +101,15 @@ public abstract class LookoutBucketCounter implements Metric, MetricIterable {
 
     public Iterator<Metric> iterator() {
 
+        if (buckets == null) {
+            return null;
+        }
+
         roll();
 
         return new Iterator<Metric>() {
 
-            int            i = 0;
+            int i = 0;
 
             private Metric metric;
 
@@ -143,7 +147,7 @@ public abstract class LookoutBucketCounter implements Metric, MetricIterable {
 
     class BucketMetric implements Metric {
 
-        Id   id;
+        Id id;
 
         long count;
 
@@ -162,7 +166,7 @@ public abstract class LookoutBucketCounter implements Metric, MetricIterable {
         public Indicator measure() {
             long time = lastInitPos.get() * step;
             Indicator indicator = new Indicator(time, id).addMeasurement(Statistic.buckets.name(),
-                count);
+                    count);
             return indicator;
         }
 
