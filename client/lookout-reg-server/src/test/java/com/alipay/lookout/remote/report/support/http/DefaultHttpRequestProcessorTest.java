@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.remote.report.support.http;
 
+import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.report.DefaultAddressService;
 import org.apache.http.client.methods.HttpPost;
@@ -41,7 +42,8 @@ public class DefaultHttpRequestProcessorTest {
     @Test(expected = IOException.class)
     public void testSendPostFail() throws IOException {
         AddressService addressService = new DefaultAddressService();
-        DefaultHttpRequestProcessor p = new DefaultHttpRequestProcessor(addressService);
+        DefaultHttpRequestProcessor p = new DefaultHttpRequestProcessor(addressService,
+            new LookoutConfig());
         HttpPost httpPost = new HttpPost("http://localhost/ok");
         try {
             httpPost.setEntity(new StringEntity("a"));

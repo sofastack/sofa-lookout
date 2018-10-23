@@ -16,6 +16,7 @@
  */
 package com.alipay.lookout.remote.report.support;
 
+import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.report.DefaultAddressService;
 import com.alipay.lookout.remote.report.support.http.DefaultHttpRequestProcessor;
 import org.apache.http.Header;
@@ -33,7 +34,8 @@ import static com.alipay.lookout.remote.report.support.http.DefaultHttpRequestPr
  */
 public class HttpRequestProcessorTest {
     final DefaultHttpRequestProcessor httpRequestProcessor = new DefaultHttpRequestProcessor(
-                                                               new DefaultAddressService());
+                                                               new DefaultAddressService(),
+                                                               new LookoutConfig());
 
     @Test
     public void testHandleErrorResponse401() {

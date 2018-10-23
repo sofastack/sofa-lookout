@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * @author xiangfeng.xzc
- * @date 2018/7/17
+ * @since 2018/7/17
  */
 public class Slot {
     private long            cursor = -1;

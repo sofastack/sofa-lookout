@@ -17,8 +17,10 @@
 package com.alipay.lookout.remote.report.support.http;
 
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
+import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.report.Address;
 import com.alipay.lookout.remote.report.AddressService;
+import com.google.common.base.Preconditions;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 
@@ -39,10 +41,18 @@ public abstract class ReportDecider implements HttpRequestProcessor {
     private long                     expiredTime             = 65000;                            //65s
 
     private AddressService           addressService;
+    private MetricConfig             metricConfig;
 
-    public ReportDecider(AddressService addressService) {
+    public ReportDecider(AddressService addressService, MetricConfig metricConfig) {
+        Preconditions.checkNotNull(addressService, "An addressService is required!");
+        Preconditions.checkNotNull(metricConfig, "A metricConfig is required!");
         this.addressService = addressService;
         this.addressLastModifiedTime = System.currentTimeMillis() - expiredTime;
+        this.metricConfig = metricConfig;
+    }
+
+    protected MetricConfig getMetricConfig() {
+        return metricConfig;
     }
 
     public boolean stillSilent() {
@@ -62,7 +72,7 @@ public abstract class ReportDecider implements HttpRequestProcessor {
     /**
      * 保证一定时间(2min)内，只使用同一个 gateway 地址连接上报（优化连接使用）
      *
-     * @return
+     * @return available address
      */
     public synchronized Address getAvailableAddress() {
         if (isAddressExpired()) {
@@ -79,6 +89,7 @@ public abstract class ReportDecider implements HttpRequestProcessor {
         Address oldOne = addressHolder.get();
         Address newOne = addressService.getAgentServerHost();
         if (newOne == null) {
+            logger.debug("No gateway address found!");
             return;
         }
         //check new address
@@ -100,7 +111,8 @@ public abstract class ReportDecider implements HttpRequestProcessor {
             return;
         } catch (Throwable e) {
             logger.debug("check gateway address {} fail:{}. old address:{}!", newOne.ip(),
-                e.getMessage(), oldOne.ip());
+                e.getMessage(), oldOne == null ? "" : oldOne.ip());
+
         }
 
     }
