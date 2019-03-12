@@ -20,30 +20,37 @@ import com.alipay.lookout.api.Clock;
 import com.alipay.lookout.api.Metric;
 import com.alipay.lookout.api.info.Info;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
+import com.alipay.lookout.core.CommonTagsAccessor;
 import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.reg.prometheus.common.PromWriter;
 import com.alipay.lookout.reg.prometheus.exporter.ExporterServer;
+import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static com.alipay.lookout.core.config.LookoutConfig.APP_NAME;
 import static com.alipay.lookout.core.config.LookoutConfig.DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT;
 import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT;
 
 /**
  * Created by kevin.luy@alipay.com on 2018/5/10.
  */
-public class PrometheusRegistry extends DefaultRegistry implements Closeable {
-    private static final Logger  logger     = LookoutLoggerFactory
-                                                .getLogger(PrometheusRegistry.class);
-    private final ExporterServer exporterServer;
-    private final PromWriter     promWriter = new PromWriter();
+public class PrometheusRegistry extends DefaultRegistry implements Closeable, CommonTagsAccessor {
+    private static final Logger       logger     = LookoutLoggerFactory
+                                                     .getLogger(PrometheusRegistry.class);
+    private final ExporterServer      exporterServer;
+    private final PromWriter          promWriter = new PromWriter();
+    private final Map<String, String> commonTags = new ConcurrentHashMap<String, String>();
 
     public PrometheusRegistry(MetricConfig config) {
         this(Clock.SYSTEM, config);
@@ -53,6 +60,10 @@ public class PrometheusRegistry extends DefaultRegistry implements Closeable {
         super(clock, config);
         int serverPort = config.getInt(LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT,
             DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT);
+        String appName = config.getString(APP_NAME);
+        if (StringUtils.isNotEmpty(appName)) {
+            setCommonTag("app", appName);
+        }
         exporterServer = new ExporterServer(serverPort);
         exporterServer.addMetricsQueryHandler(new HttpHandler() {
             @Override
@@ -87,7 +98,8 @@ public class PrometheusRegistry extends DefaultRegistry implements Closeable {
             if (metric instanceof Info) {
                 continue;
             }
-            sb.append(promWriter.printFromIndicator(metric.measure()));
+            LookoutMeasurement measurement = LookoutMeasurement.from(metric, this);
+            sb.append(promWriter.printFromLookoutMeasurement(measurement));
         }
         return sb.toString();
     }
@@ -97,5 +109,29 @@ public class PrometheusRegistry extends DefaultRegistry implements Closeable {
         exporterServer.stop();
         logger.info("lookout client exporter is stopped.");
 
+    }
+
+    @Override
+    public String getCommonTagValue(String name) {
+        return commonTags.get(name);
+    }
+
+    @Override
+    public void setCommonTag(String name, String value) {
+        if (value == null) {
+            commonTags.remove(name);
+        } else {
+            commonTags.put(name, value);
+        }
+    }
+
+    @Override
+    public void removeCommonTag(String name) {
+        commonTags.remove(name);
+    }
+
+    @Override
+    public Map<String, String> commonTags() {
+        return commonTags;
     }
 }

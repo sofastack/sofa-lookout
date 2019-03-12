@@ -72,7 +72,7 @@ public abstract class ReportDecider implements HttpRequestProcessor {
     /**
      * 保证一定时间(2min)内，只使用同一个 gateway 地址连接上报（优化连接使用）
      *
-     * @return
+     * @return available address
      */
     public synchronized Address getAvailableAddress() {
         if (isAddressExpired()) {

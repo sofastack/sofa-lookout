@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.alipay.sofa.lookout</groupId>
             <artifactId>lookout-client</artifactId>
-            <version>1.5.1</version>
+            <version>1.5.3</version>
         </dependency>
         <!-- log4j 2 for lookout client-->
         <dependency>
