@@ -24,6 +24,8 @@ package com.alipay.lookout.os.utils;
 public class NumFormatUtils {
     /**
      * 保留两位小数
+     * @param data data
+     * @return float
      */
     public static float formatFloat(float data) {
         return (float) (Math.round(data * 100) / 100.0);
@@ -31,6 +33,8 @@ public class NumFormatUtils {
 
     /**
      * 保留两位小数
+     * @param usage usage
+     * @return float
      */
     public static float formatFloat(String usage) {
         return (float) (Math.round(Float.parseFloat(usage) * 100) / 100.0);

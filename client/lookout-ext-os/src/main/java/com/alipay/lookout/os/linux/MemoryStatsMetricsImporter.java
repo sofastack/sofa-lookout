@@ -31,8 +31,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * resolve memory metrics from "/proc/meminfo"
+ *
  * @author: kevin.luy@antfin.com
- * @create: 2019-03-12 17:30
+ * 2019-03-12 17:30
  **/
 public class MemoryStatsMetricsImporter extends CachedMetricsImporter {
 
@@ -52,9 +53,9 @@ public class MemoryStatsMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     * @param filePath
-     * @param timeout
-     * @param timeoutUnit
+     * @param filePath    filePath
+     * @param timeout     timeout
+     * @param timeoutUnit timeoutUnit
      */
     public MemoryStatsMetricsImporter(String filePath, long timeout, TimeUnit timeoutUnit) {
         super(timeout, timeoutUnit);

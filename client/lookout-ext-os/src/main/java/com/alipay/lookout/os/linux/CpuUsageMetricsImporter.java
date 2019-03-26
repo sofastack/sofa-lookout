@@ -70,9 +70,9 @@ public class CpuUsageMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     * @param filePath
-     * @param timeout
-     * @param timeoutUnit
+     * @param filePath file path
+     * @param timeout timeout
+     * @param timeoutUnit timeout unit
      */
     public CpuUsageMetricsImporter(String filePath, long timeout, TimeUnit timeoutUnit) {
         super(timeout, timeoutUnit);

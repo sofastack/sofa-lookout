@@ -75,10 +75,10 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     * @param filePath
-     * @param upTimeFilePath
-     * @param timeout
-     * @param timeoutUnit
+     * @param filePath filePath
+     * @param upTimeFilePath upTimeFilePath
+     * @param timeout timeout
+     * @param timeoutUnit timeoutUnit
      */
     public IOStatsMetricsImporter(String filePath, String upTimeFilePath, long timeout,
                                   TimeUnit timeoutUnit) {
