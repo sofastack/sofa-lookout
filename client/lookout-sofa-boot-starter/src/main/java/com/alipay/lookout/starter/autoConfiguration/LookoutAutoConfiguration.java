@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -44,7 +44,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.alipay.lookout.core.config.LookoutConfig.*;
@@ -56,14 +59,9 @@ import static com.alipay.lookout.core.config.LookoutConfig.*;
 @Configuration
 @EnableConfigurationProperties(LookoutClientProperties.class)
 public class LookoutAutoConfiguration implements BeanFactoryAware {
-    private static final Logger                      logger = LoggerFactory
-                                                                .getLogger(LookoutAutoConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(LookoutAutoConfiguration.class);
 
-    @Autowired(required = false)
-    private List<MetricObserver<LookoutMeasurement>> metricObservers;
-    @Autowired(required = false)
-    private List<MetricConfigCustomizer>             metricConfigCustomizers;
-    private BeanFactory                              beanFactory;
+    private BeanFactory         beanFactory;
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -77,12 +75,19 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
         Assert.notNull(appName, "spring.application.name can not be null!");
         LookoutConfig config = buildLookoutConfig(lookoutClientProperties);
         config.setProperty(APP_NAME, appName);
-        if (metricConfigCustomizers != null) {
-            for (MetricConfigCustomizer configCustomizer : metricConfigCustomizers) {
+        //configure
+        configureLookoutConfig(config);
+        return config;
+    }
+
+    protected void configureLookoutConfig(LookoutConfig config) {
+        if (beanFactory instanceof ListableBeanFactory
+            && ((ListableBeanFactory) beanFactory).getBeansOfType(MetricConfigCustomizer.class) != null) {
+            for (MetricConfigCustomizer configCustomizer : ((ListableBeanFactory) beanFactory)
+                .getBeansOfType(MetricConfigCustomizer.class).values()) {
                 configCustomizer.customize(config);
             }
         }
-        return config;
     }
 
     @Bean
@@ -95,7 +100,22 @@ public class LookoutAutoConfiguration implements BeanFactoryAware {
     @Bean
     @ConditionalOnClass(name = "com.alipay.lookout.remote.step.LookoutRegistry")
     public MetricsRegistryFactory lookoutServerRegistryFactory(AddressService addressService) {
-        return new LookoutServerRegistryFactory(metricObservers, addressService);
+        return new LookoutServerRegistryFactory(getMetricObservers(), addressService);
+    }
+
+    protected List<MetricObserver<LookoutMeasurement>> getMetricObservers() {
+        List<MetricObserver<LookoutMeasurement>> metricObservers = null;
+        if (beanFactory instanceof ListableBeanFactory) {
+            Collection<MetricObserver> metricObserverCollection = ((ListableBeanFactory) beanFactory)
+                .getBeansOfType(MetricObserver.class).values();
+            if (!CollectionUtils.isEmpty(metricObserverCollection)) {
+                metricObservers = new ArrayList<MetricObserver<LookoutMeasurement>>();
+                for (MetricObserver metricObserver : metricObserverCollection) {
+                    metricObservers.add(metricObserver);
+                }
+            }
+        }
+        return metricObservers;
     }
 
     @Bean

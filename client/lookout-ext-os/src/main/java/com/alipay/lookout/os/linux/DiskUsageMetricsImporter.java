@@ -65,9 +65,9 @@ public class DiskUsageMetricsImporter extends CachedMetricsImporter {
 
     /**
      *
-     * @param filePath
-     * @param timeout
-     * @param timeoutUnit
+     * @param filePath filePath
+     * @param timeout timeout
+     * @param timeoutUnit timeoutUnit
      */
     public DiskUsageMetricsImporter(String filePath, long timeout, TimeUnit timeoutUnit) {
         super(timeout, timeoutUnit);

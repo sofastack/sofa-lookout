@@ -33,6 +33,7 @@ public class FileUtils {
      *
      * @param path the path to file
      * @return the file content as string
+     * @throws IOException IOException
      */
     public static String readFile(String path) throws IOException {
         BufferedReader reader = null;
@@ -60,6 +61,7 @@ public class FileUtils {
      *
      * @param path the path to file
      * @return the file content as string list
+     * @throws IOException IOException
      */
     public static List<String> readFileAsStringArray(String path) throws IOException {
         BufferedReader reader = null;
