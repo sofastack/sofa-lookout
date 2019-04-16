@@ -57,13 +57,14 @@ abstract class AbstractTopMetric {
         TopUtil.executor.execute(new Runnable() {
             @Override
             public void run() {
-                pushSafe(set, entry);
+                synchronized (set) {
+                    pushSafe(set, entry);
+                }
             }
         });
     }
 
     private void pushSafe(TreeSet<TopUtil.Entry<Id, Long>> set, TopUtil.Entry<Id, Long> e) {
-        synchronized (set) {
             if (!set.isEmpty()) {
                 boolean replaceable = false;
                 TopUtil.Entry<Id, Long> boundaryTarget = null;
@@ -82,7 +83,6 @@ abstract class AbstractTopMetric {
                 }
             }
             add(set, e);
-        }
     }
 
     private void remove(TreeSet<TopUtil.Entry<Id, Long>> set, TopUtil.Entry<Id, Long> boundaryTarget) {
