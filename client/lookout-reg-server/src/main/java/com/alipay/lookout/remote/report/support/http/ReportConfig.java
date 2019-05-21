@@ -16,24 +16,32 @@
  */
 package com.alipay.lookout.remote.report.support.http;
 
-import com.alipay.lookout.remote.report.Address;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by kevin.luy@alipay.com on 2018/6/5.
- */
-public interface HttpRequestProcessor {
+ * @author: kevin.luy@antfin.com
+ * @create: 2019-05-20 11:21
+ **/
+public class ReportConfig {
 
-    boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException;
+    private String              id     = "";
+    private Map<String, String> config = new HashMap<String, String>();
 
-    boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException;
+    public String getId() {
+        return id;
+    }
 
-    boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata,
-                           ResultConsumer resultConsumer) throws IOException;
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    Address getAvailableAddress();
+    public Map<String, String> getConfig() {
+        return config;
+    }
+
+    public void setConfig(Map<String, String> config) {
+        this.config = config;
+    }
+
 }

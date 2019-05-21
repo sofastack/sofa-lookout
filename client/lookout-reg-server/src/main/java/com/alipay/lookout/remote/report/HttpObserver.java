@@ -23,6 +23,7 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.support.http.DefaultHttpRequestProcessor;
 import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
+import com.alipay.lookout.remote.report.support.http.ReportConfigUtil;
 import com.alipay.lookout.remote.report.support.http.ReportDecider;
 import com.alipay.lookout.report.MetricObserver;
 import com.google.common.base.Preconditions;
@@ -70,6 +71,8 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     private volatile boolean           disableReportAlreadyLogged = false;
 
     private Registry                   reg;
+
+    private final ReportConfigUtil     reportConfigUtil           = new ReportConfigUtil();
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService) {
         this(lookoutConfig, addrService, null);
@@ -158,8 +161,18 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             logger.debug("## no gateway address found, drop metrics:\n{}\n", measures.toString());
             return;
         }
-        logger.debug(">> send metrics to {}:\n{}\n", address, measures.toString());
-        List<List<LookoutMeasurement>> batches = getBatches(measures,
+
+        //refresh report config
+        reportConfigUtil.refreshReportConfig(buildRealAgentServerURL(address) + "/config",
+            httpRequestProcessor, lookoutConfig.getString(LookoutConfig.APP_NAME));
+
+        //Filter measures by config
+        List<LookoutMeasurement> filteredMeasures = reportConfigUtil.filter(measures);
+        if (filteredMeasures.isEmpty()) {
+            return;
+        }
+        logger.debug(">> send metrics to {}:\n{}\n", address, filteredMeasures.toString());
+        List<List<LookoutMeasurement>> batches = getBatches(filteredMeasures,
             lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
         for (List<LookoutMeasurement> batch : batches) {
             reportBatch(batch, metadata, address);

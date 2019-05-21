@@ -21,6 +21,7 @@ import com.alipay.lookout.core.DefaultRegistry;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
+import com.alipay.lookout.remote.report.support.http.ResultConsumer;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.junit.Assert;
@@ -82,6 +83,12 @@ public class HttpObserverTest {
         @Override
         public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata)
                                                                                     throws IOException {
+            return false;
+        }
+
+        @Override
+        public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata,
+                                      ResultConsumer resultConsumer) throws IOException {
             return false;
         }
     }

@@ -26,6 +26,7 @@ import com.alipay.lookout.core.config.MetricConfig;
 import com.alipay.lookout.remote.report.AddressService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
@@ -78,17 +79,33 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
     @Override
     public boolean sendGetRequest(final HttpGet httpGet, Map<String, String> metadata)
                                                                                       throws IOException {
+        return sendGetRequest(httpGet, metadata, new ResultConsumer() {
+            @Override
+            public void consume(HttpEntity entity) {
+                logger.debug("check lookout gateway ok.{}", httpGet.toString());
+            }
+        });
+    }
+
+    @Override
+    public boolean sendGetRequest(final HttpGet httpGet, Map<String, String> metadata,
+                                  final ResultConsumer resultConsumer) throws IOException {
         addCommonHeaders(httpGet, metadata);
         httpGet.setConfig(reqConf);
         return sendRequest(httpGet, new ResponseHandler<Boolean>() {
             @Override
             public Boolean handleResponse(HttpResponse response) throws IOException {
                 try {
+                    if (304 == response.getStatusLine().getStatusCode()) {
+                        return true;
+                    }
+                    if (200 == response.getStatusLine().getStatusCode()) {
+                        resultConsumer.consume(response.getEntity());
+                        return true;
+                    }
                     if (200 != response.getStatusLine().getStatusCode()) {
                         handleErrorResponse(response, httpGet);
                         return false;
-                    } else {//success
-                        logger.debug("check lookout gateway ok.{}", httpGet.toString());
                     }
                 } finally {
                     EntityUtils.consumeQuietly(response.getEntity());
@@ -168,6 +185,9 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
             logger.info(">>WARNING: Unauthorized!msg:{},request:{}", errMsg, request.toString());
         } else if (403 == status) {
             logger.info(">>WARNING: Forbidden!msg:{},request:{}", errMsg, request.toString());
+        } else if (404 == status) {
+            logger.debug(">>WARNING: ResourceNotFound!msg:{},request:{}", errMsg,
+                request.toString());
         } else if (555 == status) {
             logger.info(">>WARNING: gateway current limit!msg:{},request:{}", errMsg,
                 request.toString());

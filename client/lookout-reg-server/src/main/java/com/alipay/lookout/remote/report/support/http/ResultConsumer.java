@@ -16,24 +16,13 @@
  */
 package com.alipay.lookout.remote.report.support.http;
 
-import com.alipay.lookout.remote.report.Address;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-
-import java.io.IOException;
-import java.util.Map;
+import org.apache.http.HttpEntity;
 
 /**
- * Created by kevin.luy@alipay.com on 2018/6/5.
- */
-public interface HttpRequestProcessor {
+ * @author: kevin.luy@antfin.com
+ * @create: 2019-05-20 11:46
+ **/
+public interface ResultConsumer {
 
-    boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException;
-
-    boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException;
-
-    boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata,
-                           ResultConsumer resultConsumer) throws IOException;
-
-    Address getAvailableAddress();
+    void consume(HttpEntity entity);
 }

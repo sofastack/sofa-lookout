@@ -66,5 +66,11 @@ public class ReportDeciderTest {
                                                                                     throws IOException {
             return true;
         }
+
+        @Override
+        public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata,
+                                      ResultConsumer resultConsumer) throws IOException {
+            return false;
+        }
     }
 }

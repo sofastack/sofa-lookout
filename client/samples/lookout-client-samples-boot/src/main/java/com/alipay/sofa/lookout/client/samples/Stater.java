@@ -27,7 +27,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
 /**
  * Created by kevin.luy@alipay.com on 2018/4/23.
  */
