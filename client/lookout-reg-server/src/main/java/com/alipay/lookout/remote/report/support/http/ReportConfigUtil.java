@@ -143,16 +143,14 @@ public class ReportConfigUtil {
                 return null;
             }
             tagWhitelist = new HashMap<String, String>();
-            if (value != null) {
-                String[] kvs = StringUtils.split(value, ",");
-                if (kvs != null) {
-                    for (String kv : kvs) {
-                        if (kv != null && kv.indexOf("=") > 0) {
-                            String[] kvArray = StringUtils.split(kv, "=");
-                            if (StringUtils.isNotEmpty(kvArray[0])
-                                && StringUtils.isNotEmpty(kvArray[1]))
-                                tagWhitelist.put(kvArray[0].trim(), kvArray[1].trim());
-                        }
+            String[] kvs = StringUtils.split(value, ",");
+            if (kvs != null) {
+                for (String kv : kvs) {
+                    if (kv != null && kv.indexOf("=") > 0) {
+                        String[] kvArray = StringUtils.split(kv, "=");
+                        if (StringUtils.isNotEmpty(kvArray[0])
+                            && StringUtils.isNotEmpty(kvArray[1]))
+                            tagWhitelist.put(kvArray[0].trim(), kvArray[1].trim());
                     }
                 }
             }

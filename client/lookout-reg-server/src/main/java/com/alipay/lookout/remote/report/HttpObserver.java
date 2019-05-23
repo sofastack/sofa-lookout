@@ -171,7 +171,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         if (filteredMeasures.isEmpty()) {
             return;
         }
-        logger.debug(">> send metrics to {}:\n{}\n", address, filteredMeasures.toString());
+        logger.debug(">> send metrics to {}:\n{}\n", address, filteredMeasures);
         List<List<LookoutMeasurement>> batches = getBatches(filteredMeasures,
             lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
         for (List<LookoutMeasurement> batch : batches) {
@@ -268,8 +268,8 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         } catch (Throwable e) {
             if (e instanceof UnknownHostException || e instanceof ConnectException) {
                 addressService.clearAddressCache();
-                logger.info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest.toString(),
-                    e.getMessage());
+                logger
+                    .info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest, e.getMessage());
             } else if (e instanceof SocketTimeoutException) {
                 registry().counter(
                     registry().createId("lookout.client.report.fail.count").withTag("err",
@@ -277,8 +277,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             } else {
                 registry().counter(registry().createId("lookout.client.report.fail.count")).inc();
             }
-            logger.info(">>WARNING: lookout agent:{} fail!cause:{}", httpRequest.toString(),
-                e.getMessage());
+            logger.info(">>WARNING: lookout agent:{} fail!cause:{}", httpRequest, e.getMessage());
         }
     }
 
