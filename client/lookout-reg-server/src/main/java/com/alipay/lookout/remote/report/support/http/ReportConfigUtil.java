@@ -20,7 +20,6 @@ import com.alibaba.fastjson.JSON;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ import java.util.*;
  * @author: kevin.luy@antfin.com
  * @create: 2019-05-20 20:19
  **/
-public class ReportConfigUtil {
+class ReportConfigUtil {
     private static final Logger          logger                       = LoggerFactory
                                                                           .getLogger(ReportConfigUtil.class);
     //jvm.memory,rpc.consumer
@@ -39,9 +38,38 @@ public class ReportConfigUtil {
     //k1=v1,k2=v2
     public static final String           TAG_WHITELIST                = "tag_wl";
 
-    private volatile ReportConfig        reportConfig                 = new ReportConfig();
+    private ReportConfig                 reportConfig                 = EMPTY_CONFIG;
     private volatile List<String>        metricNamePrefixWhitelist    = null;
     private volatile Map<String, String> tagWhitelist                 = null;
+    private static final ReportConfig    EMPTY_CONFIG                 = new ReportConfig();
+    private final ResultConsumer         configResultConsumer         = newResultConsumer();
+
+    private ResultConsumer newResultConsumer() {
+        return new ResultConsumer() {
+            @Override
+            public void consume(HttpEntity entity) {
+                try {
+                    String conf = EntityUtils.toString(entity, "UTF-8");
+                    setReportConfig(StringUtils.isEmpty(conf) ? EMPTY_CONFIG : JSON.parseObject(
+                        conf, ReportConfig.class));
+                    logger.info("receive a new report config,id:{}", reportConfig.getId());
+                    metricNamePrefixWhitelist = null;
+                    tagWhitelist = null;
+                } catch (Throwable e) {
+                    logger.warn("fail to resolve the  fresh report config response.{}",
+                        e.getMessage());
+                }
+            }
+        };
+    }
+
+    ResultConsumer getConfigResultConsumer() {
+        return configResultConsumer;
+    }
+
+    private void setReportConfig(ReportConfig reportConfig) {
+        this.reportConfig = reportConfig;
+    }
 
     public List<LookoutMeasurement> filter(List<LookoutMeasurement> measures) {
         List<String> mnps = getMetricNamePrefixWhitelist();
@@ -80,40 +108,6 @@ public class ReportConfigUtil {
 
     public ReportConfig getReportConfig() {
         return reportConfig;
-    }
-
-    private long lastRequestTime = -1l;
-
-    public synchronized void refreshReportConfig(String configUrl,
-                                                 HttpRequestProcessor httpRequestProcessor,
-                                                 String app) {
-        //上次时间,是否超过1min?
-        if (System.currentTimeMillis() - lastRequestTime < 60 * 1000) {
-            return;
-        }
-        final HttpGet httpGet = new HttpGet(configUrl
-                                            + String.format("?app=%s&id=%s", app,
-                                                reportConfig == null ? "" : reportConfig.getId()));
-        try {
-            httpRequestProcessor.sendGetRequest(httpGet, null, new ResultConsumer() {
-                @Override
-                public void consume(HttpEntity entity) {
-                    try {
-                        String conf = EntityUtils.toString(entity, "UTF-8");
-                        reportConfig = JSON.parseObject(conf, ReportConfig.class);
-                        metricNamePrefixWhitelist = null;
-                        tagWhitelist = null;
-                    } catch (Throwable e) {
-                        logger.warn("fail to resolve the  fresh report config response.{},{}",
-                            httpGet, e.getMessage());
-                    }
-                }
-            });
-        } catch (Throwable e) {
-            logger.warn("fail to refresh the report config of {}. {}", app, e.getMessage());
-        } finally {
-            lastRequestTime = System.currentTimeMillis();
-        }
     }
 
     private synchronized List<String> getMetricNamePrefixWhitelist() {

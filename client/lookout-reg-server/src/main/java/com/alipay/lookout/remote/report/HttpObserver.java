@@ -23,7 +23,6 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.support.http.DefaultHttpRequestProcessor;
 import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
-import com.alipay.lookout.remote.report.support.http.ReportConfigUtil;
 import com.alipay.lookout.remote.report.support.http.ReportDecider;
 import com.alipay.lookout.report.MetricObserver;
 import com.google.common.base.Preconditions;
@@ -71,8 +70,6 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
     private volatile boolean           disableReportAlreadyLogged = false;
 
     private Registry                   reg;
-
-    private final ReportConfigUtil     reportConfigUtil           = new ReportConfigUtil();
 
     public HttpObserver(LookoutConfig lookoutConfig, AddressService addrService) {
         this(lookoutConfig, addrService, null);
@@ -162,12 +159,8 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             return;
         }
 
-        //refresh report config
-        reportConfigUtil.refreshReportConfig(buildRealAgentServerURL(address) + "/config",
-            httpRequestProcessor, lookoutConfig.getString(LookoutConfig.APP_NAME));
-
         //Filter measures by config
-        List<LookoutMeasurement> filteredMeasures = reportConfigUtil.filter(measures);
+        List<LookoutMeasurement> filteredMeasures = filter(measures);
         if (filteredMeasures.isEmpty()) {
             return;
         }
@@ -177,6 +170,13 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         for (List<LookoutMeasurement> batch : batches) {
             reportBatch(batch, metadata, address);
         }
+    }
+
+    private List<LookoutMeasurement> filter(List<LookoutMeasurement> measures) {
+        if (httpRequestProcessor instanceof ReportDecider) {
+            return ((ReportDecider) httpRequestProcessor).filter(measures);
+        }
+        return measures;
     }
 
     /**

@@ -23,7 +23,7 @@ import java.util.Map;
  * @author: kevin.luy@antfin.com
  * @create: 2019-05-20 11:21
  **/
-public class ReportConfig {
+public final class ReportConfig {
 
     private String              id     = "";
     private Map<String, String> config = new HashMap<String, String>();

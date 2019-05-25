@@ -16,11 +16,13 @@
  */
 package com.alipay.lookout.remote.report.support.http;
 
-import com.alipay.lookout.MockHttpRequestProcessor;
 import com.alipay.lookout.api.Id;
 import com.alipay.lookout.api.Registry;
 import com.alipay.lookout.core.DefaultRegistry;
+import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.report.AddressService;
+import com.alipay.lookout.remote.report.DefaultAddressService;
 import org.apache.http.entity.StringEntity;
 import org.junit.Assert;
 import org.junit.Before;
@@ -84,14 +86,11 @@ public class ReportConfigUtilTest {
     @Test
     public void testRefreshReportConfig() throws UnsupportedEncodingException {
         ReportConfigUtil reportConfigUtil = new ReportConfigUtil();
-        MockHttpRequestProcessor mockHttpRequestProcessor = new MockHttpRequestProcessor();
-        mockHttpRequestProcessor
-            .setEntity(new StringEntity(
-                "{\"id\":\"xxx\",\"config\":{\"name_pre_wl\":\"jvm.memory,rpc.consumer\",\"tag_wl\":\"k1=v1,k2=v2\"}}"));
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        String oldId = reportConfigUtil.getReportConfig().getId();
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        Assert.assertEquals(oldId, reportConfigUtil.getReportConfig().getId());
+        reportConfigUtil
+            .getConfigResultConsumer()
+            .consume(
+                new StringEntity(
+                    "{\"id\":\"xxx\",\"config\":{\"name_pre_wl\":\"jvm.memory,rpc.consumer\",\"tag_wl\":\"k1=v1,k2=v2\"}}"));
         Assert.assertEquals(5, measurements.size());
         List<LookoutMeasurement> measurementList = reportConfigUtil.filter(measurements);
         Assert.assertEquals(4, measurementList.size());
@@ -100,13 +99,8 @@ public class ReportConfigUtilTest {
     @Test
     public void testRefreshReportConfigWithBlankValue() throws UnsupportedEncodingException {
         ReportConfigUtil reportConfigUtil = new ReportConfigUtil();
-        MockHttpRequestProcessor mockHttpRequestProcessor = new MockHttpRequestProcessor();
-        mockHttpRequestProcessor.setEntity(new StringEntity(
-            "{\"id\":\"xxx\",\"config\":{\"name_pre_wl\":\"\",\"tag_wl\":\"\"}}"));
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        String oldId = reportConfigUtil.getReportConfig().getId();
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        Assert.assertEquals(oldId, reportConfigUtil.getReportConfig().getId());
+        reportConfigUtil.getConfigResultConsumer().consume(
+            new StringEntity("{\"id\":\"xxx\",\"config\":{\"name_pre_wl\":\"\",\"tag_wl\":\"\"}}"));
         Assert.assertEquals(5, measurements.size());
         List<LookoutMeasurement> measurementList = reportConfigUtil.filter(measurements);
         Assert.assertEquals(0, measurementList.size());
@@ -115,12 +109,8 @@ public class ReportConfigUtilTest {
     @Test
     public void testRefreshReportConfigWithoutConfigs() throws UnsupportedEncodingException {
         ReportConfigUtil reportConfigUtil = new ReportConfigUtil();
-        MockHttpRequestProcessor mockHttpRequestProcessor = new MockHttpRequestProcessor();
-        mockHttpRequestProcessor.setEntity(new StringEntity("{\"id\":\"xxx\",\"config\":{}}"));
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        String oldId = reportConfigUtil.getReportConfig().getId();
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        Assert.assertEquals(oldId, reportConfigUtil.getReportConfig().getId());
+        reportConfigUtil.getConfigResultConsumer().consume(
+            new StringEntity("{\"id\":\"xxx\",\"config\":{}}"));
         Assert.assertEquals(5, measurements.size());
         List<LookoutMeasurement> measurementList = reportConfigUtil.filter(measurements);
         Assert.assertEquals(5, measurementList.size());
@@ -129,13 +119,9 @@ public class ReportConfigUtilTest {
     @Test
     public void testRefreshReportConfigOnlyMetricName() throws UnsupportedEncodingException {
         ReportConfigUtil reportConfigUtil = new ReportConfigUtil();
-        MockHttpRequestProcessor mockHttpRequestProcessor = new MockHttpRequestProcessor();
-        mockHttpRequestProcessor.setEntity(new StringEntity(
-            "{\"id\":\"xxx\",\"config\":{\"name_pre_wl\":\"jvm.memory,rpc.consumer\"}}"));
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        String oldId = reportConfigUtil.getReportConfig().getId();
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        Assert.assertEquals(oldId, reportConfigUtil.getReportConfig().getId());
+        reportConfigUtil.getConfigResultConsumer().consume(
+            new StringEntity(
+                "{\"id\":\"xxx\",\"config\":{\"name_pre_wl\":\"jvm.memory,rpc.consumer\"}}"));
         Assert.assertEquals(5, measurements.size());
         List<LookoutMeasurement> measurementList = reportConfigUtil.filter(measurements);
         Assert.assertEquals(3, measurementList.size());
@@ -144,16 +130,20 @@ public class ReportConfigUtilTest {
     @Test
     public void testRefreshReportConfigOnlyTags() throws UnsupportedEncodingException {
         ReportConfigUtil reportConfigUtil = new ReportConfigUtil();
-        MockHttpRequestProcessor mockHttpRequestProcessor = new MockHttpRequestProcessor();
-        mockHttpRequestProcessor.setEntity(new StringEntity(
-            "{\"id\":\"xxx\",\"config\":{\"tag_wl\":\"k1=v1,k2=v2\"}}"));
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        String oldId = reportConfigUtil.getReportConfig().getId();
-        reportConfigUtil.refreshReportConfig("url", mockHttpRequestProcessor, "demo");
-        Assert.assertEquals(oldId, reportConfigUtil.getReportConfig().getId());
+        reportConfigUtil.getConfigResultConsumer().consume(
+            new StringEntity("{\"id\":\"xxx\",\"config\":{\"tag_wl\":\"k1=v1,k2=v2\"}}"));
         Assert.assertEquals(5, measurements.size());
         List<LookoutMeasurement> measurementList = reportConfigUtil.filter(measurements);
         Assert.assertEquals(4, measurementList.size());
+    }
+
+    @Test
+    public void testFilterMeasures() {
+        AddressService addressService = new DefaultAddressService();
+        DefaultHttpRequestProcessor p = new DefaultHttpRequestProcessor(addressService,
+            new LookoutConfig());
+        List<LookoutMeasurement> measurementList = p.filter(measurements);
+        Assert.assertEquals(measurements.size(), measurementList.size());
     }
 
 }

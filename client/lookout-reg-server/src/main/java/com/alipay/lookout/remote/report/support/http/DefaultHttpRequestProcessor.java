@@ -23,6 +23,7 @@ import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.utils.NetworkUtil;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.core.config.MetricConfig;
+import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.AddressService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
@@ -41,6 +42,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -61,6 +63,8 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
     public static final String         WAIT_MINUTES                 = "Wait-Minutes";
     static final String                CLIENT_VERSION               = "LOOKOUT-CLIENT-V1";
     static final String                APP_HEADER_NAME              = "app";
+    static final String                CONFIG_HEADER_NAME           = "Conf-Id";
+    private static final String        CELL_HEADER_NAME             = "Cell";
 
     private final String               clientIp                     = NetworkUtil.getLocalAddress()
                                                                         .getHostAddress();
@@ -71,6 +75,8 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
     private static Runnable            clearIdleConnectionsTask;
 
     private static final AtomicBoolean httpClientInitialized        = new AtomicBoolean(false);
+
+    private final ReportConfigUtil     reportConfigUtil             = new ReportConfigUtil();
 
     public DefaultHttpRequestProcessor(AddressService addressService, MetricConfig metricConfig) {
         super(addressService, metricConfig);
@@ -83,6 +89,7 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
             @Override
             public void consume(HttpEntity entity) {
                 logger.debug("check lookout gateway ok.{}", httpGet.toString());
+                reportConfigUtil.getConfigResultConsumer().consume(entity);
             }
         });
     }
@@ -90,18 +97,30 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
     @Override
     public boolean sendGetRequest(final HttpGet httpGet, Map<String, String> metadata,
                                   final ResultConsumer resultConsumer) throws IOException {
+        //with conf-id
+        httpGet.setHeader(CONFIG_HEADER_NAME, reportConfigUtil.getReportConfig().getId());
+        // add cellinfo
+        String zone = System.getProperty("com.alipay.ldc.zone");
+        if (StringUtils.isNotEmpty(zone)) {
+            httpGet.setHeader(CELL_HEADER_NAME, zone);
+        }
         addCommonHeaders(httpGet, metadata);
         httpGet.setConfig(reqConf);
         return sendRequest(httpGet, new ResponseHandler<Boolean>() {
             @Override
             public Boolean handleResponse(HttpResponse response) throws IOException {
+                if (response.containsHeader("Conf-Refresh")) {
+                    resultConsumer.consume(response.getEntity());
+                }
                 try {
-                    if (304 == response.getStatusLine().getStatusCode()) {
+                    if (200 == response.getStatusLine().getStatusCode()) {
                         return true;
                     }
-                    if (200 == response.getStatusLine().getStatusCode()) {
-                        resultConsumer.consume(response.getEntity());
-                        return true;
+                    //client can not use this server address;
+                    if (412 == response.getStatusLine().getStatusCode()) {
+                        logger.debug("<< the address:{} is not recommended for this client use.",
+                            httpGet);
+                        return false;
                     }
                     if (200 != response.getStatusLine().getStatusCode()) {
                         handleErrorResponse(response, httpGet);
@@ -138,7 +157,7 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
                                 .inc();
                             return false;
                         } else {//success
-                            logger.debug("<< report to lookout gateway ok.{}", httpPost.toString());
+                            logger.debug("report to lookout gateway ok.{}", httpPost.toString());
                         }
                     } finally {
                         EntityUtils.consumeQuietly(response.getEntity());
@@ -248,4 +267,8 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
         return RequestConfig.custom().setConnectTimeout(1000).setSocketTimeout(1000).build();
     }
 
+    @Override
+    public List<LookoutMeasurement> filter(List<LookoutMeasurement> measures) {
+        return reportConfigUtil.filter(measures);
+    }
 }
