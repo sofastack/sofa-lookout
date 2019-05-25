@@ -114,11 +114,12 @@ public final class DefaultHttpRequestProcessor extends ReportDecider {
                 }
                 try {
                     if (200 == response.getStatusLine().getStatusCode()) {
+                        logger.debug("check lookout gateway ok.{}", httpGet);
                         return true;
                     }
                     //client can not use this server address;
                     if (412 == response.getStatusLine().getStatusCode()) {
-                        logger.debug("<< the address:{} is not recommended for this client use.",
+                        logger.debug("the address:{} is not recommended for this client use.",
                             httpGet);
                         return false;
                     }
