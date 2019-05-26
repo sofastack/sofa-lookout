@@ -53,8 +53,6 @@ class ReportConfigUtil {
                     setReportConfig(StringUtils.isEmpty(conf) ? EMPTY_CONFIG : JSON.parseObject(
                         conf, ReportConfig.class));
                     logger.info("receive a new report config,id:{}", reportConfig.getId());
-                    metricNamePrefixWhitelist = null;
-                    tagWhitelist = null;
                 } catch (Throwable e) {
                     logger.warn("fail to resolve the  fresh report config response.{}",
                         e.getMessage());
@@ -67,17 +65,18 @@ class ReportConfigUtil {
         return configResultConsumer;
     }
 
-    private void setReportConfig(ReportConfig reportConfig) {
+    private synchronized void setReportConfig(ReportConfig reportConfig) {
         this.reportConfig = reportConfig;
+        buildMetricNamePrefixWhitelist();
+        buildTagWhitelist();
     }
 
     public List<LookoutMeasurement> filter(List<LookoutMeasurement> measures) {
-        List<String> mnps = getMetricNamePrefixWhitelist();
-        Map<String, String> tagFilters = getTagWhitelist();
+        List<String> mnps = metricNamePrefixWhitelist;
+        Map<String, String> tagFilters = tagWhitelist;
         if (mnps == null && tagFilters == null) {
             return measures;
         }
-
         Iterator<LookoutMeasurement> it = measures.iterator();
         while (it.hasNext()) {
             boolean included = false;
@@ -110,31 +109,29 @@ class ReportConfigUtil {
         return reportConfig;
     }
 
-    private synchronized List<String> getMetricNamePrefixWhitelist() {
-        if (reportConfig != null && reportConfig.getConfig() != null
-            && metricNamePrefixWhitelist == null) {
+    private void buildMetricNamePrefixWhitelist() {
+        if (reportConfig != null && reportConfig.getConfig() != null) {
             String value = reportConfig.getConfig().get(METRIC_NAME_PREFIX_WHITELIST);
             if (value == null) {
-                return null;
+                metricNamePrefixWhitelist = null;
+                return;
             }
             metricNamePrefixWhitelist = new ArrayList<String>();
-            if (value != null) {
-                String[] namePrefixs = StringUtils.split(value, ",");
-                if (namePrefixs != null) {
-                    for (String namePrefix : namePrefixs) {
-                        metricNamePrefixWhitelist.add(namePrefix);
-                    }
+            String[] namePrefixs = StringUtils.split(value, ",");
+            if (namePrefixs != null) {
+                for (String namePrefix : namePrefixs) {
+                    metricNamePrefixWhitelist.add(namePrefix);
                 }
             }
         }
-        return metricNamePrefixWhitelist;
     }
 
-    private synchronized Map<String, String> getTagWhitelist() {
-        if (reportConfig != null && reportConfig.getConfig() != null && tagWhitelist == null) {
+    private void buildTagWhitelist() {
+        if (reportConfig != null && reportConfig.getConfig() != null) {
             String value = reportConfig.getConfig().get(TAG_WHITELIST);
             if (value == null) {
-                return null;
+                tagWhitelist = null;
+                return;
             }
             tagWhitelist = new HashMap<String, String>();
             String[] kvs = StringUtils.split(value, ",");
@@ -149,6 +146,5 @@ class ReportConfigUtil {
                 }
             }
         }
-        return tagWhitelist;
     }
 }
