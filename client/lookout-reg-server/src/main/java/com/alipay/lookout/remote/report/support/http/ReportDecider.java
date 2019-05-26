@@ -18,12 +18,14 @@ package com.alipay.lookout.remote.report.support.http;
 
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.core.config.MetricConfig;
+import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.Address;
 import com.alipay.lookout.remote.report.AddressService;
 import com.google.common.base.Preconditions;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -107,7 +109,6 @@ public abstract class ReportDecider implements HttpRequestProcessor {
             }
             addressLastModifiedTime = System.currentTimeMillis();
             logger.debug("change gateway address ,from {} to {} .", oldOne, newOne);
-
             return;
         } catch (Throwable e) {
             logger.debug("check gateway address {} fail:{}. old address:{}!", newOne.ip(),
@@ -121,4 +122,5 @@ public abstract class ReportDecider implements HttpRequestProcessor {
         return addressLastModifiedTime + expiredTime < System.currentTimeMillis();
     }
 
+    public abstract List<LookoutMeasurement> filter(List<LookoutMeasurement> measures);
 }

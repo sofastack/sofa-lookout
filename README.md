@@ -32,10 +32,10 @@ SOFALookout 是一个利用多维度的 metrics 对目标系统进行度量和�
 - 服务器端代码编译，进入server子目录，Maven 3.2.5+, JDK Version 1.8+；
 ## 样例工程
 
-样例工程演示了如何快速使用 SOFALookout，[详细可参考](https://github.com/alipay/sofa-lookout/wiki/useguide-samples)。
+样例工程演示了如何快速使用 SOFALookout，[详细可参考](https://github.com/sofastack/sofa-lookout/wiki/useguide-samples)。
 
 ## 贡献
 如何参与 SOFALookout [代码贡献](./CONTRIBUTING.md)
 
 ## 开源许可
-SOFALookout 基于 [Apache License 2.0](./LICENSE) 协议，SOFALookout 依赖了一些三方组件，它们的开源协议参见[依赖组件版权说明](https://github.com/alipay/sofa-lookout/wiki/NOTICE)。
+SOFALookout 基于 [Apache License 2.0](./LICENSE) 协议，SOFALookout 依赖了一些三方组件，它们的开源协议参见[依赖组件版权说明](https://github.com/sofastack/sofa-lookout/wiki/NOTICE)。

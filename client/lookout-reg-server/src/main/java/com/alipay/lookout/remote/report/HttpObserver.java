@@ -158,12 +158,25 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             logger.debug("## no gateway address found, drop metrics:\n{}\n", measures.toString());
             return;
         }
-        logger.debug(">> send metrics to {}:\n{}\n", address, measures.toString());
-        List<List<LookoutMeasurement>> batches = getBatches(measures,
+
+        //Filter measures by config
+        List<LookoutMeasurement> filteredMeasures = filter(measures);
+        if (filteredMeasures.isEmpty()) {
+            return;
+        }
+        logger.debug(">> send metrics to {}:\n{}\n", address, filteredMeasures);
+        List<List<LookoutMeasurement>> batches = getBatches(filteredMeasures,
             lookoutConfig.getInt(LOOKOUT_REPORT_BATCH_SIZE, DEFAULT_REPORT_BATCH_SIZE));
         for (List<LookoutMeasurement> batch : batches) {
             reportBatch(batch, metadata, address);
         }
+    }
+
+    private List<LookoutMeasurement> filter(List<LookoutMeasurement> measures) {
+        if (httpRequestProcessor instanceof ReportDecider) {
+            return ((ReportDecider) httpRequestProcessor).filter(measures);
+        }
+        return measures;
     }
 
     /**
@@ -255,8 +268,8 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
         } catch (Throwable e) {
             if (e instanceof UnknownHostException || e instanceof ConnectException) {
                 addressService.clearAddressCache();
-                logger.info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest.toString(),
-                    e.getMessage());
+                logger
+                    .info(">>WARNING: lookout agent:{} err?cause:{}", httpRequest, e.getMessage());
             } else if (e instanceof SocketTimeoutException) {
                 registry().counter(
                     registry().createId("lookout.client.report.fail.count").withTag("err",
@@ -264,8 +277,7 @@ public class HttpObserver implements MetricObserver<LookoutMeasurement> {
             } else {
                 registry().counter(registry().createId("lookout.client.report.fail.count")).inc();
             }
-            logger.info(">>WARNING: lookout agent:{} fail!cause:{}", httpRequest.toString(),
-                e.getMessage());
+            logger.info(">>WARNING: lookout agent:{} fail!cause:{}", httpRequest, e.getMessage());
         }
     }
 

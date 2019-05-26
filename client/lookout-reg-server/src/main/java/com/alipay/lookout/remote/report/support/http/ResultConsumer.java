@@ -14,30 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alipay.lookout.common.utils;
+package com.alipay.lookout.remote.report.support.http;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.ArrayList;
+import org.apache.http.HttpEntity;
 
 /**
- * Created by kevin.luy@alipay.com on 2018/4/4.
- */
-public class ClassUtilTest {
+ * @author: kevin.luy@antfin.com
+ * @create: 2019-05-20 11:46
+ **/
+public interface ResultConsumer {
 
-    @Test
-    public void testNewInstance() {
-        ArrayList list = ClassUtil.newInstance(ArrayList.class.getName(), null, null);
-        Assert.assertNotNull(list);
-
-        Integer integer = ClassUtil.newInstance(Integer.class.getName(), new Class[] { int.class },
-            new Object[] { 5 });
-        Assert.assertEquals("5", integer.toString());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testNewInstanceException() {
-        ClassUtil.newInstance(ArrayList.class.getName() + "x", null, null);
-    }
+    void consume(HttpEntity entity);
 }

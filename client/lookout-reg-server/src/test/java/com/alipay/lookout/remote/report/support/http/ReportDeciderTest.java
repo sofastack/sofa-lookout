@@ -17,6 +17,7 @@
 package com.alipay.lookout.remote.report.support.http;
 
 import com.alipay.lookout.core.config.LookoutConfig;
+import com.alipay.lookout.remote.model.LookoutMeasurement;
 import com.alipay.lookout.remote.report.AddressService;
 import com.alipay.lookout.remote.report.DefaultAddressService;
 import org.apache.http.client.methods.HttpGet;
@@ -25,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -65,6 +67,17 @@ public class ReportDeciderTest {
         public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata)
                                                                                     throws IOException {
             return true;
+        }
+
+        @Override
+        public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata,
+                                      ResultConsumer resultConsumer) throws IOException {
+            return false;
+        }
+
+        @Override
+        public List<LookoutMeasurement> filter(List<LookoutMeasurement> measures) {
+            return measures;
         }
     }
 }

@@ -18,6 +18,7 @@ package com.alipay.lookout.remote.report.poller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.utils.CommonUtil;
 import com.google.common.collect.Sets;
 import com.sun.net.httpserver.HttpExchange;
@@ -26,6 +27,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,6 +50,8 @@ import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_EXPORTER_ACCE
  * @since 2018/7/17
  */
 public class MetricsHttpExporter {
+    static final Logger            logger          = LookoutLoggerFactory
+                                                       .getLogger(MetricsHttpExporter.class);
     private static final Charset   UTF8            = Charset.forName("UTF-8");
     private static final int       DEFAULT_BACKLOG = 2;
     private final PollerController controller;
@@ -146,6 +150,9 @@ public class MetricsHttpExporter {
 
                                                        // if (oldRate != newStep || oldSlotCount != newSlotCount) {
                                                        // }
+                                                   } catch (Throwable e) {
+                                                       logger.warn("pull metrics failed."
+                                                                   + e.getMessage());
                                                    } finally {
                                                        exchange.close();
                                                    }

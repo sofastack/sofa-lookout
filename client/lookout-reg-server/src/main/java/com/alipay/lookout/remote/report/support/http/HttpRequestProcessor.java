@@ -32,5 +32,8 @@ public interface HttpRequestProcessor {
 
     boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException;
 
+    boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata,
+                           ResultConsumer resultConsumer) throws IOException;
+
     Address getAvailableAddress();
 }
