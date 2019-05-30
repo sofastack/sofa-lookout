@@ -36,6 +36,8 @@ public class MappedFilePersistentQueueTest {
             for (File f : file.listFiles()) {
                 f.delete();
             }
+        }else {
+            file.mkdir();
         }
     }
 
