@@ -17,7 +17,6 @@
 package com.alipay.sofa.lookout.gateway.metrics.importer.prometheus;
 
 import com.alibaba.fastjson.JSON;
-
 import com.alipay.sofa.lookout.gateway.core.scrape.JobState;
 import com.alipay.sofa.lookout.gateway.core.scrape.ScrapeJob;
 import com.alipay.sofa.lookout.gateway.core.scrape.ScrapeManager;
@@ -44,13 +43,12 @@ import static com.alipay.sofa.lookout.gateway.metrics.pipeline.common.MetricImpo
  * @date 2018/11/15
  */
 public class PrometheusMetricImporter extends AbstractWebfluxImporter {
-    ScrapeManager                    scrapeMananger;
+    ScrapeManager scrapeMananger;
 
     /**
      * TODO 临时兼容性代码 于双十二之后的发布版本删除
      */
-    private static final Set<String> WHITE_LIST = Sets.newHashSet("raycore", "streaming",
-                                                    "ray_ps_job", "wenjin-mwj_106159_expId_165385");
+    private static final Set<String> WHITE_LIST = Sets.newHashSet("");
 
     public PrometheusMetricImporter() {
         super("prometheus");

@@ -34,6 +34,9 @@ import com.alipay.sofa.lookout.gateway.core.token.impl.NoopLookoutTokenService;
 import com.alipay.sofa.lookout.gateway.core.utils.BlockExecutionHandler;
 import com.alipay.sofa.lookout.gateway.metrics.exporter.es.spring.bean.config.EsExporterConfiguration;
 import com.alipay.sofa.lookout.gateway.metrics.exporter.standard.spring.bean.config.RelayExporterConfiguration;
+import com.alipay.sofa.lookout.gateway.metrics.importer.metricbeat.spring.bean.config.MetricbeatImporterConfiguration;
+import com.alipay.sofa.lookout.gateway.metrics.importer.opentsdb.spring.bean.config.OpentsdbImporterConfiguration;
+import com.alipay.sofa.lookout.gateway.metrics.importer.prometheus.spring.bean.config.PrometheusImporterConfiguration;
 import com.alipay.sofa.lookout.gateway.metrics.importer.standard.spring.bean.config.StandardImporterConfiguration;
 import com.alipay.sofa.lookout.gateway.metrics.pipeline.exporter.DynamicExportChainProvider;
 import com.alipay.sofa.lookout.gateway.metrics.pipeline.exporter.MetricsExportChainManager;
@@ -75,19 +78,20 @@ import java.util.concurrent.ExecutorService;
  */
 @ConditionalOnMonitorComponent("metric")
 @Configuration
-@Import({ SelfMetricConfiguration.class, StandardImporterConfiguration.class,
-         RelayExporterConfiguration.class, EsExporterConfiguration.class })
+@Import({SelfMetricConfiguration.class, StandardImporterConfiguration.class, PrometheusImporterConfiguration.class,
+        MetricbeatImporterConfiguration.class, OpentsdbImporterConfiguration.class,
+        RelayExporterConfiguration.class, EsExporterConfiguration.class})
 public class MetricPipelineConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricPipelineConfiguration.class);
 
     @Autowired
-    Environment                 env;
+    Environment env;
     @Autowired
-    Registry                    registry;
+    Registry registry;
     @Autowired
-    RateLimitService            rateLimitService;
+    RateLimitService rateLimitService;
     @Autowired
-    LookoutTokenService         lookoutTokenService;
+    LookoutTokenService lookoutTokenService;
 
     @Bean
     ImporterProcessor<RawMetric> importerProcessor(@Autowired(required = false) List<Importer<RawMetric>> importers) {
@@ -158,7 +162,7 @@ public class MetricPipelineConfiguration {
     @Bean
     ExecutorService computingThreadPool() {
         return Executors.newFixedThreadPoolExecutor(computingThreads, 1, "computing",
-            new BlockExecutionHandler(), registry);
+                new BlockExecutionHandler(), registry);
     }
 
     @Bean
