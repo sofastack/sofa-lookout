@@ -50,4 +50,13 @@
         <module>boot/metrics-server-bootstrap</module>
         <module>boot/sofa-ark-support</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>sofaark</id>
+            <modules>
+                <module>boot/all-in-one-bootstrap</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

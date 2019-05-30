@@ -78,20 +78,21 @@ import java.util.concurrent.ExecutorService;
  */
 @ConditionalOnMonitorComponent("metric")
 @Configuration
-@Import({SelfMetricConfiguration.class, StandardImporterConfiguration.class, PrometheusImporterConfiguration.class,
-        MetricbeatImporterConfiguration.class, OpentsdbImporterConfiguration.class,
-        RelayExporterConfiguration.class, EsExporterConfiguration.class})
+@Import({ SelfMetricConfiguration.class, StandardImporterConfiguration.class,
+         PrometheusImporterConfiguration.class, MetricbeatImporterConfiguration.class,
+         OpentsdbImporterConfiguration.class, RelayExporterConfiguration.class,
+         EsExporterConfiguration.class })
 public class MetricPipelineConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricPipelineConfiguration.class);
 
     @Autowired
-    Environment env;
+    Environment                 env;
     @Autowired
-    Registry registry;
+    Registry                    registry;
     @Autowired
-    RateLimitService rateLimitService;
+    RateLimitService            rateLimitService;
     @Autowired
-    LookoutTokenService lookoutTokenService;
+    LookoutTokenService         lookoutTokenService;
 
     @Bean
     ImporterProcessor<RawMetric> importerProcessor(@Autowired(required = false) List<Importer<RawMetric>> importers) {
@@ -162,7 +163,7 @@ public class MetricPipelineConfiguration {
     @Bean
     ExecutorService computingThreadPool() {
         return Executors.newFixedThreadPoolExecutor(computingThreads, 1, "computing",
-                new BlockExecutionHandler(), registry);
+            new BlockExecutionHandler(), registry);
     }
 
     @Bean

@@ -14,6 +14,9 @@
 
 	<properties>
 		<lookout.sofaark.version>1.6.0</lookout.sofaark.version>
+		<gateway.version>1.6.0</gateway.version>
+		<metrics.server.version>1.6.0</metrics.server.version>
+		<sofaark.version>0.6.0</sofaark.version>
 	</properties>
 
 	<dependencies>
@@ -31,7 +34,7 @@
 			<groupId>com.alipay.sofa.lookout</groupId>
 			<artifactId>lookout-gateway-bootstrap</artifactId>
 			<classifier>ark-biz</classifier>
-			<version>${project.version}</version>
+			<version>${gateway.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -45,7 +48,7 @@
 			<groupId>com.alipay.sofa.lookout</groupId>
 			<artifactId>lookout-metrics-server-bootstrap</artifactId>
 			<classifier>ark-biz</classifier>
-			<version>${project.version}</version>
+			<version>${metrics.server.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>*</groupId>
@@ -60,7 +63,6 @@
 			<artifactId>spring-core</artifactId>
 			<version>5.1.6.RELEASE</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>

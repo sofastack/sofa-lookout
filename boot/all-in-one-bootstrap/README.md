@@ -18,7 +18,7 @@ metrics-server.spring.data.jest.uri=http://localhost:9200
 ```
 java -Dcom.alipay.sofa.ark.master.biz=lookoutall \
 -Dlookoutall.config-file=abc.properties \
--jar lookout-all-in-one-bootstrap-1.2.0-executable-ark.jar
+-jar lookout-all-in-one-bootstrap-1.6.0-executable-ark.jar
 ```
 
 > 注意 -Dcom.alipay.sofa.ark.master.biz=lookoutall 是必须的, 用于设置sofa-ark的master biz.  
