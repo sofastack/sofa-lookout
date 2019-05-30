@@ -12,6 +12,7 @@
 
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-reg-server</artifactId>
+    <name>client-reg-server</name>
     <packaging>jar</packaging>
 
 

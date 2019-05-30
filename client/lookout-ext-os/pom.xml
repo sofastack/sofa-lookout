@@ -13,6 +13,7 @@
 
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-ext-os</artifactId>
+    <name>client-ext-os</name>
     <packaging>jar</packaging>
 
     <properties>

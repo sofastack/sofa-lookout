@@ -1,0 +1,58 @@
+curl http://localhost:9200/_cat/aliases
+curl http://localhost:9200/_cat/indices
+
+
+
+- index: metrics
+- mapping:
+
+curl -XPUT -H 'Content-Type:application/json' http://localhost:9200/active-metrics/metrics/_mapping -d '
+{
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "tags": {
+        "type": "keyword"
+      },
+      "time": {
+        "type": "date"
+      },
+      "value": {
+        "type": "float"
+      }
+    }
+}'
+
+
+
+- create index alias
+
+```
+curl -XPUT -H 'Content-Type:application/json' http://localhost:9200/_template/active-metrics -d '
+{
+"template": "metrics-*",
+"settings": {
+"number_of_shards":   5,
+"number_of_replicas": 1,
+"routing.allocation.include.box_type": "hot",
+"routing.allocation.total_shards_per_node": 8
+},
+"aliases": {
+"active-metrics":  {},
+"search-metrics": {}
+}
+}'
+```
+
+curl -XPUT -H 'Content-Type:application/json' http://localhost:9200/%3Cmetrics-%7Bnow%2Fd%7D-1%3E
+
+- trigger indices rollover [自带]
+
+```
+POST active-metrics/_rollover -d '{"conditions": {"max_age": "1d","max_docs":  1000000000}}'
+```
+
+- delete old indices [自带]
+
+

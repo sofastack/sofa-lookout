@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>lookout-ext-jvm</artifactId>
+    <name>client-ext-jvm</name>
     <packaging>jar</packaging>
 
 

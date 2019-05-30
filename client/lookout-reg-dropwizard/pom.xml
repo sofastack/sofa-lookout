@@ -12,6 +12,7 @@
 
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-reg-dropwizard</artifactId>
+    <name>client-reg-dropwizard</name>
     <packaging>jar</packaging>
 
 

@@ -12,6 +12,7 @@
 
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-sofa-boot-starter</artifactId>
+    <name>client-sofa-boot-starter</name>
     <description>Starter for using lookout client</description>
     <organization>
         <name>Alipay, Inc.</name>

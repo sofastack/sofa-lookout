@@ -11,6 +11,7 @@
 
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-api</artifactId>
+    <name>client-api</name>
     <packaging>jar</packaging>
 
 
