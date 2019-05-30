@@ -31,5 +31,8 @@ Maven 3.2.5+, JDK Version 1.6+
 ## Contributing
 Refer to [CONTRIBUTING.md](./CONTRIBUTING.md)
 
+## Sincere thanks
+Lookout's promQL related parsing logic was ported from Prometheus, with some optimizations and improvements, thanks to Prometheus open source for such an easy to use and powerful QL implementation of the golang version.
+
 ## License
 Apache License 2.0, see [LICENSE](./LICENSE).

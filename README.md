@@ -37,5 +37,9 @@ SOFALookout 是一个利用多维度的 metrics 对目标系统进行度量和�
 ## 贡献
 如何参与 SOFALookout [代码贡献](./CONTRIBUTING.md)
 
+## 致谢
+
+Lookout 的 promQL 相关解析逻辑是从 Prometheus 移植而来，做了一些优化和改进， 感谢 Prometheus 开源了如此易用和强大的 golang 版本的 QL 实现
+
 ## 开源许可
 SOFALookout 基于 [Apache License 2.0](./LICENSE) 协议，SOFALookout 依赖了一些三方组件，它们的开源协议参见[依赖组件版权说明](https://github.com/sofastack/sofa-lookout/wiki/NOTICE)。

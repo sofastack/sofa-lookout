@@ -3,14 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<artifactId>lookout-opensource-parent</artifactId>
 		<groupId>com.alipay.sofa.lookout</groupId>
-		<version>1.5.3</version>
+		<artifactId>lookout-parent</artifactId>
+		<version>1.6.0</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>sofa-ark-support</artifactId>
+	<version>1.6.0</version>
 
 	<properties>
 		<sofaark.version>0.6.0</sofaark.version>

@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.alipay.sofa.lookout</groupId>
         <artifactId>lookout-server-parent</artifactId>
-        <version>1.2.0</version>
+        <version>1.6.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>metrics-server-promql</artifactId>
     <packaging>jar</packaging>
-    <name>metrics server promql</name>
+    <name>metrics-server-promql</name>
     <properties>
         <java.version>1.8</java.version>
     </properties>

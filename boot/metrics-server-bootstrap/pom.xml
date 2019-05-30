@@ -6,33 +6,37 @@
 	<parent>
 		<groupId>com.alipay.sofa.lookout</groupId>
 		<artifactId>lookout-server-parent</artifactId>
-		<version>1.1.0</version>
+		<version>1.6.0</version>
 		<relativePath>../../server/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>lookout-metrics-server-bootstrap</artifactId>
-	<version>1.2.0</version>
+	<version>1.6.0</version>
+	<properties>
+		<metrics.server.version>1.6.0</metrics.server.version>
+		<sofa.ark.version>1.6.0</sofa.ark.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.alipay.sofa.lookout</groupId>
 			<artifactId>metrics-server-spring-boot-starter</artifactId>
-			<version>1.1.0</version>
+			<version>${metrics.server.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alipay.sofa.lookout</groupId>
 			<artifactId>metrics-storage-ext-es</artifactId>
-			<version>1.1.0</version>
+			<version>${metrics.server.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alipay.sofa.lookout</groupId>
 			<artifactId>metrics-web-ui</artifactId>
-			<version>1.1.0</version>
+			<version>${metrics.server.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alipay.sofa.lookout</groupId>
 			<artifactId>sofa-ark-support</artifactId>
-			<version>1.5.3</version>
+			<version>${sofa.ark.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -41,6 +45,7 @@
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
+				<version>3.0.0</version>
 			</plugin>
 		</plugins>
 	</build>
