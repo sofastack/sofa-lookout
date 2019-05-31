@@ -42,7 +42,7 @@ public class MappedFilePersistentQueueTest {
     }
 
     public String getTmpPath() {
-        return System.getProperty("java.io.tmpdir") + "test/";
+        return System.getProperty("user.dir") + "test/";
     }
 
     @Test
