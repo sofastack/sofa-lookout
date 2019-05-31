@@ -36,13 +36,13 @@ public class MappedFilePersistentQueueTest {
             for (File f : file.listFiles()) {
                 f.delete();
             }
-        }else {
+        } else {
             file.mkdir();
         }
     }
 
     public String getTmpPath() {
-        return System.getProperty("user.dir") + "test/";
+        return System.getProperty("user.home") + "/test/";
     }
 
     @Test
