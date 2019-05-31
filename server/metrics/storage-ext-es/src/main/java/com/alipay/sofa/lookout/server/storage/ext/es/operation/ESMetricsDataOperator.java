@@ -17,6 +17,7 @@
 package com.alipay.sofa.lookout.server.storage.ext.es.operation;
 
 import com.alipay.sofa.lookout.server.common.es.operation.ESDataType;
+import com.alipay.sofa.lookout.server.common.es.operation.ESOperator;
 import com.alipay.sofa.lookout.server.common.es.operation.ESOperatorBuilder;
 import com.alipay.sofa.lookout.server.storage.ext.es.ElasticSearchStorage;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ public class ESMetricsDataOperator {
                                                   .getLogger(ESMetricsDataOperator.class);
     @Value("${metrics.server.es.index:metrics}")
     private String                     index;
+    @Value("${metrics.server.es.type:metrics}")
+    private String                     type;
     @Value("${metrics.server.es.operation.rollover.maxAge:1d}")
     private String                     maxAge;
     @Value("${metrics.server.es.operation.rollover.maxDocs:100000000}")
@@ -51,8 +54,11 @@ public class ESMetricsDataOperator {
     @PostConstruct
     public void run() {
         ESOperatorBuilder esOperatorBuilder = new ESOperatorBuilder(ESDataType.METRIC).index(index)
-            .httpHost(esUrl).addRolloverTask(maxAge, maxDocs).addDropOldIndicesTask(validDays);
-        esOperatorBuilder.build().run();
+            .mapping(type).httpHost(esUrl).addRolloverTask(maxAge, maxDocs)
+            .addDropOldIndicesTask(validDays);
+        ESOperator esOperator = esOperatorBuilder.build();
+        esOperator.initializeDatabase();
+        esOperator.run();
         logger.info("ElasticSearch operator is active and running");
         storage.setMetricsIndex(esOperatorBuilder.getAlias());
     }

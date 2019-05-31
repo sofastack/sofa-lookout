@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import static com.alipay.sofa.lookout.server.common.es.operation.ESOperatorBuilder.DEFAULT_ES_METRICS_MAPPING;
+
 /**
  * @author: kevin.luy@antfin.com
  * @author xiangfeng.xzc
@@ -83,7 +85,7 @@ public class ESMetricExporter extends AbstractBatchExporter<Metric> {
             ESOperatorBuilder esOperatorBuilder = new ESOperatorBuilder(ESDataType.METRIC)
                     .httpHost(httpHost.toURI())
                     .index(esProperties.getIndex())
-                    .mapping(esProperties.getType(), ESConsts.DEFAULT_ES_METRICS_MAPPING);
+                    .mapping(esProperties.getType());
             esOperatorBuilder.build().initializeDatabase();
             //replace index with alias
             index = esOperatorBuilder.getAlias();

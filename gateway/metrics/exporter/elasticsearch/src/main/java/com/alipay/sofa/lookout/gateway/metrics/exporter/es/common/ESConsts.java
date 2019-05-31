@@ -21,10 +21,7 @@ package com.alipay.sofa.lookout.gateway.metrics.exporter.es.common;
  * @create: 2019-05-08 11:44
  **/
 public interface ESConsts {
-    String DEFAULT_ES_HOST            = "localhost";
-    String DEFAULT_ES_INDEX           = "metrics";
-    String DEFAULT_ES_TYPE            = "metrics";
-
-    String DEFAULT_ES_METRICS_MAPPING = "{\"properties\": {\"id\": {\"type\": \"keyword\"},\"tags\": {\"type\": \"keyword\"},\"time\": {\"type\": \"date\"},\"value\": {\"type\": \"float\"}}}";
-
+    String DEFAULT_ES_HOST  = "localhost";
+    String DEFAULT_ES_INDEX = "metrics";
+    String DEFAULT_ES_TYPE  = "metrics";
 }

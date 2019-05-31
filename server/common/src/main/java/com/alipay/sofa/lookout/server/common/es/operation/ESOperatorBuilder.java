@@ -27,17 +27,19 @@ import java.util.concurrent.ScheduledExecutorService;
  * @create: 2019-05-12 16:39
  **/
 public class ESOperatorBuilder {
-    String     index;
-    String     alias;
-    String     searchAlias;
-    String     mappingType;
-    String     mappingContent;
-    String     hostUrl;
-    ESDataType dataType;
-    boolean    autoScanEnable = false;
-    String     maxAge         = "1d";
-    long       maxDocs        = 100000000;
-    long       validDays      = 7;
+    public static String DEFAULT_ES_METRICS_MAPPING = "{\"properties\": {\"id\": {\"type\": \"keyword\"},\"tags\": {\"type\": \"keyword\"},\"time\": {\"type\": \"date\"},\"value\": {\"type\": \"float\"}}}";
+
+    String               index;
+    String               alias;
+    String               searchAlias;
+    String               mappingType;
+    String               mappingContent;
+    String               hostUrl;
+    ESDataType           dataType;
+    boolean              autoScanEnable             = false;
+    String               maxAge                     = "1d";
+    long                 maxDocs                    = 100000000;
+    long                 validDays                  = 7;
 
     public ScheduledExecutorService getScheduler() {
         return SingletonHolder.SCHEDULER;
@@ -62,6 +64,13 @@ public class ESOperatorBuilder {
 
     public String getAlias() {
         return alias;
+    }
+
+    public ESOperatorBuilder mapping(String type) {
+        this.mappingType = type;
+        this.mappingContent = DEFAULT_ES_METRICS_MAPPING;
+        return this;
+
     }
 
     public ESOperatorBuilder mapping(String type, String mappingContent) {
