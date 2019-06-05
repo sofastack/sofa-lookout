@@ -28,11 +28,29 @@ SOFALookout 是一个利用多维度的 metrics 对目标系统进行度量和�
 
 ## 编译
 
-- 客户端代码编译，进入client子目录，Maven 3.2.5+, JDK Version 1.6+；
-- 服务器端代码编译，进入server子目录，Maven 3.2.5+, JDK Version 1.8+；
-## 样例工程
+- 客户端代码编译: `cd client && mvn clean install -DskipTests`
+- 服务器端代码编译:
+  - all-in-one模式: `./boot/all-ine-one-bootstrap/build.sh`, 打包结果在`boot/all-in-one-bootstrap/target/xxx-executable-ark.jar`
+  - metrics-server: `mvn clean install -DskipTests -am -pl boot/metrics-server-bootstrap`
+  - gateway: `mvn clean install -DskipTests -am -pl boot/gateway/bootstrap`
+  
+> 要求Maven 3.2.5+, JDK Version 8+；
 
-样例工程演示了如何快速使用 SOFALookout，[详细可参考](https://github.com/sofastack/sofa-lookout/wiki/useguide-samples)。
+## 样例工程
+源码工程中提供了一些样例工程，辅助说明项目的使用。样例工程的 readme 有使用补充说明，另外需要将这些 sample 工程单独的导入 IDE。
+
+### 客户端样例工程
+- [lookout-client-samples-java](https://github.com/sofastack/sofa-lookout/tree/master/samples/metrics/client/lookout-client-samples-java)  
+该样例工程展示了，在普通 Java 项目中,如何以代码形式使用和配置客户端。
+
+- [lookout-client-samples-boot](https://github.com/sofastack/sofa-lookout/tree/master/samples/metrics/client/lookout-client-samples-boot)  
+该样例工程展示了，在 SpringBoot(或SofaBoot) 项目中,如何使用和配置客户端。
+
+- [lookout-client-samples-prometheus](https://github.com/sofastack/sofa-lookout/tree/master/samples/metrics/client/lookout-client-samples-prometheus)  
+该样例工程展示了，在 SpringBoot(或SofaBoot) 项目中,如何使用和配置客户端使用 prometheus。
+
+### 服务器端样例工程
+coming soon...
 
 ## 贡献
 如何参与 SOFALookout [代码贡献](./CONTRIBUTING.md)
