@@ -24,10 +24,7 @@ import com.alipay.sofa.lookout.server.interfaces.common.QueryExpressionUtil;
 import com.alipay.sofa.lookout.server.interfaces.common.TimestampUtil;
 import com.alipay.sofa.lookout.server.interfaces.exception.PromClientException;
 import com.alipay.sofa.lookout.server.interfaces.exception.PromServerException;
-import com.alipay.sofa.lookout.server.interfaces.model.MatrixResult;
-import com.alipay.sofa.lookout.server.interfaces.model.SlowLog;
-import com.alipay.sofa.lookout.server.interfaces.model.ValueData;
-import com.alipay.sofa.lookout.server.interfaces.model.VectorResult;
+import com.alipay.sofa.lookout.server.interfaces.model.*;
 import com.alipay.sofa.lookout.server.prom.common.DebugLog;
 import com.alipay.sofa.lookout.server.prom.exception.QLParseException;
 import com.alipay.sofa.lookout.server.prom.exception.TooManyPointsException;
@@ -37,6 +34,7 @@ import com.alipay.sofa.lookout.server.prom.ql.engine.PromQLEngine;
 import com.alipay.sofa.lookout.server.prom.ql.engine.Query;
 import com.alipay.sofa.lookout.server.prom.ql.engine.Result;
 import com.alipay.sofa.lookout.server.prom.ql.value.Matrix;
+import com.alipay.sofa.lookout.server.prom.ql.value.Scalar;
 import com.alipay.sofa.lookout.server.prom.ql.value.ValueType;
 import com.alipay.sofa.lookout.server.prom.ql.value.Vector;
 import com.alipay.sofa.lookout.server.prom.storage.query.LabelValuesStatement;
@@ -45,11 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -74,7 +68,7 @@ public class PromQueryController {
     private int                 slowLogDuration;
 
     /**
-     * 默认情况下, 查询底层数据的时候是否使用原生的底层查询
+     * 默认情况下, 查询底层数据的时候是否使用原生的底层查询（计算下推）
      */
     @Value("${lookout.server.useNative:false}")
     private boolean             defaultUseNative;
@@ -97,6 +91,12 @@ public class PromQueryController {
                                        @RequestParam(required = false) String time,
                                        @RequestParam(required = false) String timeout) {
         Preconditions.checkNotNull(query);
+        //FIXME,Temporarily. Use when adding a promethues data source to grafana for health check
+        if (query.equals("1+1")) {
+            return ValueData.newValueData(true, ValueType.scalar,
+                ScalarResult.from(new Scalar(System.currentTimeMillis(), 2)));
+        }
+
         QueryExpressionUtil.checkNoTagFilter(query);
         QueryExpressionUtil.checkRegexMatcher(query);
         Instant queryTime = Instant.now();
