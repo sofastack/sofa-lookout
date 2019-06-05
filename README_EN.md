@@ -11,7 +11,7 @@ Lookout can help you to measure and monitor the status of the target system with
 Lookout's multi-dimensional metrics refer to the [Metrics 2.0](http://metrics20.org/) standard.
 
 - The client part of this project is a Java library.  You can instrument your code to collect metrics of your project.[more details](./client/README.md).
-- The server part of this project is coming soon. Through this service, metrics data can be collected, processed, stored, and queried. In addition, it can work together with grafana to analyze and visualize data.
+- The server part of this project is available now. Through this service, metrics data can be collected, processed, stored, and queried. In addition, it can work together with grafana to analyze and visualize data.
 
 ## Compared with common monitoring solutions, we have the following considerations:
 
@@ -30,6 +30,9 @@ Maven 3.2.5+, JDK Version 1.6+
 
 ## Contributing
 Refer to [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Sincere thanks
+Lookout's promQL related parsing logic was ported from Prometheus, with some optimizations and improvements, thanks to Prometheus open source for such an easy to use and powerful QL implementation of the golang version.
 
 ## License
 Apache License 2.0, see [LICENSE](./LICENSE).

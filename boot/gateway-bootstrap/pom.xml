@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.alipay.sofa.lookout</groupId>
+		<artifactId>lookout-server-parent</artifactId>
+		<version>1.6.0</version>
+		<relativePath>../../server/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>lookout-gateway-bootstrap</artifactId>
+	<version>1.6.0</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>metrics-gateway-spring-boot-starter</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>lookout-sofa-boot-starter</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>sofa-ark-support</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sofa.common</groupId>
+			<artifactId>sofa-common-tools</artifactId>
+			<version>1.0.17</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>3.0.0</version>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>sofaark</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.alipay.sofa</groupId>
+						<artifactId>sofa-ark-maven-plugin</artifactId>
+						<version>0.6.0</version>
+						<executions>
+							<execution>
+								<id>default-cli</id>
+								<goals>
+									<goal>repackage</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<bizName>gateway</bizName>
+							<attach>true</attach>
+							<priority>200</priority>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.alipay.sofa.lookout</groupId>
+		<artifactId>lookout-server-parent</artifactId>
+		<version>1.6.0</version>
+		<relativePath>../../server/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>lookout-metrics-server-bootstrap</artifactId>
+	<version>1.6.0</version>
+	<properties>
+		<metrics.server.version>1.6.0</metrics.server.version>
+		<sofa.ark.version>1.6.0</sofa.ark.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>metrics-server-spring-boot-starter</artifactId>
+			<version>${metrics.server.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>metrics-storage-ext-es</artifactId>
+			<version>${metrics.server.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>metrics-web-ui</artifactId>
+			<version>${metrics.server.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>sofa-ark-support</artifactId>
+			<version>${sofa.ark.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>3.0.0</version>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>sofaark</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.alipay.sofa</groupId>
+						<artifactId>sofa-ark-maven-plugin</artifactId>
+						<version>0.6.0</version>
+						<executions>
+							<execution>
+								<id>default-cli</id>
+								<goals>
+									<goal>repackage</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<bizName>metrics-server</bizName>
+							<attach>true</attach>
+							<priority>300</priority>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

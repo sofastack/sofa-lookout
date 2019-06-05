@@ -1,0 +1,6 @@
+2019-05-27T16:37:30+08:00,7,app=gateway,host=local,ip=127.0.0.1,__name__=test_metric
+2019-05-27T16:38:00+08:00,9,app=gateway,host=local,ip=127.0.0.1,__name__=test_metric
+2019-05-27T16:39:30+08:00,9,app=gateway,host=local,ip=127.0.0.1,__name__=test_metric
+2019-05-27T16:40:00+08:00,9,app=gateway,host=local,ip=127.0.0.1,__name__=test_metric
+2019-05-27T16:40:30+08:00,8,app=gateway,host=local,ip=127.0.0.1,__name__=test_metric
+2019-05-27T16:41:00+08:00,9,app=gateway,host=local,ip=127.0.0.1,__name__=test_metric

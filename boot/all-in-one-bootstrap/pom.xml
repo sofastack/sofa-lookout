@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.alipay.sofa.lookout</groupId>
+		<artifactId>lookout-server-parent</artifactId>
+		<version>1.6.0</version>
+		<relativePath>../../server/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>lookout-all-in-one-bootstrap</artifactId>
+
+	<properties>
+		<lookout.sofaark.version>1.6.0</lookout.sofaark.version>
+		<gateway.version>1.6.0</gateway.version>
+		<metrics.server.version>1.6.0</metrics.server.version>
+		<sofaark.version>0.6.0</sofaark.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>sofa-ark-support</artifactId>
+			<version>${lookout.sofaark.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>lookout-gateway-bootstrap</artifactId>
+			<classifier>ark-biz</classifier>
+			<version>${gateway.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alipay.sofa.lookout</groupId>
+			<artifactId>lookout-metrics-server-bootstrap</artifactId>
+			<classifier>ark-biz</classifier>
+			<version>${metrics.server.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>5.1.6.RELEASE</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>3.0.0</version>
+			</plugin>
+			<plugin>
+				<groupId>com.alipay.sofa</groupId>
+				<artifactId>sofa-ark-maven-plugin</artifactId>
+				<version>${sofaark.version}</version>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<bizName>lookoutall</bizName>
+					<arkClassifier>executable-ark</arkClassifier>
+					<attach>true</attach>
+					<!--使用priority来调整优先级-->
+					<priority>1</priority>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
