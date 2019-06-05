@@ -17,7 +17,7 @@ java -Dcom.alipay.sofa.ark.master.biz=lookoutall \
 -Dlookoutall.config-file=abc.properties \
 -Dlookoutgateway.foo=bar \
 -Dlookoutserver.bar=baz \
--jar lookout-all-in-one-bootstrap-1.2.0-executable-ark.jar
+-jar allinone-executable.jar
 ```
 
 > 注意 -Dcom.alipay.sofa.ark.master.biz=lookoutall 是必须的, 用于设置sofa-ark的master biz.  
@@ -78,7 +78,7 @@ lookoutserver.server.port=7100
 ```
 java -Dcom.alipay.sofa.ark.master.biz=lookoutall \
 -Dlookoutall.config-file=abc.properties \
--jar lookout-all-in-one-bootstrap-1.2.0-executable-ark.jar
+-jar allinone-executable.jar
 ```
 
 `server.port=7300`会作用于`lookoutgateway`子应用, `server.port=7100`会作用于`lookoutserver`子应用.
