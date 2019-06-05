@@ -75,10 +75,10 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     }
 
     /**
-     * @param filePath
-     * @param upTimeFilePath
-     * @param timeout
-     * @param timeoutUnit
+     * @param filePath filePath
+     * @param upTimeFilePath upTimeFilePath
+     * @param timeout timeout
+     * @param timeoutUnit timeoutUnit
      */
     public IOStatsMetricsImporter(String filePath, String upTimeFilePath, long timeout,
                                   TimeUnit timeoutUnit) {
@@ -96,7 +96,7 @@ public class IOStatsMetricsImporter extends CachedMetricsImporter {
     protected void doRegister(Registry registry) {
         for (Map.Entry<String, Float[]> entry : statsByDevice.entrySet()) {
             final String device = entry.getKey();
-            Id id = registry.createId("os.io.stats." + device);
+            Id id = registry.createId("os.io.stats");
             id = id.withTag("device", device);
             MixinMetric mixin = registry.mixinMetric(id);
 

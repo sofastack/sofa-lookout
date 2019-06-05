@@ -16,21 +16,16 @@
  */
 package com.alipay.lookout.remote.report;
 
-import com.alipay.lookout.api.Gauge;
-import com.alipay.lookout.api.Metric;
-import com.alipay.lookout.api.MetricRegistry;
-import com.alipay.lookout.api.PRIORITY;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.api.composite.CompositeRegistry;
 import com.alipay.lookout.common.Assert;
 import com.alipay.lookout.common.log.LookoutLoggerFactory;
 import com.alipay.lookout.common.top.RollableTopGauge;
-import com.alipay.lookout.core.AbstractRegistry;
-import com.alipay.lookout.core.CommonTagsAccessor;
-import com.alipay.lookout.core.GaugeWrapper;
-import com.alipay.lookout.core.InfoWrapper;
+import com.alipay.lookout.core.*;
 import com.alipay.lookout.core.config.LookoutConfig;
 import com.alipay.lookout.jdk8.Function;
 import com.alipay.lookout.remote.model.LookoutMeasurement;
+import com.alipay.lookout.remote.step.LookoutBucketCounter;
 import com.alipay.lookout.remote.step.PollableInfoWrapper;
 import com.alipay.lookout.report.AbstractPoller;
 import com.alipay.lookout.report.MetricObserver;
@@ -174,12 +169,8 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
             Map<String, String> metadata = Maps.newHashMap();
             metadata.put(PRIORITY_NAME, priority.name());
             List<LookoutMeasurement> measurements = getMeasurements(priority, metricFilter);
-            try {
-                observer.update(measurements, metadata);
-            } finally {
-                logger.debug("send {} metrics to remote server. metrics:\n{}", measurements.size(),
-                    measurements.toString());
-            }
+            logger.debug("collect {} metrics", measurements.size());
+            observer.update(measurements, metadata);
         }
     }
 
@@ -227,8 +218,9 @@ public final class SchedulerPoller extends AbstractPoller<LookoutMeasurement> {
     private Iterator<Metric> getMetricsIterator(PRIORITY priority) {
         if (priority == null) {
             return registry().iterator();
+        } else {
+            return priorityMetricsCache.getMetricIteratorByPriority(priority);
         }
-        return priorityMetricsCache.getMetricByPriority(priority).iterator();
     }
 
 }

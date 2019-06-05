@@ -29,6 +29,8 @@ import com.alipay.lookout.remote.step.LookoutRegistry;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.alipay.lookout.core.config.LookoutConfig.LOOKOUT_EXPORTER_ENABLE;
+
 /**
  * 与 @see DefaultLookoutClient 相比，SimpleLookoutClient限制更严格：
  * 1.所有的Registry需要预先设置！
@@ -78,6 +80,9 @@ public final class SimpleLookoutClient extends AbstractLookoutClient {
             registry.registerExtendedMetrics();
             super.addRegistry(registry);
             if (registry instanceof LookoutRegistry) {
+                if (!lookoutConfig.getBoolean(LOOKOUT_EXPORTER_ENABLE, false)) {
+                    return;
+                }
                 try {
                     setMetricsHttpExporter(PollerUtils.exportHttp((LookoutRegistry) registry));
                 } catch (Exception e) {

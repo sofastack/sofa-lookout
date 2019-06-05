@@ -26,8 +26,7 @@ import com.alipay.lookout.core.config.LookoutConfig;
 import com.google.common.base.Preconditions;
 
 /**
- * proactive mode; different fixed steps by different priorities.
- * reactive mode; step is determined by collector;
+ * proactive mode; different fixed steps by different priorities. reactive mode; step is determined by collector;
  * <p>
  * Created by kevin.luy@alipay.com on 2017/3/26.
  */
@@ -46,9 +45,9 @@ public class StepRegistry extends AbstractRegistry {
     /**
      * for LookoutMixinMetric
      *
-     * @param clock
-     * @param config
-     * @param currentStepMillis
+     * @param clock clock
+     * @param config config
+     * @param currentStepMillis currentStepMillis
      */
     public StepRegistry(Clock clock, LookoutConfig config, long currentStepMillis) {
         super(clock, config);
@@ -71,7 +70,9 @@ public class StepRegistry extends AbstractRegistry {
 
     @Override
     protected DistributionSummary newDistributionSummary(Id id) {
-        return new LookoutDistributionSummary(id, clock, getStepMillis(id));
+        LookoutDistributionSummary distributionSummary = new LookoutDistributionSummary(id, clock,
+            getStepMillis(id));
+        return distributionSummary;
     }
 
     protected long getStepMillis(Id id) {
@@ -137,10 +138,9 @@ public class StepRegistry extends AbstractRegistry {
     }
 
     /**
-     * reactive mode.
-     * 重新设置step, 修改所有的metric
+     * reactive mode. 重新设置step, 修改所有的metric
      *
-     * @param step
+     * @param step step
      */
     protected synchronized void setStep(long step) {
         if (this.currentStepMillis == step) {
@@ -155,10 +155,9 @@ public class StepRegistry extends AbstractRegistry {
     }
 
     /**
-     * reactive mode.
-     * 获取当前使用的采样间隔时间
+     * reactive mode. 获取当前使用的采样间隔时间
      *
-     * @return
+     * @return the interval of sampling
      */
     public long getCurrentStepMillis() {
         return currentStepMillis;

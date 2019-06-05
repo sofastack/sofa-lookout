@@ -5,12 +5,13 @@
     <parent>
         <groupId>com.alipay.sofa.lookout</groupId>
         <artifactId>lookout-client-parent</artifactId>
-        <version>1.5.0</version>
+        <version>1.6.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-api</artifactId>
+    <name>client-api</name>
     <packaging>jar</packaging>
 
 

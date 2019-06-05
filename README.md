@@ -7,12 +7,12 @@
 
 [English Document](./README_EN.md)
 
-访问 [WIKI](https://github.com/alipay/sofa-lookout/wiki) 查看完整的文档使用指南。
+访问 [WIKI](http://www.sofastack.tech/sofa-lookout/docs/Home) 查看完整的文档使用指南。
 
 SOFALookout 是一个利用多维度的 metrics 对目标系统进行度量和监控的项目。SOFALookout 的多维度 metrics 参考[Metrics2.0 标准](http://metrics20.org/)。SOFALookout 项目分为客户端部分与服务器端部分。
 
 - 客户端是一个 Java 的类库，可以将它植入您的应用代码中采集 metrics 信息，[客户端更多详情](./client/README.md)。
-- 服务端代码部分，`将于下一版本提供`。通过 SOFALookout 的服务，可以对 metrics 数据进行收集、加工、存储和查询等处理，另外结合 [grafana](https://grafana.com)，可做数据可视化展示。
+- 服务端代码部分，对 metrics 数据进行收集、加工、存储和查询等处理，另外结合 [grafana](https://grafana.com)，可做数据可视化展示。
 
 ## 相较于常用的监控方案：
 
@@ -32,10 +32,14 @@ SOFALookout 是一个利用多维度的 metrics 对目标系统进行度量和�
 - 服务器端代码编译，进入server子目录，Maven 3.2.5+, JDK Version 1.8+；
 ## 样例工程
 
-样例工程演示了如何快速使用 SOFALookout，[详细可参考](https://github.com/alipay/sofa-lookout/wiki/useguide-samples)。
+样例工程演示了如何快速使用 SOFALookout，[详细可参考](https://github.com/sofastack/sofa-lookout/wiki/useguide-samples)。
 
 ## 贡献
 如何参与 SOFALookout [代码贡献](./CONTRIBUTING.md)
 
+## 致谢
+
+Lookout 的 promQL 相关解析逻辑是从 Prometheus 移植而来，做了一些优化和改进， 感谢 Prometheus 开源了如此易用和强大的 golang 版本的 QL 实现
+
 ## 开源许可
-SOFALookout 基于 [Apache License 2.0](./LICENSE) 协议，SOFALookout 依赖了一些三方组件，它们的开源协议参见[依赖组件版权说明](https://github.com/alipay/sofa-lookout/wiki/NOTICE)。
+SOFALookout 基于 [Apache License 2.0](./LICENSE) 协议，SOFALookout 依赖了一些三方组件，它们的开源协议参见[依赖组件版权说明](https://github.com/sofastack/sofa-lookout/wiki/NOTICE)。

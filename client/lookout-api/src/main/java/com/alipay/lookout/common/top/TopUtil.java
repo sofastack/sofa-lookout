@@ -73,11 +73,11 @@ public final class TopUtil {
         if (registry instanceof NoopRegistry || (id == NoopRegistry.INSTANCE.createId(null))) {
             return NoopTopGauger.INSTANCE;
         }
-        Id key = id.withTag(TOP_NUM_TAG_KEY, String.valueOf(maxNumber));
+        final Id key = id.withTag(TOP_NUM_TAG_KEY, String.valueOf(maxNumber));
         TopGauger topGauger = computeIfAbsent(cache, key, new Function<Object, TopGauger>() {
             @Override
             public TopGauger apply(Object obj) {
-                return new DefaultTopGauger(registry, id, maxNumber, order);
+                return new DefaultTopGauger(registry, key, maxNumber, order);
             }
         });
         return topGauger == null ? NoopTopGauger.INSTANCE : topGauger;
@@ -109,9 +109,7 @@ public final class TopUtil {
      * @param <K>
      * @param <V>
      */
-    static class Entry<K, V>
-
-    {
+    static class Entry<K, V> {
         private final K key;
         private V       value;
 

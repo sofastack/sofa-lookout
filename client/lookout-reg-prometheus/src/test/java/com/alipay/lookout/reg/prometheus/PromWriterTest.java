@@ -48,7 +48,7 @@ public class PromWriterTest {
 
         String str = promWriter.printFromLookoutMeasurement(measurement);
         System.out.println(str);
-        Assert.assertTrue(str.contains("aa.bb.cc_xxx3{tagk3=\"tagv3\"} 3"));
+        Assert.assertTrue(str.contains("aa_bb_cc_xxx3{tagk3=\"tagv3\"} 3"));
     }
 
     @Test

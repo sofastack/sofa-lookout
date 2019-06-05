@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-parent</artifactId>
-    <version>1.5.0</version>
+    <version>1.6.0</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,6 +25,38 @@
     </developers>
     <modules>
         <module>client</module>
+        <!--gateway modules-->
+        <module>gateway</module>
+        <module>gateway/core</module>
+        <module>gateway/metrics/pipeline</module>
+        <module>gateway/metrics/starter</module>
+        <module>gateway/metrics/importer/standard</module>
+        <module>gateway/metrics/importer/opentsdb</module>
+        <module>gateway/metrics/importer/prometheus</module>
+        <module>gateway/metrics/importer/metricbeat</module>
+        <module>gateway/metrics/exporter/elasticsearch</module>
+        <module>gateway/metrics/exporter/standard</module>
+        <!--server modules-->
         <module>server</module>
+        <module>server/common</module>
+        <module>server/metrics/promql</module>
+        <module>server/metrics/storage-ext-es</module>
+        <module>server/metrics/interfaces</module>
+        <module>server/metrics/starter</module>
+        <module>server/metrics/web-ui</module>
+        <module>server/server-test</module>
+        <!-- boot modules-->
+        <module>boot/gateway-bootstrap</module>
+        <module>boot/metrics-server-bootstrap</module>
+        <module>boot/sofa-ark-support</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>sofaark</id>
+            <modules>
+                <module>boot/all-in-one-bootstrap</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

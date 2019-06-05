@@ -65,9 +65,9 @@ public class DiskUsageMetricsImporter extends CachedMetricsImporter {
 
     /**
      *
-     * @param filePath
-     * @param timeout
-     * @param timeoutUnit
+     * @param filePath filePath
+     * @param timeout timeout
+     * @param timeoutUnit timeoutUnit
      */
     public DiskUsageMetricsImporter(String filePath, long timeout, TimeUnit timeoutUnit) {
         super(timeout, timeoutUnit);
@@ -83,7 +83,7 @@ public class DiskUsageMetricsImporter extends CachedMetricsImporter {
     protected void doRegister(Registry registry) {
         for (Map.Entry<String, DiskUsage> entry : diskUsageByDevice.entrySet()) {
             final String device = entry.getKey();
-            Id id = registry.createId("os.disk.usage." + device);
+            Id id = registry.createId("os.disk.usage");
             id = id.withTag("device", device);
             id = id.withTag("root", diskUsageByDevice.get(device).fsFile);
             id = id.withTag("type", diskUsageByDevice.get(device).fsVfType);

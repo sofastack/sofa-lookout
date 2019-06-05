@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * A timer metric
  * Created by kevin.luy@alipay.com on 2017/2/14.
  */
-public interface Timer extends Metric {
+public interface Timer extends BucketCounter {
     /**
      * @param amount Duration of a single event
      * @param unit time unit
@@ -52,4 +52,5 @@ public interface Timer extends Metric {
      * @return The total time of recorded events
      */
     long totalTime();
+
 }

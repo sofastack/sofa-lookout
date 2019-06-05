@@ -17,8 +17,7 @@
 package com.alipay.lookout.api;
 
 /**
- * Measurement type
- * Created by kevin.luy@alipay.com on 2017/2/14.
+ * Measurement type Created by kevin.luy@alipay.com on 2017/2/14.
  */
 public enum Statistic {
     rate,
@@ -36,6 +35,11 @@ public enum Statistic {
      * The sum of the amounts recorded.
      */
     totalAmount,
+
+    /**
+     * buckets of the amounts recorded
+     */
+    buckets,
 
     //    /**
     //     * The sum of the squares of the amounts recorded.

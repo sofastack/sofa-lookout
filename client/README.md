@@ -10,7 +10,7 @@ SOFALookout Client 项目支持 Maven 3.2.5+，JDK 6+ 进行编译。
 
 ## 2. API 埋点需知
 
-lookout-api 支持被单独依赖和使用，方便植入您的项目代码，收集需要的 metrics，更多信息参考 [WIKI 文档](https://github.com/alipay/sofa-lookout/wiki)。
+lookout-api 支持被单独依赖和使用，方便植入您的项目代码，收集需要的 metrics，更多信息参考 [官方文档](http://www.sofastack.tech/sofa-lookout/docs/Home)。
 
 ## 3. 扩展能力
 
@@ -49,4 +49,4 @@ lookout 客户端提供了 SPI 机制（只需要实现 `com.alipay.lookout.spi.
 
 ## 6.如何使用
 
-参考 [WIKI 文档](https://github.com/alipay/sofa-lookout/wiki)的快速开始和用户手册。
+参考 [官方文档](http://www.sofastack.tech/sofa-lookout/docs/Home)的快速开始和用户手册。

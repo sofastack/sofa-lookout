@@ -16,13 +16,7 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.ResettableStep;
-import com.alipay.lookout.api.Clock;
-import com.alipay.lookout.api.DistributionSummary;
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Indicator;
-import com.alipay.lookout.api.Measurement;
-import com.alipay.lookout.api.Statistic;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.step.StepLong;
 import com.alipay.lookout.step.StepValue;
 
@@ -31,7 +25,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-public class LookoutDistributionSummary implements DistributionSummary, ResettableStep {
+public class LookoutDistributionSummary extends LookoutBucketCounter implements
+                                                                    DistributionSummary,
+                                                                    ResettableStep {
 
     private final Id       id;
     private final StepLong count;
@@ -39,6 +35,7 @@ public class LookoutDistributionSummary implements DistributionSummary, Resettab
     private final StepLong max;
 
     LookoutDistributionSummary(Id id, Clock clock, long step) {
+        super(clock, step);
         this.id = id;
         this.count = new StepLong(0L, clock, step);
         this.total = new StepLong(0L, clock, step);
@@ -72,6 +69,7 @@ public class LookoutDistributionSummary implements DistributionSummary, Resettab
 
     @Override
     public void setStep(long step) {
+        super.setStep(step);
         count.setStep(step);
         total.setStep(step);
         max.setStep(step);
@@ -83,6 +81,7 @@ public class LookoutDistributionSummary implements DistributionSummary, Resettab
             count.getCurrent().incrementAndGet();
             total.getCurrent().addAndGet(amount);
             refreshMax(max.getCurrent(), amount);
+            recordBucket(amount);
         }
     }
 
@@ -101,4 +100,5 @@ public class LookoutDistributionSummary implements DistributionSummary, Resettab
     public long totalAmount() {
         return total.poll();
     }
+
 }

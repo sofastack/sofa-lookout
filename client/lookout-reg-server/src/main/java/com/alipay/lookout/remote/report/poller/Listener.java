@@ -20,7 +20,7 @@ package com.alipay.lookout.remote.report.poller;
  * 用于监听 poller 激活 和 空闲 的事件
  *
  * @author xiangfeng.xzc
- * @date 2018/7/19
+ * @since 2018/7/19
  */
 public interface Listener {
     /**

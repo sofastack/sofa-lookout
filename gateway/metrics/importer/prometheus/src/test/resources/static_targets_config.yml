@@ -1,0 +1,24 @@
+metric_scrape_configs:
+    - job_name: prometheus
+      metrics_path: /metrics
+      scheme: http
+      scrape_interval: 5s
+      params:
+        'match[]':
+          - '{job="prometheus"}'
+          - '{__name__=~"job:.*"}'
+      static_configs:
+        - targets: ['localhost:1234']
+          labels:
+            group: 'canary'
+
+    - job_name: 'federate'
+      scrape_interval: 15s
+      metrics_path: '/federate'
+      params:
+        'match[]':
+          - '{job="prometheus"}'
+          - '{__name__=~"job:.*"}'
+      static_configs:
+        - targets:
+            - 'confkeepermain-d6719.alipay.net:9090'

@@ -16,7 +16,10 @@
  */
 package com.alipay.lookout;
 
+import com.alipay.lookout.remote.report.Address;
 import com.alipay.lookout.remote.report.support.http.HttpRequestProcessor;
+import com.alipay.lookout.remote.report.support.http.ResultConsumer;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
@@ -28,15 +31,33 @@ import java.util.Map;
  */
 public class MockHttpRequestProcessor implements HttpRequestProcessor {
 
-    public Object request;
+    public Object      request;
+    private HttpEntity entity;
 
     @Override
-    public void sendPostRequest(HttpPost httpPost, Map<String, String> metadata) throws IOException {
-        this.request = httpPost;
+    public boolean sendPostRequest(HttpPost httpPost, Map<String, String> metadata)
+                                                                                   throws IOException {
+        return false;
     }
 
     @Override
-    public void sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException {
+    public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata) throws IOException {
+        return false;
+    }
 
+    @Override
+    public boolean sendGetRequest(HttpGet httpGet, Map<String, String> metadata,
+                                  ResultConsumer resultConsumer) throws IOException {
+        resultConsumer.consume(entity);
+        return true;
+    }
+
+    @Override
+    public Address getAvailableAddress() {
+        return new Address("localhost", 8080);
+    }
+
+    public void setEntity(HttpEntity entity) {
+        this.entity = entity;
     }
 }

@@ -57,7 +57,7 @@ public class PromWriter {
         }
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Object> entry : measurement.getValues().entrySet()) {
-            sb.append(measurement.metricId().name()).append("_").append(entry.getKey())
+            sb.append(formatMetricName(measurement.metricId().name() + "_" + entry.getKey()))
                 .append(tagStr).append(" ").append(entry.getValue().toString()).append("\n");
         }
         return sb.toString();

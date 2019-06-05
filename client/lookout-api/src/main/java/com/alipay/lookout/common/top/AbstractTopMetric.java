@@ -21,6 +21,8 @@ import com.alipay.lookout.api.Registry;
 
 import java.util.Comparator;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by kevin.luy@alipay.com on 2017/3/31.
@@ -44,6 +46,7 @@ abstract class AbstractTopMetric {
                                                                       };
     private final TopUtil.Order                       order;
     private long                                      lastRolledStamp = -1l;
+    private final Lock                                lock            = new ReentrantLock();
 
     AbstractTopMetric(Registry registry, Id id, int maxNumber, TopUtil.Order order) {
         this.maxNumber = maxNumber;
@@ -57,32 +60,35 @@ abstract class AbstractTopMetric {
         TopUtil.executor.execute(new Runnable() {
             @Override
             public void run() {
-                pushSafe(set, entry);
+                lock.lock();
+                try {
+                    pushSafe(set, entry);
+                } finally {
+                    lock.unlock();
+                }
             }
         });
     }
 
     private void pushSafe(TreeSet<TopUtil.Entry<Id, Long>> set, TopUtil.Entry<Id, Long> e) {
-        synchronized (set) {
-            if (!set.isEmpty()) {
-                boolean replaceable = false;
-                TopUtil.Entry<Id, Long> boundaryTarget = null;
-                if (order == TopUtil.Order.DESC) {
-                    boundaryTarget = set.first();
-                    replaceable = boundaryTarget.getValue() < e.getValue();
-                } else {
-                    boundaryTarget = set.last();
-                    replaceable = boundaryTarget.getValue() > e.getValue();
-                }
-                if (replaceable & set.size() >= maxNumber) {
-                    remove(set, boundaryTarget);
-                }
-                if (!replaceable & set.size() >= maxNumber) {
-                    return;//不add
-                }
+        if (!set.isEmpty()) {
+            boolean replaceable = false;
+            TopUtil.Entry<Id, Long> boundaryTarget = null;
+            if (order == TopUtil.Order.DESC) {
+                boundaryTarget = set.first();
+                replaceable = boundaryTarget.getValue() < e.getValue();
+            } else {
+                boundaryTarget = set.last();
+                replaceable = boundaryTarget.getValue() > e.getValue();
             }
-            add(set, e);
+            if (replaceable & set.size() >= maxNumber) {
+                remove(set, boundaryTarget);
+            }
+            if (!replaceable & set.size() >= maxNumber) {
+                return;//不add
+            }
         }
+        add(set, e);
     }
 
     private void remove(TreeSet<TopUtil.Entry<Id, Long>> set, TopUtil.Entry<Id, Long> boundaryTarget) {

@@ -16,13 +16,7 @@
  */
 package com.alipay.lookout.remote.step;
 
-import com.alipay.lookout.api.ResettableStep;
-import com.alipay.lookout.api.Clock;
-import com.alipay.lookout.api.Id;
-import com.alipay.lookout.api.Indicator;
-import com.alipay.lookout.api.Measurement;
-import com.alipay.lookout.api.Statistic;
-import com.alipay.lookout.api.Timer;
+import com.alipay.lookout.api.*;
 import com.alipay.lookout.step.StepLong;
 
 import java.util.concurrent.Callable;
@@ -32,15 +26,15 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by kevin.luy@alipay.com on 2017/2/6.
  */
-class LookoutTimer implements Timer, ResettableStep {
+class LookoutTimer extends LookoutBucketCounter implements Timer, ResettableStep {
 
     private final Id       id;
-    private final Clock    clock;
     private final StepLong count;
     private final StepLong total;
     private final StepLong max;
 
     LookoutTimer(Id id, Clock clock, long step) {
+        super(clock, step);
         this.id = id;
         this.clock = clock;
         this.count = new StepLong(0L, clock, step);
@@ -50,6 +44,7 @@ class LookoutTimer implements Timer, ResettableStep {
 
     @Override
     public void setStep(long step) {
+        super.setStep(step);
         count.setStep(step);
         total.setStep(step);
         max.setStep(step);
@@ -86,6 +81,7 @@ class LookoutTimer implements Timer, ResettableStep {
             count.getCurrent().incrementAndGet();
             total.getCurrent().addAndGet(nanos);
             refreshMax(max.getCurrent(), nanos);
+            recordBucket(unit.toMillis(amount));
         }
     }
 

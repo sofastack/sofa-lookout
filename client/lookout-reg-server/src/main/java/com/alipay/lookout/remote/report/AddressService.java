@@ -16,11 +16,19 @@
  */
 package com.alipay.lookout.remote.report;
 
+import java.util.Random;
+
 /**
  * 动态地址服务
  * Created by kevin.luy@alipay.com on 2017/3/8.
  */
 public interface AddressService {
+    ThreadLocal<Random> randomThreadLocal = new ThreadLocal<Random>() {
+                                              @Override
+                                              protected Random initialValue() {
+                                                  return new Random();
+                                              }
+                                          };
 
     /**
      * set a agentTestUrl,优先与动态发现的地址
@@ -38,8 +46,14 @@ public interface AddressService {
 
     boolean isAgentServerExisted();
 
+    /**
+     * select one address from addresses
+     *
+     * @return agent address
+     */
     Address getAgentServerHost();
 
+    @Deprecated
     void clearAddressCache();
 
 }

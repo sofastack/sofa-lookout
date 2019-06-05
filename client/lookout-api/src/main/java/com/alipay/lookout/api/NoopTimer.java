@@ -62,4 +62,8 @@ enum NoopTimer implements Timer {
     public long totalTime() {
         return 0L;
     }
+
+    @Override
+    public void buckets(long[] buckets) {
+    }
 }

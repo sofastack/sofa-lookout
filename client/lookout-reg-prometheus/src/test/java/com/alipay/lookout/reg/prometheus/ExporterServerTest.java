@@ -33,9 +33,9 @@ public class ExporterServerTest {
 
     @Test
     public void testExporterServer() throws IOException {
-        ExporterServer server = new ExporterServer(9494);
+        ExporterServer server = new ExporterServer(9194);
         server.start();
-        String result = sendHttpRequest(new URL("http://localhost:9494/"));
+        String result = sendHttpRequest(new URL("http://localhost:9194/"));
         Assert.assertTrue(result.contains("/metrics"));
         server.stop();
     }

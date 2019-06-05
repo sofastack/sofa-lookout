@@ -61,9 +61,9 @@ public class SystemLoadMetricsImporter extends CachedMetricsImporter {
 
     /**
      *
-     * @param filePath
-     * @param timeout
-     * @param timeoutUnit
+     * @param filePath filePath
+     * @param timeout timeout
+     * @param timeoutUnit timeoutUnit
      */
     public SystemLoadMetricsImporter(String filePath, long timeout, TimeUnit timeoutUnit) {
         super(timeout, timeoutUnit);

@@ -54,7 +54,7 @@ final class DefaultDistributionSummary implements DistributionSummary {
     public Indicator measure() {
         long now = clock.wallTime();
         return new Indicator(now, id).addMeasurement(Statistic.count.name(), count.get())
-            .addMeasurement(Statistic.count.name(), totalAmount.get());
+            .addMeasurement(Statistic.totalAmount.name(), totalAmount.get());
     }
 
     @Override
@@ -66,4 +66,10 @@ final class DefaultDistributionSummary implements DistributionSummary {
     public long totalAmount() {
         return totalAmount.get();
     }
+
+    @Override
+    public void buckets(long[] buckets) {
+
+    }
+
 }

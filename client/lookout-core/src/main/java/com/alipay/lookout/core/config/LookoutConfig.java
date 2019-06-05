@@ -40,11 +40,17 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
     public static final String                      LOOKOUT_AUTOPOLL_OS_METRIC_IGNORE       = "lookout.autopoll.os.ignore";
     public static final String                      LOOKOUT_AGENT_SERVER_PORT               = "lookout.agent.server.port";
     public static final String                      LOOKOUT_ANT_EVENT_LOG_ENABLE            = "lookout.ant.event.log.enable";
+    /**
+     * 多久没有请求拉取数据就进入idle状态
+     */
+    public static final String                      LOOKOUT_EXPORTER_IDLE_SECONDS           = "lookout.exporter.idle.seconds";
+    public static final String                      LOOKOUT_EXPORTER_ENABLE                 = "lookout.exporter.enable";
     public static final String                      LOOKOUT_EXPORTER_ACCESS_TOKEN           = "lookout.exporter.access.token";
 
     public static final String                      LOOKOUT_PROMETHEUS_EXPORTER_SERVER_PORT = "lookout.prometheus.exporter.server.port";
     // default value
     public static final int                         DEFAULT_WEB_SERVER_PORT                 = 8083;
+    public static final int                         DEFAULT_HTTP_EXPORTER_PORT              = 19399;
     public static final int                         DEFAULT_PROMETHEUS_EXPORTER_SERVER_PORT = 9494;
     public static final String                      APP_NAME                                = "app.name";
     public static int                               DEFAULT_REPORT_BATCH_SIZE               = 1700;
@@ -54,11 +60,6 @@ public final class LookoutConfig extends MapConfiguration implements MetricConfi
      * 是否提供一个接口, 让外界拉取数据
      */
     //    public static final String                      POLLER_EXPORTER_ENABLED                 = "lookout.poller.enabled";
-
-    /**
-     * 多久没有请求拉取数据就进入idle状态
-     */
-    public static final String                      POLLER_EXPORTER_IDLE_SECONDS            = "lookout.poller.exporter.idle.seconds";
 
     /**
      * priority->Millsecond

@@ -16,11 +16,16 @@
  */
 package com.alipay.lookout.remote.step;
 
+import com.alipay.lookout.api.Indicator;
 import com.alipay.lookout.api.ManualClock;
+import com.alipay.lookout.api.Measurement;
+import com.alipay.lookout.api.Metric;
 import com.alipay.lookout.core.DefaultRegistry;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -87,5 +92,36 @@ public class LookoutTimerTest {
         clock.setWallTime(20L);
         assertThat(timer.count()).isEqualTo(2L);
         assertThat(timer.totalTime()).isEqualTo(6000000L);
+    }
+
+    @Test
+    public void testBuckets() {
+        final ManualClock clock = new ManualClock();
+        DefaultRegistry registry = new DefaultRegistry(clock);
+        LookoutTimer timer = new LookoutTimer(registry.createId("timer"), clock, 10L);
+        timer.buckets(new long[] { 100, 200, 300, 400, 500 });
+        for (int i = 1; i <= 1000; i++) {
+            timer.record(i, TimeUnit.MILLISECONDS);
+        }
+        clock.setWallTime(0l);
+        long sum = 0;
+        for (Metric metric : timer) {
+            Indicator indicator = metric.measure();
+            Collection<Measurement<Long>> measurements = indicator.measurements();
+            for (Measurement<Long> measurement : measurements) {
+                sum += measurement.value();
+            }
+        }
+        Assert.assertEquals(0, sum);
+        clock.setWallTime(10l);
+        sum = 0;
+        for (Metric metric : timer) {
+            Indicator indicator = metric.measure();
+            Collection<Measurement<Long>> measurements = indicator.measurements();
+            for (Measurement<Long> measurement : measurements) {
+                sum += measurement.value();
+            }
+        }
+        Assert.assertEquals(1000, sum);
     }
 }

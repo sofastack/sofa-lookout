@@ -38,7 +38,7 @@ import java.util.concurrent.*;
 
 /**
  * @author xiangfeng.xzc
- * @date 2018/7/26
+ * @since 2018/7/26
  */
 public class PollerController implements Closeable {
     private static final Logger           LOGGER               = LookoutLoggerFactory
@@ -119,7 +119,7 @@ public class PollerController implements Closeable {
         scheduledExecutorService = new ScheduledThreadPoolExecutor(1,
             CommonUtil.getNamedThreadFactory("poller-controller"),
             new ThreadPoolExecutor.AbortPolicy());
-        idleSeconds = registry.getConfig().getInteger(LookoutConfig.POLLER_EXPORTER_IDLE_SECONDS,
+        idleSeconds = registry.getConfig().getInteger(LookoutConfig.LOOKOUT_EXPORTER_IDLE_SECONDS,
             DEFAULT_IDLE_SECONDS);
         update(registry.getCurrentStepMillis(), initSlotCount);
     }
@@ -131,8 +131,8 @@ public class PollerController implements Closeable {
     /**
      * 因为step或slowCount的调整, 导致需要重建 MetricCache, 这个方法尽量保留已有的slot, 减少数据丢失
      *
-     * @param step
-     * @param slotCount
+     * @param step      step
+     * @param slotCount slotCount
      * @return
      */
     private MetricCache createCache(long step, int slotCount) {
@@ -147,7 +147,7 @@ public class PollerController implements Closeable {
     /**
      * 修改slotCount
      *
-     * @param slotCount
+     * @param slotCount slotCount
      */
     public void setSlotCount(int slotCount) {
         Preconditions.checkArgument(slotCount > 0, "slotCount must greater than 0");
@@ -166,7 +166,7 @@ public class PollerController implements Closeable {
     /**
      * 修改频率
      *
-     * @param step
+     * @param step step
      */
     public void setStep(long step) {
         if (this.step == step) {
@@ -207,8 +207,8 @@ public class PollerController implements Closeable {
     /**
      * 获得下一批是数据
      *
-     * @param successCursors 上一次成功的curcors
-     * @return
+     * @param successCursors 上一次成功的 cursors
+     * @return next data
      */
     public List<Slot> getNextData(Set<Long> successCursors) {
         touchTimer();
@@ -236,10 +236,11 @@ public class PollerController implements Closeable {
     /**
      * 更新该 poller 的配置
      *
-     * @param newStep
-     * @param newSlotCount
+     * @param newStep      newStep
+     * @param newSlotCount newSlotCount
      */
     public synchronized void update(long newStep, int newSlotCount) {
+        Preconditions.checkArgument(newStep >= 0, "step must greater than 0");
         setSlotCount(newSlotCount);
         setStep(newStep);
         registry.setStep(newStep);
@@ -248,7 +249,7 @@ public class PollerController implements Closeable {
     /**
      * 获取槽数量
      *
-     * @return
+     * @return slot count
      */
     public int getSlotCount() {
         return slotCount;
@@ -257,7 +258,7 @@ public class PollerController implements Closeable {
     /**
      * 获取采样步长
      *
-     * @return
+     * @return step
      */
     public long getStep() {
         return step;
@@ -352,7 +353,7 @@ public class PollerController implements Closeable {
     /**
      * 添加监听器
      *
-     * @param listener
+     * @param listener listener
      */
     public void addListener(Listener listener) {
         this.listeners.add(listener);
@@ -361,7 +362,7 @@ public class PollerController implements Closeable {
     /**
      * 删除监听器
      *
-     * @param listener
+     * @param listener listener
      */
     public void removeListener(Listener listener) {
         this.listeners.remove(listener);
@@ -373,5 +374,6 @@ public class PollerController implements Closeable {
             this.scheduledExecutorService.shutdown();
             this.scheduledExecutorService = null;
         }
+        registry.destroy();
     }
 }

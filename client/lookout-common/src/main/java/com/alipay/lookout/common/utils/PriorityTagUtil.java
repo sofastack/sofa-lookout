@@ -36,7 +36,7 @@ public final class PriorityTagUtil {
         String value = Utils.getTagValue(tags, TAG_PRIORITY_KEY);
         if (value != null) {
             for (PRIORITY p : PRIORITY.values()) {
-                if (p.name().equals(value)) {
+                if (p.name().equalsIgnoreCase(value)) {
                     return p;
                 }
             }

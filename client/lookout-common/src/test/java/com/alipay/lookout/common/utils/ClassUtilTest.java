@@ -35,4 +35,9 @@ public class ClassUtilTest {
             new Object[] { 5 });
         Assert.assertEquals("5", integer.toString());
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void testNewInstanceException() {
+        ClassUtil.newInstance(ArrayList.class.getName() + "x", null, null);
+    }
 }

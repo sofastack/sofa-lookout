@@ -82,4 +82,11 @@ class CompositeTimer extends CompositeMetric implements Timer {
         Iterator<Registry> it = registries.iterator();
         return it.hasNext() ? getMetric(it.next()).totalTime() : 0L;
     }
+
+    @Override
+    public void buckets(long[] buckets) {
+        for (Registry r : registries) {
+            getMetric(r).buckets(buckets);
+        }
+    }
 }
