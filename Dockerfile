@@ -19,7 +19,7 @@ RUN mkdir -p /root/.m2 && \
   useradd admin && \
   chown -R admin:admin /home/admin
 
-EXPOSE 6200 7200 9000
+EXPOSE 6200 7200 9090
 
 VOLUME /home/admin/logs /home/admin/lookout_gateway_queue_cache
 
