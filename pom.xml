@@ -1,62 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.alipay.sofa.lookout</groupId>
-    <artifactId>lookout-parent</artifactId>
-    <version>1.6.0</version>
-    <packaging>pom</packaging>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <licenses>
-        <license>
-            <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
-    <developers>
-        <developer>
-            <name>kevin.luy</name>
-            <email>kevin.luy@antfin.com</email>
-            <organization>Ant Financial</organization>
-            <organizationUrl>https://www.alipay.com/</organizationUrl>
-        </developer>
-    </developers>
-    <modules>
-        <module>client</module>
-        <!--gateway modules-->
-        <module>gateway</module>
-        <module>gateway/core</module>
-        <module>gateway/metrics/pipeline</module>
-        <module>gateway/metrics/starter</module>
-        <module>gateway/metrics/importer/standard</module>
-        <module>gateway/metrics/importer/opentsdb</module>
-        <module>gateway/metrics/importer/prometheus</module>
-        <module>gateway/metrics/importer/metricbeat</module>
-        <module>gateway/metrics/exporter/elasticsearch</module>
-        <module>gateway/metrics/exporter/standard</module>
-        <!--server modules-->
-        <module>server</module>
-        <module>server/common</module>
-        <module>server/metrics/promql</module>
-        <module>server/metrics/storage-ext-es</module>
-        <module>server/metrics/interfaces</module>
-        <module>server/metrics/starter</module>
-        <module>server/metrics/web-ui</module>
-        <module>server/server-test</module>
-        <!-- boot modules-->
-        <module>boot/gateway-bootstrap</module>
-        <module>boot/metrics-server-bootstrap</module>
-        <module>boot/sofa-ark-support</module>
-    </modules>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.alipay.sofa.lookout</groupId>
+	<artifactId>lookout-parent</artifactId>
+	<version>1.6.0</version>
+	<packaging>pom</packaging>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>kevin.luy</name>
+			<email>kevin.luy@antfin.com</email>
+			<organization>Ant Financial</organization>
+			<organizationUrl>https://www.alipay.com/</organizationUrl>
+		</developer>
+	</developers>
+	<modules>
+		<module>client</module>
+		<!--gateway modules-->
+		<module>gateway</module>
+		<module>gateway/core</module>
+		<module>gateway/metrics/pipeline</module>
+		<module>gateway/metrics/starter</module>
+		<module>gateway/metrics/importer/standard</module>
+		<module>gateway/metrics/importer/opentsdb</module>
+		<module>gateway/metrics/importer/prometheus</module>
+		<module>gateway/metrics/importer/metricbeat</module>
+		<module>gateway/metrics/exporter/elasticsearch</module>
+		<module>gateway/metrics/exporter/standard</module>
+		<!--server modules-->
+		<module>server</module>
+		<module>server/common</module>
+		<module>server/metrics/promql</module>
+		<module>server/metrics/storage-ext-es</module>
+		<module>server/metrics/interfaces</module>
+		<module>server/metrics/starter</module>
+		<module>server/metrics/web-ui</module>
+		<module>server/server-test</module>
+		<!-- boot modules-->
+		<module>boot/gateway-bootstrap</module>
+		<module>boot/metrics-server-bootstrap</module>
+		<module>boot/sofa-ark-support</module>
+	</modules>
 
-    <profiles>
-        <profile>
-            <id>sofaark</id>
-            <modules>
-                <module>boot/all-in-one-bootstrap</module>
-            </modules>
-        </profile>
-    </profiles>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>pl.project13.maven</groupId>
+					<artifactId>git-commit-id-plugin</artifactId>
+					<version>3.0.0</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>revision</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<generateGitPropertiesFile>true</generateGitPropertiesFile>
+						<failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
+						<failOnNoGitDirectory>false</failOnNoGitDirectory>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>sofaark</id>
+			<modules>
+				<module>boot/all-in-one-bootstrap</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>

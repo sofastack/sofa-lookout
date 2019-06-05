@@ -70,7 +70,6 @@
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
-				<version>3.0.0</version>
 			</plugin>
 			<plugin>
 				<groupId>com.alipay.sofa</groupId>
@@ -85,8 +84,9 @@
 					</execution>
 				</executions>
 				<configuration>
+					<finalName>allinone</finalName>
 					<bizName>lookoutall</bizName>
-					<arkClassifier>executable-ark</arkClassifier>
+					<arkClassifier>executable</arkClassifier>
 					<attach>true</attach>
 					<!--使用priority来调整优先级-->
 					<priority>1</priority>
