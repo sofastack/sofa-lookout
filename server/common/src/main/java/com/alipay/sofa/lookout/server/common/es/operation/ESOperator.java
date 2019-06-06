@@ -57,10 +57,10 @@ public class ESOperator {
         // add scheduler tasks
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doRollOver(esOperatorBuilder.alias);
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 10, TimeUnit.MINUTES);
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doDelete(esOperatorBuilder.index);
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 10, TimeUnit.MINUTES);
     }
 
     public void initializeDatabase() {
