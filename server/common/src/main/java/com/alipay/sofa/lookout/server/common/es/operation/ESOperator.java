@@ -16,6 +16,8 @@
  */
 package com.alipay.sofa.lookout.server.common.es.operation;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -28,11 +30,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,11 +40,10 @@ import java.util.concurrent.TimeUnit;
  * @create: 2019-05-12 17:09
  **/
 public class ESOperator {
-    private static final Logger logger       = LoggerFactory.getLogger(ESOperator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ESOperator.class);
 
     private ESOperatorBuilder   esOperatorBuilder;
-    private final OkHttpClient  client       = new OkHttpClient();
-    private final String        indexWithDay = "%s-%s-1";
+    private final OkHttpClient  client = new OkHttpClient();
 
     ESOperator(ESOperatorBuilder esOperatorBuilder) {
         this.esOperatorBuilder = esOperatorBuilder;
@@ -57,7 +56,7 @@ public class ESOperator {
         // add scheduler tasks
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doRollOver(esOperatorBuilder.alias);
-        }, 0, 10, TimeUnit.MINUTES);
+        }, 0, 10, TimeUnit.SECONDS);
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doDelete(esOperatorBuilder.index);
         }, 0, 10, TimeUnit.MINUTES);
@@ -92,8 +91,12 @@ public class ESOperator {
             "this alias is conflicted with an index name:" + alias);
         //create alias and indices
         doCreateIndexTemplate(alias, searchAlias, index);
-        doCreateFirstIndex(index);
-        doCreateIndexAlias(index, alias);
+        String realIndex = doCreateFirstIndex(index);
+        if (StringUtils.isNotEmpty(realIndex)) {
+            doCreateIndexAlias(realIndex, alias);
+        } else {
+            logger.error("can't get the first index name");
+        }
     }
 
     boolean isIndexOrAliasExisted(String index) throws IOException {
@@ -141,9 +144,8 @@ public class ESOperator {
     }
 
     boolean doCreateIndexAlias(String index, String alias) {
-        String realIndex = indexWithDay(index);
         String addAliasTemplate = "{\"actions\":[{\"add\":{\"index\":\"%s\",\"alias\":\"%s\"}}]}";
-        String addAlias = String.format(addAliasTemplate, realIndex, alias);
+        String addAlias = String.format(addAliasTemplate, index, alias);
         try {
             final Request request = new Request.Builder()
                 .url(esOperatorBuilder.hostUrl + "/_aliases")
@@ -161,13 +163,23 @@ public class ESOperator {
         return true;
     }
 
-    boolean doCreateFirstIndex(String index) throws IOException {
-        String url = URLEncoder.encode(indexWithDay(index), "UTF-8");
+    /**
+     *
+     * @param index
+     * @return the created real index name
+     * @throws IOException
+     */
+    String doCreateFirstIndex(String index) throws IOException {
+        String url = URLEncoder.encode(String.format("<%s-{now/d}-1>", index), "UTF-8");
         final Request request = new Request.Builder().url(esOperatorBuilder.hostUrl + "/" + url)
             .put(RequestBody.create(MediaType.parse("application/json"), "".getBytes("UTF-8")))
             .build();
         Response response = client.newCall(request).execute();
-        return response.isSuccessful();
+        if (response.isSuccessful()) {
+            return getIndexNameFromResponse(response.body().string());
+        } else {
+            return getIndexNameFromErrorResponse(response.body().string());
+        }
     }
 
     boolean doCreateMapping(String alias, String type, String mapping) throws IOException {
@@ -221,10 +233,29 @@ public class ESOperator {
         }
     }
 
-    private String indexWithDay(String index) {
-        SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
-        String day = sf.format(new Date());
-        return String.format(indexWithDay, index, day);
+    private String getIndexNameFromResponse(String response) {
+        try {
+            JSONObject resJSON = JSON.parseObject(response);
+            return resJSON.getString("index");
+        } catch (Exception e) {
+            logger.warn("parse create index response error.", e);
+            return null;
+        }
+    }
+
+    private String getIndexNameFromErrorResponse(String response) {
+        try {
+            JSONObject resJSON = JSON.parseObject(response);
+            if (resJSON.containsKey("error")) {
+                JSONObject errorJSON = resJSON.getJSONObject("error");
+                return errorJSON.getString("index");
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            logger.warn("parse create index response error.", e);
+            return null;
+        }
     }
 
 }
