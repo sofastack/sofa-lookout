@@ -56,7 +56,7 @@ public class ESOperator {
         // add scheduler tasks
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doRollOver(esOperatorBuilder.alias);
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 10, TimeUnit.MINUTES);
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doDelete(esOperatorBuilder.index);
         }, 0, 10, TimeUnit.MINUTES);
@@ -202,7 +202,9 @@ public class ESOperator {
                     RequestBody.create(MediaType.parse("application/json"),
                         rollOverContent.getBytes("UTF-8"))).build();
             Response response = client.newCall(request).execute();
-            logger.info("rollOver:{}", request.toString());
+            if (logger.isDebugEnabled()) {
+                logger.debug("rollOver:{}", request.toString());
+            }
             if (!response.isSuccessful()) {
                 logger.warn("rollOver fail!", response.body().string());
             }
