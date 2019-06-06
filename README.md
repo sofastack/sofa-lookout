@@ -32,7 +32,7 @@ SOFALookout（已开源部分）是一个利用多维度的 metrics 对目标系
 - 服务器端代码编译:
   - all-in-one模式: `./boot/all-ine-one-bootstrap/build.sh`, 打包结果在`boot/all-in-one-bootstrap/target/xxx-executable-ark.jar`
   - metrics-server: `mvn clean install -DskipTests -am -pl boot/metrics-server-bootstrap`
-  - gateway: `mvn clean install -DskipTests -am -pl boot/gateway/bootstrap`
+  - gateway: `mvn clean install -DskipTests -am -pl boot/gateway-bootstrap`
   
 > 要求至少Maven 3.2.5+, JDK Version 8+；
 

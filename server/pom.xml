@@ -30,6 +30,7 @@
         <coveralls.maven.plugin>3.1.0</coveralls.maven.plugin>
         <maven.java.formatter.plugin>0.4</maven.java.formatter.plugin>
         <maven.javadoc.plugin>2.9.1</maven.javadoc.plugin>
+        <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
 
         <metrics.client.version>1.6.0</metrics.client.version>
         <metrics.server.version>1.6.0</metrics.server.version>
@@ -110,7 +111,7 @@
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.1.4.RELEASE</version>
+                <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -173,6 +174,23 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                    <executions>
+                        <execution>
+                            <id>generate-bootstrap</id>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>com.mycila</groupId>
