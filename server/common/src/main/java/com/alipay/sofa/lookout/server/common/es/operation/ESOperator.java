@@ -17,16 +17,22 @@
 package com.alipay.sofa.lookout.server.common.es.operation;
 
 import com.google.common.base.Preconditions;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,10 +40,11 @@ import java.util.concurrent.TimeUnit;
  * @create: 2019-05-12 17:09
  **/
 public class ESOperator {
-    private static final Logger logger = LoggerFactory.getLogger(ESOperator.class);
+    private static final Logger logger       = LoggerFactory.getLogger(ESOperator.class);
 
     private ESOperatorBuilder   esOperatorBuilder;
-    private final OkHttpClient  client = new OkHttpClient();
+    private final OkHttpClient  client       = new OkHttpClient();
+    private final String        indexWithDay = "%s-%s-1";
 
     ESOperator(ESOperatorBuilder esOperatorBuilder) {
         this.esOperatorBuilder = esOperatorBuilder;
@@ -50,10 +57,10 @@ public class ESOperator {
         // add scheduler tasks
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doRollOver(esOperatorBuilder.alias);
-        }, 0, 10, TimeUnit.MINUTES);
+        }, 0, 10, TimeUnit.SECONDS);
         esOperatorBuilder.getScheduler().scheduleAtFixedRate(() -> {
             doDelete(esOperatorBuilder.index);
-        }, 0, 10, TimeUnit.MINUTES);
+        }, 0, 10, TimeUnit.SECONDS);
     }
 
     public void initializeDatabase() {
@@ -84,8 +91,9 @@ public class ESOperator {
         Preconditions.checkState(!isIndexOrAliasExisted(alias),
             "this alias is conflicted with an index name:" + alias);
         //create alias and indices
-        doCreateAlias(alias, searchAlias, index);
+        doCreateIndexTemplate(alias, searchAlias, index);
         doCreateFirstIndex(index);
+        doCreateIndexAlias(index, alias);
     }
 
     boolean isIndexOrAliasExisted(String index) throws IOException {
@@ -116,20 +124,45 @@ public class ESOperator {
         return 1;
     }
 
-    boolean doCreateAlias(String alias, String searchAlias, String index) throws IOException {
-        String aliasTemplate = "{\"template\": \"%s-*\",\"settings\": {\"number_of_shards\":3,\"number_of_replicas\": %d,\"routing.allocation.total_shards_per_node\": 9},\"aliases\": {\"%s\": {},\"%s\": {}}}";
+    boolean doCreateIndexTemplate(String alias, String searchAlias, String index)
+                                                                                 throws IOException {
+        String aliasTemplate = "{\"template\": \"%s-*\",\"settings\": {\"number_of_shards\":3,\"number_of_replicas\": %d,\"routing.allocation"
+                               + ".total_shards_per_node\": 9},\"aliases\": {\"%s\": {}}}";
         int nodesNum = doGetClusterNodesNum();
-        String body = String.format(aliasTemplate, index, nodesNum > 1 ? 1 : 0, alias, searchAlias);
+        String body = String.format(aliasTemplate, index, nodesNum > 1 ? 1 : 0, searchAlias);
+        logger.info("index template:{}", body);
         final Request request = new Request.Builder()
             .url(esOperatorBuilder.hostUrl + String.format("/_template/%s", alias + "-t"))
             .put(RequestBody.create(MediaType.parse("application/json"), body.getBytes("UTF-8")))
             .build();
+        logger.info("create template:{}", request.toString());
         Response response = client.newCall(request).execute();
         return response.isSuccessful();
     }
 
+    boolean doCreateIndexAlias(String index, String alias) {
+        String realIndex = indexWithDay(index);
+        String addAliasTemplate = "{\"actions\":[{\"add\":{\"index\":\"%s\",\"alias\":\"%s\"}}]}";
+        String addAlias = String.format(addAliasTemplate, realIndex, alias);
+        try {
+            final Request request = new Request.Builder()
+                .url(esOperatorBuilder.hostUrl + "/_aliases")
+                .post(
+                    RequestBody.create(MediaType.parse("application/json"),
+                        addAlias.getBytes("UTF-8"))).build();
+            Response response = client.newCall(request).execute();
+            logger.info("add alias:{}", addAlias);
+            if (!response.isSuccessful()) {
+                logger.warn("add alias fail!", response.body().string());
+            }
+        } catch (Throwable e) {
+            logger.warn("add alias fail!", e.getMessage());
+        }
+        return true;
+    }
+
     boolean doCreateFirstIndex(String index) throws IOException {
-        String url = URLEncoder.encode(String.format("<%s-{now/d}-1>", index), "UTF-8");
+        String url = URLEncoder.encode(indexWithDay(index), "UTF-8");
         final Request request = new Request.Builder().url(esOperatorBuilder.hostUrl + "/" + url)
             .put(RequestBody.create(MediaType.parse("application/json"), "".getBytes("UTF-8")))
             .build();
@@ -157,6 +190,7 @@ public class ESOperator {
                     RequestBody.create(MediaType.parse("application/json"),
                         rollOverContent.getBytes("UTF-8"))).build();
             Response response = client.newCall(request).execute();
+            logger.info("rollOver:{}", request.toString());
             if (!response.isSuccessful()) {
                 logger.warn("rollOver fail!", response.body().string());
             }
@@ -185,6 +219,12 @@ public class ESOperator {
         } catch (Throwable e) {
             logger.warn("delete the old metrics index:{} fail. err:{}", idx, e.getMessage());
         }
+    }
+
+    private String indexWithDay(String index) {
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy.MM.dd");
+        String day = sf.format(new Date());
+        return String.format(indexWithDay, index, day);
     }
 
 }
