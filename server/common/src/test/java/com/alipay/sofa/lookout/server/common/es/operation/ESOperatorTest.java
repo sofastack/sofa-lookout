@@ -77,7 +77,7 @@
 //    public void testCreateAlias() throws IOException {
 //        ESOperator esOperator = new ESOperatorBuilder(ESDataType.METRIC).httpHost(
 //            "http://localhost:9200").build();
-//        esOperator.doCreateAlias("active-metrics", "search-metrics", "metrics");
+//        esOperator.doCreateIndexTemplate("active-metrics", "search-metrics", "metrics");
 //
 //    }
 //

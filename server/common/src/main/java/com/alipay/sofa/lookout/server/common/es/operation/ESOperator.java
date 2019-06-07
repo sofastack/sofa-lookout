@@ -16,8 +16,14 @@
  */
 package com.alipay.sofa.lookout.server.common.es.operation;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +90,13 @@ public class ESOperator {
         Preconditions.checkState(!isIndexOrAliasExisted(alias),
             "this alias is conflicted with an index name:" + alias);
         //create alias and indices
-        doCreateAlias(alias, searchAlias, index);
-        doCreateFirstIndex(index);
+        doCreateIndexTemplate(alias, searchAlias, index);
+        String realIndex = doCreateFirstIndex(index);
+        if (StringUtils.isNotEmpty(realIndex)) {
+            doCreateIndexAlias(realIndex, alias);
+        } else {
+            logger.error("can't get the first index name");
+        }
     }
 
     boolean isIndexOrAliasExisted(String index) throws IOException {
@@ -116,25 +127,59 @@ public class ESOperator {
         return 1;
     }
 
-    boolean doCreateAlias(String alias, String searchAlias, String index) throws IOException {
-        String aliasTemplate = "{\"template\": \"%s-*\",\"settings\": {\"number_of_shards\":3,\"number_of_replicas\": %d,\"routing.allocation.total_shards_per_node\": 9},\"aliases\": {\"%s\": {},\"%s\": {}}}";
+    boolean doCreateIndexTemplate(String alias, String searchAlias, String index)
+                                                                                 throws IOException {
+        String aliasTemplate = "{\"template\": \"%s-*\",\"settings\": {\"number_of_shards\":3,\"number_of_replicas\": %d,\"routing.allocation"
+                               + ".total_shards_per_node\": 9},\"aliases\": {\"%s\": {}}}";
         int nodesNum = doGetClusterNodesNum();
-        String body = String.format(aliasTemplate, index, nodesNum > 1 ? 1 : 0, alias, searchAlias);
+        String body = String.format(aliasTemplate, index, nodesNum > 1 ? 1 : 0, searchAlias);
+        logger.info("index template:{}", body);
         final Request request = new Request.Builder()
             .url(esOperatorBuilder.hostUrl + String.format("/_template/%s", alias + "-t"))
             .put(RequestBody.create(MediaType.parse("application/json"), body.getBytes("UTF-8")))
             .build();
+        logger.info("create template:{}", request.toString());
         Response response = client.newCall(request).execute();
         return response.isSuccessful();
     }
 
-    boolean doCreateFirstIndex(String index) throws IOException {
+    boolean doCreateIndexAlias(String index, String alias) {
+        String addAliasTemplate = "{\"actions\":[{\"add\":{\"index\":\"%s\",\"alias\":\"%s\"}}]}";
+        String addAlias = String.format(addAliasTemplate, index, alias);
+        try {
+            final Request request = new Request.Builder()
+                .url(esOperatorBuilder.hostUrl + "/_aliases")
+                .post(
+                    RequestBody.create(MediaType.parse("application/json"),
+                        addAlias.getBytes("UTF-8"))).build();
+            Response response = client.newCall(request).execute();
+            logger.info("add alias:{}", addAlias);
+            if (!response.isSuccessful()) {
+                logger.warn("add alias fail!", response.body().string());
+            }
+        } catch (Throwable e) {
+            logger.warn("add alias fail!", e.getMessage());
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param index
+     * @return the created real index name
+     * @throws IOException
+     */
+    String doCreateFirstIndex(String index) throws IOException {
         String url = URLEncoder.encode(String.format("<%s-{now/d}-1>", index), "UTF-8");
         final Request request = new Request.Builder().url(esOperatorBuilder.hostUrl + "/" + url)
             .put(RequestBody.create(MediaType.parse("application/json"), "".getBytes("UTF-8")))
             .build();
         Response response = client.newCall(request).execute();
-        return response.isSuccessful();
+        if (response.isSuccessful()) {
+            return getIndexNameFromResponse(response.body().string());
+        } else {
+            return getIndexNameFromErrorResponse(response.body().string());
+        }
     }
 
     boolean doCreateMapping(String alias, String type, String mapping) throws IOException {
@@ -157,6 +202,9 @@ public class ESOperator {
                     RequestBody.create(MediaType.parse("application/json"),
                         rollOverContent.getBytes("UTF-8"))).build();
             Response response = client.newCall(request).execute();
+            if (logger.isDebugEnabled()) {
+                logger.debug("rollOver:{}", request.toString());
+            }
             if (!response.isSuccessful()) {
                 logger.warn("rollOver fail!", response.body().string());
             }
@@ -184,6 +232,31 @@ public class ESOperator {
             logger.debug("delete the old metrics index:{} fail.", idx);
         } catch (Throwable e) {
             logger.warn("delete the old metrics index:{} fail. err:{}", idx, e.getMessage());
+        }
+    }
+
+    private String getIndexNameFromResponse(String response) {
+        try {
+            JSONObject resJSON = JSON.parseObject(response);
+            return resJSON.getString("index");
+        } catch (Exception e) {
+            logger.warn("parse create index response error.", e);
+            return null;
+        }
+    }
+
+    private String getIndexNameFromErrorResponse(String response) {
+        try {
+            JSONObject resJSON = JSON.parseObject(response);
+            if (resJSON.containsKey("error")) {
+                JSONObject errorJSON = resJSON.getJSONObject("error");
+                return errorJSON.getString("index");
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            logger.warn("parse create index response error.", e);
+            return null;
         }
     }
 
