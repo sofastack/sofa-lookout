@@ -6,6 +6,9 @@
 	<artifactId>lookout-parent</artifactId>
 	<version>1.6.0</version>
 	<packaging>pom</packaging>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>lookout root pom</description>
+	<url>https://github.com/sofastack/sofa-lookout</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.encoding>UTF-8</project.encoding>
