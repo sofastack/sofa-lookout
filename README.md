@@ -9,8 +9,24 @@
 
 访问 [WIKI](http://www.sofastack.tech/sofa-lookout/docs/Home) 查看完整的文档使用指南。
 
-SOFALookout（已开源部分）是一个利用多维度的 metrics 对目标系统进行度量和监控的项目。SOFALookout 的多维度 metrics 参考[Metrics2.0 标准](http://metrics20.org/)。SOFALookout 项目分为客户端部分与服务器端部分。
+SOFALookout（已开源部分）是一个利用多维度的 metrics 对目标系统进行度量和监控的项目。SOFALookout 的多维度 metrics 参考[Metrics2.0 标准](http://metrics20.org/)。
 
+```
++----------------+
+| Lookout Client +----+
++----------------+    |
++----------------+    |
+| Prometheus SDK +----+  +-------------------+   +------------+  +------------------+  +-----------+
++----------------+    +-->  Lookout Gateway  +--->  DB(ES/...)<--+  Lookout Server  <--+  Grafana  |
++----------------+    |  +-------------------+   +------------+  +------------------+  +-----------+
+|   Metricbeat   +----+
++----------------+    |
++----------------+    |
+|       ...      +----+
++----------------+
+```
+
+SOFALookout 项目分为客户端部分与服务器端部分：
 - 客户端是一个 Java 的类库，可以将它植入您的应用代码中采集 metrics 信息，[客户端更多详情](./client/README.md)。
 - 服务端代码（Metrics）部分，对 Metrics 数据进行收集、加工、存储和查询等处理，另外结合 [grafana](https://grafana.com)，可做数据可视化展示。
 
@@ -28,14 +44,9 @@ SOFALookout（已开源部分）是一个利用多维度的 metrics 对目标系
 会持续开源 tracing，eventing 功能。
 
 ## 编译
-- 客户端代码编译: `cd client && mvn clean install -DskipTests`
-- 服务器端代码编译:
-  - all-in-one模式: `./boot/all-ine-one-bootstrap/build.sh`, 打包结果在`boot/all-in-one-bootstrap/target/xxx-executable-ark.jar`
-  - metrics-server: `mvn clean install -DskipTests -am -pl boot/metrics-server-bootstrap`
-  - gateway: `mvn clean install -DskipTests -am -pl boot/gateway-bootstrap`
+  - 代码编译: 至少Maven 3.2.5+, JDK Version 8+；
+  - all-in-one 启动模块编译: `./boot/all-ine-one-bootstrap/build.sh`, 打包结果在`boot/all-in-one-bootstrap/target/xxx-executable-ark.jar`
   
-> 要求至少Maven 3.2.5+, JDK Version 8+；
-
 ## 致谢
 Lookout 的 promQL 相关解析逻辑是从 Prometheus 移植而来，做了一些优化和改进， 感谢 Prometheus 开源了如此易用和强大的 golang 版本的 QL 实现
 
