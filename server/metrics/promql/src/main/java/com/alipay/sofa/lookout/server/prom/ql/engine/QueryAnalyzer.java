@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.alipay.sofa.lookout.server.prom.common.QueryConstants.EXPRESSION_CONTEXT;
 import static com.alipay.sofa.lookout.server.prom.ql.engine.Evaluator.LookbackDelta;
 
 /**
@@ -147,6 +148,7 @@ public class QueryAnalyzer {
                         QueryStatement queryStmt = querier.createQueryStmt();
                         queryStmt.setStartTime(analysis.getStartTime())
                             .setEndTime(analysis.getEndTime()).setMatchers(n.getMatchers());
+                        queryStmt.context().put(EXPRESSION_CONTEXT, n.getContext());
                         set = queryStmt.executeQuery();
                     }
 
@@ -169,6 +171,7 @@ public class QueryAnalyzer {
                         QueryStatement queryStmt = querier.createQueryStmt();
                         queryStmt.setStartTime(analysis.getStartTime())
                             .setEndTime(analysis.getEndTime()).setMatchers(n.getMatchers());
+                        queryStmt.context().put(EXPRESSION_CONTEXT, n.getContext());
                         set = queryStmt.executeQuery();
                     }
 

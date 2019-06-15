@@ -22,6 +22,8 @@ package com.alipay.sofa.lookout.server.prom.common;
  **/
 public interface QueryConstants {
 
-    long MAX_DATA_POINTS = 100000L;
-    long MAX_LABEL_SIZE  = 10000L;
+    long   MAX_DATA_POINTS    = 100000L;
+    long   MAX_LABEL_SIZE     = 10000L;
+
+    String EXPRESSION_CONTEXT = "expr_ctxt";
 }
