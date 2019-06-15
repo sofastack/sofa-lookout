@@ -6,8 +6,18 @@
 	<artifactId>lookout-parent</artifactId>
 	<version>1.6.0</version>
 	<packaging>pom</packaging>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>lookout root pom</description>
+	<url>https://github.com/sofastack/sofa-lookout</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.encoding>UTF-8</project.encoding>
+		<maven.javadoc.plugin>2.9.1</maven.javadoc.plugin>
+		<license.maven.plugin>3.0</license.maven.plugin>
+		<cobertura.maven.plugin>2.6</cobertura.maven.plugin>
+		<coveralls.maven.plugin>3.1.0</coveralls.maven.plugin>
+		<maven.java.formatter.plugin>0.4</maven.java.formatter.plugin>
+		<spring.boot.version>2.1.4.RELEASE</spring.boot.version>
 	</properties>
 	<licenses>
 		<license>
@@ -23,6 +33,11 @@
 			<organizationUrl>https://www.alipay.com/</organizationUrl>
 		</developer>
 	</developers>
+	<scm>
+		<connection>scm:git:git://github.com/sofastack/sofa-lookout.git</connection>
+		<developerConnection>scm:git:ssh://github.com/sofastack/sofa-lookout.git</developerConnection>
+		<url>https://github.com/sofastack/sofa-lookout/tree/master</url>
+	</scm>
 	<modules>
 		<module>client</module>
 		<!--gateway modules-->
@@ -55,6 +70,19 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring.boot.version}</version>
+					<executions>
+						<execution>
+							<id>generate-bootstrap</id>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
 					<groupId>pl.project13.maven</groupId>
 					<artifactId>git-commit-id-plugin</artifactId>
 					<version>3.0.0</version>
@@ -71,6 +99,118 @@
 						<failOnNoGitDirectory>false</failOnNoGitDirectory>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven.javadoc.plugin}</version>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<additionalparam>-Xdoclint:none</additionalparam>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${license.maven.plugin}</version>
+					<executions>
+						<execution>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>remove</goal>
+								<goal>format</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<quiet>true</quiet>
+						<header>${user.dir}/HEADER</header>
+						<includes>
+							<include>**/src/main/java/**</include>
+							<include>**/src/test/java/**</include>
+						</includes>
+						<excludes>
+							<exclude>**/Step*.java</exclude>
+							<exclude>**/Clock.java</exclude>
+						</excludes>
+						<strictCheck>true</strictCheck>
+						<mapping>
+							<java>SLASHSTAR_STYLE</java>
+						</mapping>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.0.2</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.21.0</version>
+					<configuration>
+						<includes>
+							<include>**/*Test*.java</include>
+						</includes>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+					<artifactId>maven-java-formatter-plugin</artifactId>
+					<version>${maven.java.formatter.plugin}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>format</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<configFile>${user.dir}/Formatter.xml</configFile>
+						<encoding>${project.encoding}</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eluder.coveralls</groupId>
+					<artifactId>coveralls-maven-plugin</artifactId>
+					<version>${coveralls.maven.plugin}</version>
+					<configuration>
+						<sourceEncoding>${project.encoding}</sourceEncoding>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>cobertura-maven-plugin</artifactId>
+					<version>${cobertura.maven.plugin}</version>
+					<configuration>
+						<encoding>${project.encoding}</encoding>
+						<aggregate>true</aggregate>
+						<formats>
+							<format>xml</format>
+							<format>html</format>
+						</formats>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -84,6 +224,35 @@
 		</profile>
 		<profile>
 			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.7</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>false</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 			<distributionManagement>
 				<snapshotRepository>
 					<id>ossrh</id>
