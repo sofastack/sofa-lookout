@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.alipay.sofa.lookout</groupId>
         <artifactId>lookout-gateway-parent</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
         <relativePath>../../../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>

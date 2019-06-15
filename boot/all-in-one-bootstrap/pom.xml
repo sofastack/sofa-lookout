@@ -6,16 +6,16 @@
 	<parent>
 		<groupId>com.alipay.sofa.lookout</groupId>
 		<artifactId>lookout-server-parent</artifactId>
-		<version>1.6.0</version>
+		<version>1.6.1</version>
 		<relativePath>../../server/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>lookout-all-in-one-bootstrap</artifactId>
 
 	<properties>
-		<lookout.sofaark.version>1.6.0</lookout.sofaark.version>
-		<gateway.version>1.6.0</gateway.version>
-		<metrics.server.version>1.6.0</metrics.server.version>
+		<lookout.sofaark.version>1.6.1</lookout.sofaark.version>
+		<gateway.version>1.6.1</gateway.version>
+		<metrics.server.version>1.6.1</metrics.server.version>
 		<sofaark.version>0.6.0</sofaark.version>
 	</properties>
 

@@ -5,13 +5,12 @@
 	<parent>
 		<groupId>com.alipay.sofa.lookout</groupId>
 		<artifactId>lookout-parent</artifactId>
-		<version>1.6.0</version>
+		<version>1.6.1</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>sofa-ark-support</artifactId>
-	<version>1.6.0</version>
 
 	<properties>
 		<sofaark.version>0.6.0</sofaark.version>
