@@ -33,6 +33,11 @@
 			<organizationUrl>https://www.alipay.com/</organizationUrl>
 		</developer>
 	</developers>
+	<scm>
+		<connection>scm:git:git://github.com/sofastack/sofa-lookout.git</connection>
+		<developerConnection>scm:git:ssh://github.com/sofastack/sofa-lookout.git</developerConnection>
+		<url>https://github.com/sofastack/sofa-lookout/tree/master</url>
+	</scm>
 	<modules>
 		<module>client</module>
 		<!--gateway modules-->

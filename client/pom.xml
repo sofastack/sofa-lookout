@@ -46,12 +46,6 @@
         </developer>
     </developers>
 
-    <scm>
-        <connection>scm:git:git://github.com/alipay/sofa-lookout.git</connection>
-        <developerConnection>scm:git:ssh://github.com/alipay/sofa-lookout.git</developerConnection>
-        <url>https://github.com/alipay/sofa-lookout/tree/master</url>
-    </scm>
-
     <dependencyManagement>
         <!-- lookout client modules-->
         <dependencies>
