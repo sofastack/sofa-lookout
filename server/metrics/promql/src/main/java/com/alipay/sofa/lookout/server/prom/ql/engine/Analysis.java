@@ -28,7 +28,7 @@ public class Analysis {
     /**
      * 是否可以使用原生查询功能
      */
-    private boolean useNative = true;
+    private boolean useNative = false;
     private long    startTime;
     private long    endTime;
     private long    step;

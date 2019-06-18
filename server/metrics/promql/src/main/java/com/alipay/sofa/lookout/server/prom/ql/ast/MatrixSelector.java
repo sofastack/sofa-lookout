@@ -78,7 +78,7 @@ public class MatrixSelector implements Expr {
 
     public Context getContext() {
         if (context == null) {
-            context = new Context();
+            context = new Context(this);
         }
         return context;
     }
@@ -89,8 +89,16 @@ public class MatrixSelector implements Expr {
     }
 
     public static class Context extends ExprContext {
-
+        private MatrixSelector matrixSelector;
         private Function downsampleFunction;
+
+        public Context(MatrixSelector matrixSelector) {
+            this.matrixSelector = matrixSelector;
+        }
+
+        public MatrixSelector getMatrixSelector() {
+            return matrixSelector;
+        }
 
         public Function getDownsampleFunction() {
             return downsampleFunction;
