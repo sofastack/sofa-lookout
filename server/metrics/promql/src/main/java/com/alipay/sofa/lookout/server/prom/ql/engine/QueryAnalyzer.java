@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.alipay.sofa.lookout.server.prom.common.QueryConstants.EXPRESSION_CONTEXT;
 import static com.alipay.sofa.lookout.server.prom.ql.engine.Evaluator.LookbackDelta;
 
 /**
@@ -46,7 +47,6 @@ public class QueryAnalyzer {
         EvalStmt s = (EvalStmt) query.getStmt();
         Analysis analysis = new Analysis();
         analysis.setExpr(s.getExpr());
-
         //add query hint
         if (s.getExpr() instanceof VectorSelector) {
             query.hints.setVectorSelectQuery(true);
@@ -64,27 +64,35 @@ public class QueryAnalyzer {
                         analysis.setUseNative(false);
                         return true;
                     }
+
                     Expr expr = agg.getExpr();
                     if (expr instanceof Call) {
                         Call call = (Call) expr;
                         Call.Context ctx = call.getContext();
                         ctx.setAggregationType(agg.getOp());
                         ctx.setGrouping(agg.getGrouping());
+                        analysis.setUseNative(true);
                     } else if (expr instanceof VectorSelector) {
                         VectorSelector vectorSelector = (VectorSelector) expr;
                         VectorSelector.Context ctx = vectorSelector.getContext();
                         ctx.setAggregationType(agg.getOp());
                         ctx.setGrouping(agg.getGrouping());
+                        analysis.setUseNative(true);
                     }
+                    //else expr type,useNative keep false;
+
                 } else if (node instanceof Call) {
                     //for example,"sum_over_time(..[5m])"
                     Call call = (Call) node;
                     Call.Context callCtx = call.getContext();
-                    //aggr support?
-                    if (!storage.querier().supportAggregator(callCtx.getAggregationType())) {
+                    //FIXME 需要传入[Call函数名称]
+                    if (callCtx.getAggregationType() == null
+                        || !storage.querier().supportAggregator(callCtx.getAggregationType())) {
+                        //TODO Call function name must map with aggr;
                         analysis.setUseNative(false);
                         return true;
                     }
+                    analysis.setUseNative(true);
                     for (Expr expr : call.getArgs().getExpressions()) {
                         if (expr instanceof MatrixSelector) {
                             MatrixSelector ms = (MatrixSelector) expr;
@@ -119,8 +127,10 @@ public class QueryAnalyzer {
         analysis.setStartTime(mint.toEpochMilli());
         analysis.setEndTime(s.getEnd().toEpochMilli());
         analysis.setStep(s.getInterval().toMillis());
-        //FIXME, judge for the storage
-        analysis.setUseNative(false);
+        //support but config disable.
+        if (analysis.isUseNative() && !query.hints().isUseNative()) {
+            analysis.setUseNative(false);
+        }
         return analysis;
     }
 
@@ -142,11 +152,13 @@ public class QueryAnalyzer {
 
                         aggrStmt.setAggregator(n.getContext().getAggregationType()).setGroups(
                             n.getContext().getGrouping());
+                        aggrStmt.context().put(EXPRESSION_CONTEXT, n.getContext());
                         set = aggrStmt.executeQuery();
                     } else {
                         QueryStatement queryStmt = querier.createQueryStmt();
                         queryStmt.setStartTime(analysis.getStartTime())
                             .setEndTime(analysis.getEndTime()).setMatchers(n.getMatchers());
+                        queryStmt.context().put(EXPRESSION_CONTEXT, n.getContext());
                         set = queryStmt.executeQuery();
                     }
 
@@ -164,11 +176,13 @@ public class QueryAnalyzer {
 
                         aggrStmt.setAggregator(n.getContext().getAggregationType()).setGroups(
                             n.getContext().getGrouping());
+                        aggrStmt.context().put(EXPRESSION_CONTEXT, n.getContext());
                         set = aggrStmt.executeQuery();
                     } else {
                         QueryStatement queryStmt = querier.createQueryStmt();
                         queryStmt.setStartTime(analysis.getStartTime())
                             .setEndTime(analysis.getEndTime()).setMatchers(n.getMatchers());
+                        queryStmt.context().put(EXPRESSION_CONTEXT, n.getContext());
                         set = queryStmt.executeQuery();
                     }
 

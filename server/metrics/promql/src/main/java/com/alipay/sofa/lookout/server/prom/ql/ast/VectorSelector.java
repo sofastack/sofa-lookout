@@ -72,7 +72,7 @@ public class VectorSelector implements Expr {
 
     public Context getContext() {
         if (context == null) {
-            context = new Context();
+            context = new Context(this);
         }
         return context;
     }
@@ -87,6 +87,14 @@ public class VectorSelector implements Expr {
     }
 
     public static class Context extends ExprContext {
+        private VectorSelector selector;
 
+        public Context(VectorSelector selector) {
+            this.selector = selector;
+        }
+
+        public VectorSelector getVectorSelector() {
+            return selector;
+        }
     }
 }

@@ -5,11 +5,10 @@
     <parent>
         <groupId>com.alipay.sofa.lookout</groupId>
         <artifactId>lookout-parent</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
     </parent>
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-gateway-parent</artifactId>
-    <version>1.6.0</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>lookout gateway project</description>
@@ -23,9 +22,9 @@
         <cobertura.maven.plugin>2.6</cobertura.maven.plugin>
         <coveralls.maven.plugin>3.1.0</coveralls.maven.plugin>
         <maven.java.formatter.plugin>0.4</maven.java.formatter.plugin>
-        <metrics.client.version>1.6.0</metrics.client.version>
-        <metrics.server.version>1.6.0</metrics.server.version>
-        <gateway.version>1.6.0</gateway.version>
+        <metrics.client.version>1.6.1</metrics.client.version>
+        <metrics.server.version>1.6.1</metrics.server.version>
+        <gateway.version>1.6.1</gateway.version>
     </properties>
 
     <licenses>
