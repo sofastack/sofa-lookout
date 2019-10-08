@@ -17,6 +17,7 @@ RUN mkdir -p /root/.m2 && \
   cd ~ && \
   rm -rf /root/.m2 $deploy_path/source && \
   useradd admin && \
+  mkdir -p /home/admin/logs /home/admin/lookout_gateway_queue_cache && \
   chown -R admin:admin /home/admin
 
 EXPOSE 6200 7200 9090
