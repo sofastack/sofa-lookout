@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.alipay.sofa.lookout</groupId>
         <artifactId>lookout-parent</artifactId>
-        <version>1.6.1</version>
+        <version>1.6.2-SNAPSHOT</version>
     </parent>
     <groupId>com.alipay.sofa.lookout</groupId>
     <artifactId>lookout-server-parent</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>It is a metrics project</description>
