@@ -22,7 +22,7 @@
         <metrics.version>3.1.2</metrics.version>
         <fastjson.version>1.2.49</fastjson.version>
         <log4j2.version>2.3</log4j2.version>
-        <netty.version>4.0.36.Final</netty.version>
+        <netty.version>4.1.42.Final</netty.version>
         <license.maven.plugin>3.0</license.maven.plugin>
         <cobertura.maven.plugin>2.6</cobertura.maven.plugin>
         <coveralls.maven.plugin>3.1.0</coveralls.maven.plugin>
