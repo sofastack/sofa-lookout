@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>com.alipay.sofa.lookout</groupId>
 		<artifactId>lookout-server-parent</artifactId>
-		<version>1.6.2-SNAPSHOT</version>
+		<version>1.6.1</version>
 		<relativePath>../../server/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>lookout-metrics-server-bootstrap</artifactId>
-	<version>1.6.2-SNAPSHOT</version>
+	<version>1.6.1</version>
 	<properties>
 		<metrics.server.version>1.6.1</metrics.server.version>
 		<sofa.lookout.ark.version>1.6.1</sofa.lookout.ark.version>
