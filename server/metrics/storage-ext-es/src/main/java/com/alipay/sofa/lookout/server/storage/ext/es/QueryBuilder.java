@@ -111,7 +111,7 @@ class QueryBuilder {
         }
 
         public StringQuery addTagCond(String tagKey, String tagValExpr) {
-            String expr = "tags:" + tagKey + "=" + tagValExpr;
+            String expr = "tags.keyword:" + tagKey + "=" + tagValExpr;
             valueExprs.add(expr);
             return this;
         }
