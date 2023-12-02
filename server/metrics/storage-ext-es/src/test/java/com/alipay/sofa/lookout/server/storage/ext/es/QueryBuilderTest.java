@@ -38,7 +38,7 @@ public class QueryBuilderTest {
         System.out.println(qry);
         Assert
             .assertEquals(
-                "{\"size\":10000,\"query\":{\"bool\":{\"must\":[{\"query_string\":{\"query\":\"tags:zone=G*\"}},{\"regexp\":{\"tags\":\"tags=.*ms\"}},{\"range\":{\"time\":{\"gte\":1556525226597,\"lte\":1556525226597,\"format\":\"epoch_millis\"}}}],\"must_not\":[{\"query_string\":{\"query\":\"tags:zone=G*\"}},{\"regexp\":{\"tags\":\"tags=.*ms\"}}]}}}",
+                "{\"size\":10000,\"query\":{\"bool\":{\"must\":[{\"query_string\":{\"query\":\"tags.keyword:zone=G*\"}},{\"regexp\":{\"tags\":\"tags=.*ms\"}},{\"range\":{\"time\":{\"gte\":1556525226597,\"lte\":1556525226597,\"format\":\"epoch_millis\"}}}],\"must_not\":[{\"query_string\":{\"query\":\"tags.keyword:zone=G*\"}},{\"regexp\":{\"tags\":\"tags=.*ms\"}}]}}}",
                 qry);
     }
 
@@ -52,7 +52,7 @@ public class QueryBuilderTest {
         System.out.println(qry);
         Assert
             .assertEquals(
-                "{\"size\":10000,\"query\":{\"bool\":{\"must\":[{\"query_string\":{\"query\":\"tags:zone=G*\"}},{\"regexp\":{\"tags\":\"tags=.*ms\"}},{\"range\":{\"time\":{\"gte\":1556525491882,\"lte\":1556525491882,\"format\":\"epoch_millis\"}}}],\"must_not\":[]}}}",
+                "{\"size\":10000,\"query\":{\"bool\":{\"must\":[{\"query_string\":{\"query\":\"tags.keyword:zone=G*\"}},{\"regexp\":{\"tags\":\"tags=.*ms\"}},{\"range\":{\"time\":{\"gte\":1556525491882,\"lte\":1556525491882,\"format\":\"epoch_millis\"}}}],\"must_not\":[]}}}",
                 qry);
     }
 
@@ -69,7 +69,7 @@ public class QueryBuilderTest {
         QueryBuilder.StringQuery stringQuery = new QueryBuilder.StringQuery();
         stringQuery.addTagCond("zone", "G*").addTagCond("app", "zk");
         System.out.println(stringQuery);
-        Assert.assertEquals("{\"query_string\":{\"query\":\"tags:zone=G* AND tags:app=zk\"}}",
+        Assert.assertEquals("{\"query_string\":{\"query\":\"tags.keyword:zone=G* AND tags.keyword:app=zk\"}}",
             stringQuery.toString());
 
         stringQuery = new QueryBuilder.StringQuery();
