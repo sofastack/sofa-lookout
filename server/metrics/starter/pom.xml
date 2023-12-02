@@ -75,12 +75,12 @@
                 <repository>
                     <id>nexus-server@alipay</id>
                     <name>Alipay Release Repository</name>
-                    <url>http://mvn.dev.alipay.net:8081/artifactory/content/repositories/Alipay-Releases</url>
+                    <url>https://mvn.dev.alipay.net:8081/artifactory/content/repositories/Alipay-Releases</url>
                 </repository>
                 <snapshotRepository>
                     <id>nexus-server@alipay</id>
                     <name>Alipay Snapshot Repository</name>
-                    <url>http://mvn.dev.alipay.net:8081/artifactory/content/repositories/Alipay-Snapshot</url>
+                    <url>https://mvn.dev.alipay.net:8081/artifactory/content/repositories/Alipay-Snapshot</url>
                 </snapshotRepository>
             </distributionManagement>
         </profile>
